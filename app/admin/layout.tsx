@@ -10,7 +10,7 @@ export default async function AdminLayout({
 
   return (
     <AdminShell
-      role={viewer.role}
+      role={viewer.role as "admin" | "super_admin"}
       email={viewer.email}
       impersonating={viewer.impersonating}
     >
