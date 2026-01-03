@@ -69,12 +69,15 @@ export default async function AdminOverviewPage() {
         <div className="rounded-3xl border border-[#d6d2c6] bg-white/80 p-6 shadow-[0_18px_60px_rgba(27,24,19,0.08)] backdrop-blur">
           <p className="text-xs uppercase tracking-[0.3em] text-[#7b756a]">Avg. confidence</p>
           <div className="mt-4 space-y-2 text-sm text-[#4f4a40]">
-            {Object.entries(stats.avg_confidence_by_verdict).map(([verdict, avg]) => (
-              <div key={verdict} className="flex items-center justify-between">
-                <span>{verdict}</span>
-                <span className="text-[#1f1d18]">{avg.toFixed(1)}%</span>
-              </div>
-            ))}
+            {Object.entries(stats.avg_confidence_by_verdict).map(([verdict, avg]) => {
+              const value = typeof avg === "number" && Number.isFinite(avg) ? avg : 0;
+              return (
+                <div key={verdict} className="flex items-center justify-between">
+                  <span>{verdict}</span>
+                  <span className="text-[#1f1d18]">{value.toFixed(1)}%</span>
+                </div>
+              );
+            })}
           </div>
         </div>
       </div>
