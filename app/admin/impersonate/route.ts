@@ -53,11 +53,12 @@ export async function GET(request: Request) {
     return NextResponse.redirect(new URL("/admin/users", request.url));
   }
 
-  const { data: target } = await admin
+  const { data: targetData } = await admin
     .from("profiles")
     .select("email")
     .eq("id", session.target_user_id)
     .single();
+  const target = (targetData as { email: string | null } | null) ?? null;
 
   await admin
     .from("impersonation_sessions")
