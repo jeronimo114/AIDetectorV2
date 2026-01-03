@@ -9,6 +9,14 @@ const toNumber = (value: string | undefined, fallback: number) => {
   return Number.isFinite(parsed) ? parsed : fallback;
 };
 
+type RunRow = {
+  id: string;
+  verdict: string | null;
+  confidence: number | null;
+  webhook_status: "success" | "error" | "timeout";
+  created_at: string;
+};
+
 export default async function AdminRunsPage({
   searchParams
 }: {
@@ -21,7 +29,8 @@ export default async function AdminRunsPage({
   const from = searchParams.from;
   const to = searchParams.to;
 
-  const runs = await adminListRuns({ page, perPage: 25, verdict, status, q, from, to });
+  const runsData = await adminListRuns({ page, perPage: 25, verdict, status, q, from, to });
+  const runs: RunRow[] = Array.isArray(runsData) ? (runsData as RunRow[]) : [];
 
   const params = new URLSearchParams();
   if (verdict) params.set("verdict", verdict);

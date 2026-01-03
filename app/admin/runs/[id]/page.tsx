@@ -4,12 +4,27 @@ import StatusPill from "@/components/admin/StatusPill";
 import { adminGetRun } from "@/lib/admin/runs";
 import { markRunReviewed, rerunAnalysis } from "@/app/admin/runs/actions";
 
+type AdminRun = {
+  id: string;
+  user_id: string;
+  input_text: string | null;
+  verdict: string | null;
+  confidence: number | null;
+  webhook_status: "success" | "error" | "timeout";
+  error_message: string | null;
+  breakdown: unknown;
+  signals: unknown;
+  raw_response: unknown;
+  reviewed: boolean;
+  review_label: string | null;
+};
+
 export default async function AdminRunDetailPage({
   params
 }: {
   params: { id: string };
 }) {
-  const run = await adminGetRun(params.id);
+  const run = (await adminGetRun(params.id)) as AdminRun;
 
   async function handleReview(formData: FormData) {
     "use server";

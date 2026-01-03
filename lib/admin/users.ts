@@ -30,8 +30,10 @@ export async function adminListUsers(params: z.infer<typeof listSchema>) {
 
   const { data: counts } = await admin.rpc("admin_run_counts", { user_ids: userIds });
 
-  const profileMap = new Map(profiles?.map((profile) => [profile.id, profile]) ?? []);
-  const countMap = new Map(counts?.map((row: { user_id: string; run_count: number }) => [row.user_id, row.run_count]) ?? []);
+  const profileRows = Array.isArray(profiles) ? profiles : [];
+  const countRows = Array.isArray(counts) ? (counts as { user_id: string; run_count: number }[]) : [];
+  const profileMap = new Map(profileRows.map((profile) => [profile.id, profile]));
+  const countMap = new Map(countRows.map((row) => [row.user_id, row.run_count]));
 
   const enriched = users.map((user) => {
     const profile = profileMap.get(user.id);

@@ -45,11 +45,13 @@ export async function rerunAnalysis(runId: string) {
   const viewer = await requireAdmin();
   const admin = getSupabaseAdminClient();
 
-  const { data: run } = await admin
+  const { data } = await admin
     .from("analysis_runs")
     .select("id, user_id, input_text")
     .eq("id", runId)
     .single();
+
+  const run = data as { id: string; user_id: string; input_text: string | null } | null;
 
   if (!run) {
     throw new Error("Run not found.");
@@ -76,7 +78,7 @@ export async function rerunAnalysis(runId: string) {
   const controller = new AbortController();
   const timeoutId = setTimeout(() => controller.abort(), timeoutSeconds * 1000);
 
-  let responseData: any = null;
+  let responseData: Record<string, unknown> | null = null;
   let status: "success" | "error" | "timeout" = "success";
   let errorMessage: string | null = null;
 
@@ -95,7 +97,7 @@ export async function rerunAnalysis(runId: string) {
       signal: controller.signal
     });
 
-    responseData = await response.json();
+    responseData = (await response.json()) as Record<string, unknown>;
 
     if (!response.ok) {
       status = "error";
@@ -108,20 +110,22 @@ export async function rerunAnalysis(runId: string) {
     clearTimeout(timeoutId);
   }
 
-  const verdict = responseData?.verdict ?? null;
+  const verdict = typeof responseData?.verdict === "string" ? responseData.verdict : null;
   const confidence = typeof responseData?.confidence === "number"
     ? Math.round(responseData.confidence * 10000) / 100
     : null;
+  const inputText = typeof run.input_text === "string" ? run.input_text : null;
+  const charCount = typeof inputText === "string" ? inputText.length : null;
 
   const { error } = await admin.from("analysis_runs").insert({
     user_id: run.user_id,
-    input_text: run.input_text,
-    char_count: run.input_text?.length ?? null,
+    input_text: inputText,
+    char_count: charCount,
     verdict,
     confidence,
     breakdown: responseData?.breakdown ?? null,
     signals: responseData?.signals ?? null,
-    model: responseData?.model ?? null,
+    model: typeof responseData?.model === "string" ? responseData.model : null,
     webhook_status: status,
     error_message: errorMessage,
     raw_response: responseData,

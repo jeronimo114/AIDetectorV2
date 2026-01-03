@@ -4,11 +4,34 @@ import { adminGetLatestActivity, adminGetOverviewStats } from "@/lib/admin/overv
 
 const formatPercent = (value: number) => `${Math.round(value * 100)}%`;
 
+type ActivityRun = {
+  id: string;
+  verdict: string | null;
+  created_at: string;
+};
+
+type ActivityUser = {
+  id: string;
+  email: string | null;
+  created_at: string;
+};
+
+type ActivityAudit = {
+  id: string;
+  action: string;
+  target_type: string;
+  target_id: string | null;
+  created_at: string;
+};
+
 export default async function AdminOverviewPage() {
   const [stats, activity] = await Promise.all([
     adminGetOverviewStats(),
     adminGetLatestActivity()
   ]);
+  const runs: ActivityRun[] = Array.isArray(activity.runs) ? (activity.runs as ActivityRun[]) : [];
+  const users: ActivityUser[] = Array.isArray(activity.users) ? (activity.users as ActivityUser[]) : [];
+  const audits: ActivityAudit[] = Array.isArray(activity.audits) ? (activity.audits as ActivityAudit[]) : [];
 
   return (
     <div className="space-y-8">
@@ -60,7 +83,7 @@ export default async function AdminOverviewPage() {
         <div className="rounded-3xl border border-[#d6d2c6] bg-white/80 p-6 shadow-[0_18px_60px_rgba(27,24,19,0.08)] backdrop-blur">
           <p className="text-xs uppercase tracking-[0.3em] text-[#7b756a]">Latest runs</p>
           <ul className="mt-4 space-y-3 text-sm text-[#4f4a40]">
-            {activity.runs.map((run) => (
+            {runs.map((run) => (
               <li key={run.id} className="flex items-center justify-between">
                 <span>{new Date(run.created_at).toLocaleString()}</span>
                 <StatusPill
@@ -75,7 +98,7 @@ export default async function AdminOverviewPage() {
         <div className="rounded-3xl border border-[#d6d2c6] bg-white/80 p-6 shadow-[0_18px_60px_rgba(27,24,19,0.08)] backdrop-blur">
           <p className="text-xs uppercase tracking-[0.3em] text-[#7b756a]">Latest signups</p>
           <ul className="mt-4 space-y-3 text-sm text-[#4f4a40]">
-            {activity.users.map((user) => (
+            {users.map((user) => (
               <li key={user.id} className="flex items-center justify-between">
                 <span className="truncate">{user.email ?? user.id}</span>
                 <span className="text-xs text-[#6a6459]">
@@ -89,7 +112,7 @@ export default async function AdminOverviewPage() {
         <div className="rounded-3xl border border-[#d6d2c6] bg-white/80 p-6 shadow-[0_18px_60px_rgba(27,24,19,0.08)] backdrop-blur">
           <p className="text-xs uppercase tracking-[0.3em] text-[#7b756a]">Admin actions</p>
           <ul className="mt-4 space-y-3 text-sm text-[#4f4a40]">
-            {activity.audits.map((audit) => (
+            {audits.map((audit) => (
               <li key={audit.id} className="space-y-1">
                 <p className="text-[#1f1d18]">{audit.action}</p>
                 <p className="text-xs text-[#6a6459]">

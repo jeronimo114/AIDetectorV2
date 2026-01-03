@@ -13,13 +13,24 @@ import {
   updateUserStatus
 } from "@/app/admin/users/actions";
 
+type UserDetail = {
+  id: string;
+  email: string | null;
+  created_at: string;
+  last_sign_in_at: string | null;
+  role: "user" | "admin" | "super_admin";
+  status: "active" | "suspended";
+  admin_notes: string;
+  runs: { id: string; verdict: string | null; confidence: number | null; created_at: string }[];
+};
+
 export default async function AdminUserDetailPage({
   params
 }: {
   params: { id: string };
 }) {
   const viewer = await requireAdmin();
-  const user = await adminGetUser(params.id);
+  const user = (await adminGetUser(params.id)) as UserDetail | null;
 
   if (!user) {
     return (

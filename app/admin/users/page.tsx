@@ -9,6 +9,15 @@ const toNumber = (value: string | undefined, fallback: number) => {
   return Number.isFinite(parsed) ? parsed : fallback;
 };
 
+type UserRow = {
+  id: string;
+  email: string | null;
+  created_at: string;
+  role: "user" | "admin" | "super_admin";
+  status: "active" | "suspended";
+  runs_count: number;
+};
+
 export default async function AdminUsersPage({
   searchParams
 }: {
@@ -19,7 +28,22 @@ export default async function AdminUsersPage({
   const role = searchParams.role as "user" | "admin" | "super_admin" | undefined;
   const status = searchParams.status as "active" | "suspended" | undefined;
 
-  const { users } = await adminListUsers({ page, perPage: 25, q, role, status });
+  const { users: usersData } = await adminListUsers({ page, perPage: 25, q, role, status });
+  const users: UserRow[] = Array.isArray(usersData)
+    ? usersData.map((user) => {
+        const roleValue =
+          user.role === "admin" || user.role === "super_admin" ? user.role : "user";
+        const statusValue = user.status === "suspended" ? "suspended" : "active";
+        return {
+          id: String(user.id),
+          email: typeof user.email === "string" ? user.email : null,
+          created_at: String(user.created_at),
+          role: roleValue,
+          status: statusValue,
+          runs_count: typeof user.runs_count === "number" ? user.runs_count : 0
+        };
+      })
+    : [];
 
   const params = new URLSearchParams();
   if (q) params.set("q", q);

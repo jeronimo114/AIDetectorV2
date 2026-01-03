@@ -48,7 +48,7 @@ export async function requireAdmin(): Promise<ViewerContext> {
 
   return {
     userId: user.id,
-    email: user.email,
+    email: user.email ?? null,
     role: profile.role,
     status: profile.status,
     impersonating: impersonateUserId
