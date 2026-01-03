@@ -58,7 +58,8 @@ export async function GET(request: Request) {
     .select("email")
     .eq("id", session.target_user_id)
     .single();
-  const target = (targetData as { email: string | null } | null) ?? null;
+  const target = (targetData as { email?: string | null } | null) ?? null;
+  const targetEmail = typeof target?.email === "string" ? target.email : "";
 
   await admin
     .from("impersonation_sessions")
@@ -75,7 +76,7 @@ export async function GET(request: Request) {
   });
   response.cookies.set({
     name: "impersonate_user_email",
-    value: target?.email ?? "",
+    value: targetEmail,
     httpOnly: false,
     sameSite: "lax",
     path: "/"
