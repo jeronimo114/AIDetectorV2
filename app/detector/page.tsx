@@ -594,6 +594,24 @@ export default function Home() {
 
   return (
     <main className="relative min-h-screen overflow-hidden bg-[#f7f7f4]">
+      {isLoading && (
+        <div className="fixed inset-0 z-[60] flex items-center justify-center bg-[#f7f7f4]/95 backdrop-blur">
+          <div className="w-full max-w-md px-6" role="status" aria-live="polite">
+            <p className="text-xs uppercase tracking-[0.3em] text-[#7a7670]">
+              Processing
+            </p>
+            <p className="mt-3 text-lg font-semibold text-[#1f1f1c]">
+              Analyzing signals...
+            </p>
+            <div className="mt-6 h-2 w-full overflow-hidden rounded-full bg-[#d8d6cf]">
+              <div className="h-full w-2/3 rounded-full bg-[#2f3e4e] animate-[loading-bar_2.4s_ease-in-out_infinite]" />
+            </div>
+            <p className="mt-4 text-xs text-[#7a7670]">
+              This may take a few seconds.
+            </p>
+          </div>
+        </div>
+      )}
       <div className="pointer-events-none absolute inset-0">
         <div className="absolute -top-32 left-1/2 h-80 w-80 -translate-x-1/2 rounded-full bg-[#e6ecf1] opacity-70 blur-3xl" />
         <div className="absolute top-40 right-6 h-56 w-56 rounded-full bg-[#edf2f5] opacity-60 blur-3xl" />
