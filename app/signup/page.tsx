@@ -1,13 +1,15 @@
 "use client";
 
 import Link from "next/link";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { useState, type FormEvent } from "react";
 
 import { getSupabaseBrowserClient } from "@/lib/supabase/client";
 
 export default function SignupPage() {
   const router = useRouter();
+  const searchParams = useSearchParams();
+  const redirectedFrom = searchParams.get("redirectedFrom");
   const supabase = getSupabaseBrowserClient();
 
   const [email, setEmail] = useState("");
@@ -33,8 +35,13 @@ export default function SignupPage() {
       return;
     }
 
+    const safeRedirect =
+      redirectedFrom && redirectedFrom.startsWith("/") && !redirectedFrom.startsWith("//")
+        ? redirectedFrom
+        : "/dashboard";
+
     if (data.session) {
-      router.push("/dashboard");
+      router.push(safeRedirect);
       router.refresh();
       return;
     }

@@ -93,8 +93,8 @@ export default function SiteHeader() {
       : normalizedPlan === "starter"
         ? "border-[#c9d5de] bg-[#edf2f5] text-[#2f3e4e]"
         : "border-[#d8d6cf] bg-[#f3f3ef] text-[#4c4b45]";
-  const detectorActive = pathname === "/";
-  const detectorLabel = detectorActive ? "Detector" : "Back to detector";
+  const detectorActive = pathname === "/detector";
+  const detectorLabel = detectorActive ? "Detector" : "Go to detector";
   const detectorClassName = detectorActive
     ? "inline-flex items-center justify-center rounded-full border border-[#c9d5de] bg-[#edf2f5] px-4 py-2 text-[11px] font-semibold uppercase tracking-[0.16em] text-[#2f3e4e] shadow-[inset_0_0_0_1px_rgba(47,62,78,0.06)]"
     : "inline-flex items-center justify-center rounded-full border border-[#2f3e4e] bg-[#2f3e4e] px-4 py-2 text-[11px] font-semibold uppercase tracking-[0.16em] text-[#f7f7f4] shadow-[0_8px_24px_rgba(31,42,54,0.18)] transition hover:bg-[#27323f]";
@@ -127,9 +127,9 @@ export default function SiteHeader() {
         </Link>
         <nav className="flex items-center gap-6">
           <LoadingLink
-            href="/"
+            href="/detector"
             className={detectorClassName}
-            aria-label="Go back to the detector"
+            aria-label="Go to the detector"
             aria-current={detectorActive ? "page" : undefined}
             leadingIcon={detectorIcon}
           >

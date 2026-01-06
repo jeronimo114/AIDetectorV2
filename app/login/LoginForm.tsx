@@ -10,6 +10,10 @@ export default function LoginForm() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const redirectedFrom = searchParams.get("redirectedFrom");
+  const safeRedirect =
+    redirectedFrom && redirectedFrom.startsWith("/") && !redirectedFrom.startsWith("//")
+      ? redirectedFrom
+      : "/dashboard";
   const supabase = getSupabaseBrowserClient();
 
   const [email, setEmail] = useState("");
@@ -33,7 +37,7 @@ export default function LoginForm() {
       return;
     }
 
-    router.push("/dashboard");
+    router.push(safeRedirect);
     router.refresh();
   };
 
