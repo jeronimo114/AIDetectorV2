@@ -1,5 +1,7 @@
 import Link from "next/link";
 
+import LoadingLink from "@/components/LoadingLink";
+
 import FilterBar from "@/components/admin/FilterBar";
 import StatusPill from "@/components/admin/StatusPill";
 import { adminListRuns } from "@/lib/admin/runs";
@@ -95,12 +97,12 @@ export default async function AdminRunsPage({
             Filter
           </button>
         </form>
-        <Link
+        <LoadingLink
           href={`/admin/reports/export?verdict=${verdict ?? ""}&status=${status ?? ""}&from=${from ?? ""}&to=${to ?? ""}`}
           className="rounded-full border border-[#b9b4a6] px-4 py-2 text-xs font-semibold uppercase tracking-[0.2em] text-[#4f4a40]"
         >
           Export CSV
-        </Link>
+        </LoadingLink>
       </FilterBar>
 
       <div className="rounded-3xl border border-[#d6d2c6] bg-white/80 p-4 shadow-[0_18px_60px_rgba(27,24,19,0.08)] backdrop-blur">

@@ -1,9 +1,10 @@
 "use client";
 
 import Link from "next/link";
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState, type ChangeEvent } from "react";
 import type { User } from "@supabase/supabase-js";
 
+import LoadingLink from "@/components/LoadingLink";
 import TipRotator from "@/components/TipRotator";
 import WhatChangedPanel from "@/components/WhatChangedPanel";
 import type { Comparison, Verdict } from "@/lib/analysis/compare";
@@ -14,6 +15,7 @@ const MIN_CHARS = 80;
 const MAX_CHARS = 12000;
 const FREE_MAX_CHARS = 1500;
 const TIMEOUT_MS = 20000;
+const FILE_ACCEPT = ".txt,.md,text/plain,text/markdown";
 const WEBHOOK_URL = process.env.NEXT_PUBLIC_N8N_WEBHOOK_URL ?? "";
 
 type PreferredResponse = {
@@ -131,6 +133,7 @@ const isPreferredResponse = (value: unknown): value is PreferredResponse => {
 export default function Home() {
   const supabase = getSupabaseBrowserClient();
   const textareaRef = useRef<HTMLTextAreaElement | null>(null);
+  const fileInputRef = useRef<HTMLInputElement | null>(null);
   const [text, setText] = useState("");
   const [result, setResult] = useState<ResultState | null>(null);
   const [latestSnapshot, setLatestSnapshot] = useState<RunSnapshot | null>(null);
@@ -139,12 +142,15 @@ export default function Home() {
   const [comparisonBase, setComparisonBase] = useState<RunSnapshot | null>(null);
   const [upgradeIntent, setUpgradeIntent] = useState<null | "edit">(null);
   const [isLoading, setIsLoading] = useState(false);
+  const [isFileLoading, setIsFileLoading] = useState(false);
   const [requestError, setRequestError] = useState<string | null>(null);
+  const [fileError, setFileError] = useState<string | null>(null);
   const [saveError, setSaveError] = useState<string | null>(null);
   const [user, setUser] = useState<User | null>(null);
   const [authReady, setAuthReady] = useState(false);
   const [tipsEnabled, setTipsEnabled] = useState(true);
   const [timeoutMs, setTimeoutMs] = useState(TIMEOUT_MS);
+  const [uploadedFileName, setUploadedFileName] = useState<string | null>(null);
 
   useEffect(() => {
     let isMounted = true;
@@ -222,7 +228,8 @@ export default function Home() {
   const maxChars = plan === "free" ? FREE_MAX_CHARS : MAX_CHARS;
   const exceedsMax = charCount > maxChars;
 
-  const canAnalyze = !isLoading && !exceedsMax && !underMin && !isWebhookMissing;
+  const canAnalyze =
+    !isLoading && !isFileLoading && !exceedsMax && !underMin && !isWebhookMissing;
 
   const confidencePercent = useMemo(() => {
     if (!result || result.type !== "preferred") {
@@ -265,11 +272,13 @@ export default function Home() {
     setText("");
     setResult(null);
     setRequestError(null);
+    setFileError(null);
     setSaveError(null);
     setPendingEdit(null);
     setComparison(null);
     setComparisonBase(null);
     setUpgradeIntent(null);
+    setUploadedFileName(null);
   };
 
   const persistRun = async (
@@ -380,7 +389,7 @@ export default function Home() {
   };
 
   const handleAnalyze = async () => {
-    if (isLoading) {
+    if (isLoading || isFileLoading) {
       return;
     }
 
@@ -403,6 +412,7 @@ export default function Home() {
 
     setIsLoading(true);
     setRequestError(null);
+    setFileError(null);
     setSaveError(null);
     setResult(null);
     setComparison(null);
@@ -515,6 +525,36 @@ export default function Home() {
     textareaRef.current?.scrollIntoView({ behavior: "smooth", block: "center" });
   };
 
+  const handleFileUpload = async (event: ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (!file) {
+      return;
+    }
+    setIsFileLoading(true);
+    setFileError(null);
+
+    try {
+      const content = await file.text();
+      if (content.length > maxChars) {
+        setUploadedFileName(null);
+        setFileError(
+          `File has ${content.length} characters, which exceeds the ${maxChars} character limit for your plan.`
+        );
+        return;
+      }
+      handleClear();
+      setText(content);
+      setUploadedFileName(file.name);
+      focusTextarea();
+    } catch {
+      setUploadedFileName(null);
+      setFileError("We could not read that file.");
+    } finally {
+      setIsFileLoading(false);
+      event.target.value = "";
+    }
+  };
+
   const startEditFromSnapshot = (snapshot: RunSnapshot | null) => {
     if (!snapshot) {
       return;
@@ -525,6 +565,8 @@ export default function Home() {
     }
     setPendingEdit(snapshot);
     setText(snapshot.inputText);
+    setUploadedFileName(null);
+    setFileError(null);
     setRequestError(null);
     setComparison(null);
     setUpgradeIntent(null);
@@ -583,6 +625,46 @@ export default function Home() {
               {charCount}/{maxChars}
             </span>
           </div>
+          <div className="mt-3 flex flex-wrap items-center justify-between gap-3">
+            <div className="flex flex-wrap items-center gap-2 text-xs text-[#7a7670]">
+              <span>Upload a .txt or .md file.</span>
+              {uploadedFileName && (
+                <span
+                  className="max-w-[220px] truncate text-[#4c4b45]"
+                  title={uploadedFileName}
+                >
+                  Loaded: {uploadedFileName}
+                </span>
+              )}
+            </div>
+            <div className="flex items-center gap-2">
+              <input
+                ref={fileInputRef}
+                type="file"
+                accept={FILE_ACCEPT}
+                className="hidden"
+                onChange={handleFileUpload}
+              />
+              <button
+                type="button"
+                className="inline-flex items-center justify-center gap-2 rounded-full border border-[#c4c1b8] px-4 py-2 text-xs font-semibold uppercase tracking-[0.2em] text-[#4c4b45] transition hover:border-[#9b978f] disabled:cursor-not-allowed disabled:opacity-50"
+                onClick={() => fileInputRef.current?.click()}
+                disabled={isLoading || isFileLoading}
+                aria-busy={isFileLoading}
+              >
+                <span
+                  className={`h-3 w-3 rounded-full border-2 border-current border-t-transparent transition-opacity ${
+                    isFileLoading ? "animate-spin opacity-100" : "opacity-0"
+                  }`}
+                  aria-hidden="true"
+                />
+                {isFileLoading ? "Loading..." : "Choose file"}
+              </button>
+            </div>
+          </div>
+          {fileError && (
+            <p className="mt-2 text-xs text-[#6a4033]">{fileError}</p>
+          )}
           {pendingEdit && (
             <p className="mt-3 text-xs uppercase tracking-[0.25em] text-[#7a7670]">
               Editing previous run from {new Date(pendingEdit.receivedAt).toLocaleString()}
@@ -593,7 +675,10 @@ export default function Home() {
             className="mt-4 min-h-[260px] w-full resize-none rounded-2xl border border-[#d8d6cf] bg-white/90 p-4 text-base leading-relaxed text-[#1f1f1c] shadow-sm transition focus:border-[#8fa3b5] focus:outline-none focus:ring-4 focus:ring-[#d7e1ea] disabled:opacity-70"
             placeholder="Paste or type your draft here."
             value={text}
-            onChange={(event) => setText(event.target.value)}
+            onChange={(event) => {
+              setText(event.target.value);
+              setFileError(null);
+            }}
             disabled={isLoading}
           />
           <div className="mt-4 flex flex-wrap items-center justify-between gap-4">
@@ -624,7 +709,7 @@ export default function Home() {
                 type="button"
                 className="inline-flex items-center justify-center rounded-full border border-[#c4c1b8] px-5 py-3 text-xs font-semibold uppercase tracking-[0.3em] text-[#4c4b45] transition hover:border-[#9b978f] disabled:cursor-not-allowed disabled:opacity-50"
                 onClick={handleClear}
-                disabled={isLoading || text.length === 0}
+                disabled={isLoading || isFileLoading || text.length === 0}
               >
                 Clear
               </button>
@@ -915,12 +1000,12 @@ export default function Home() {
                 </button>
               </div>
               <div className="mt-4 flex flex-wrap items-center gap-3">
-                <Link
+                <LoadingLink
                   href="/pricing"
                   className="rounded-full bg-[#2f3e4e] px-5 py-2 text-xs font-semibold uppercase tracking-[0.3em] text-[#f7f7f4] transition hover:bg-[#3b4d60]"
                 >
                   Upgrade to Starter
-                </Link>
+                </LoadingLink>
               </div>
             </div>
           </div>
@@ -957,7 +1042,7 @@ export default function Home() {
           className="mt-auto pt-12 text-xs uppercase tracking-[0.3em] text-[#7a7670] opacity-0 animate-fade-in"
           style={{ animationDelay: "240ms" }}
         >
-          Text is sent to your analysis endpoint.
+          You control where your text is analyzed.
         </footer>
       </div>
     </main>

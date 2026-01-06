@@ -10,6 +10,7 @@ import { logAdminAction } from "@/lib/admin/audit";
 
 const roleSchema = z.enum(["user", "admin", "super_admin"]);
 const statusSchema = z.enum(["active", "suspended"]);
+const planSchema = z.enum(["free", "starter", "pro"]);
 
 export async function updateUserRole(userId: string, role: string) {
   const viewer = await requireSuperAdmin();
@@ -98,6 +99,44 @@ export async function updateAdminNotes(userId: string, formData: FormData) {
     targetId: userId,
     before,
     after: { admin_notes: notes }
+  });
+}
+
+export async function updateUserPlan(userId: string, formData: FormData) {
+  const viewer = await requireAdmin();
+  const nextPlan = planSchema.parse(String(formData.get("plan") ?? "free"));
+  const admin = getSupabaseAdminClient();
+
+  const { data: userResponse, error: userError } = await admin.auth.admin.getUserById(userId);
+  if (userError || !userResponse.user) {
+    throw new Error(userError?.message ?? "User not found.");
+  }
+
+  const beforePlan =
+    typeof userResponse.user.user_metadata?.plan === "string"
+      ? userResponse.user.user_metadata.plan
+      : "free";
+
+  const nextMetadata = {
+    ...(userResponse.user.user_metadata ?? {}),
+    plan: nextPlan
+  };
+
+  const { error } = await admin.auth.admin.updateUserById(userId, {
+    user_metadata: nextMetadata
+  });
+
+  if (error) {
+    throw new Error(error.message);
+  }
+
+  await logAdminAction({
+    actorId: viewer.userId,
+    action: "user.plan.update",
+    targetType: "user",
+    targetId: userId,
+    before: { plan: beforePlan },
+    after: { plan: nextPlan }
   });
 }
 

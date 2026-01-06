@@ -4,6 +4,8 @@ import FilterBar from "@/components/admin/FilterBar";
 import StatusPill from "@/components/admin/StatusPill";
 import { adminListUsers } from "@/lib/admin/users";
 
+export const dynamic = "force-dynamic";
+
 const toNumber = (value: string | undefined, fallback: number) => {
   const parsed = Number(value);
   return Number.isFinite(parsed) ? parsed : fallback;
@@ -25,8 +27,16 @@ export default async function AdminUsersPage({
 }) {
   const page = toNumber(searchParams.page, 1);
   const q = searchParams.q ?? "";
-  const role = searchParams.role as "user" | "admin" | "super_admin" | undefined;
-  const status = searchParams.status as "active" | "suspended" | undefined;
+  const role =
+    searchParams.role === "user" ||
+    searchParams.role === "admin" ||
+    searchParams.role === "super_admin"
+      ? searchParams.role
+      : undefined;
+  const status =
+    searchParams.status === "active" || searchParams.status === "suspended"
+      ? searchParams.status
+      : undefined;
 
   const { users: usersData } = await adminListUsers({ page, perPage: 25, q, role, status });
   const users: UserRow[] = Array.isArray(usersData)

@@ -1,16 +1,25 @@
 import { z } from "zod";
+import { unstable_noStore as noStore } from "next/cache";
 
 import { getSupabaseAdminClient } from "@/lib/supabase/admin";
+
+const emptyToUndefined = (value: unknown) => {
+  if (typeof value === "string" && value.trim() === "") {
+    return undefined;
+  }
+  return value;
+};
 
 const listSchema = z.object({
   page: z.number().min(1),
   perPage: z.number().min(1).max(50),
   q: z.string().optional(),
-  role: z.enum(["user", "admin", "super_admin"]).optional(),
-  status: z.enum(["active", "suspended"]).optional()
+  role: z.preprocess(emptyToUndefined, z.enum(["user", "admin", "super_admin"]).optional()),
+  status: z.preprocess(emptyToUndefined, z.enum(["active", "suspended"]).optional())
 });
 
 export async function adminListUsers(params: z.infer<typeof listSchema>) {
+  noStore();
   const { page, perPage, q, role, status } = listSchema.parse(params);
   const admin = getSupabaseAdminClient();
 
@@ -65,6 +74,7 @@ export async function adminListUsers(params: z.infer<typeof listSchema>) {
 }
 
 export async function adminGetUser(id: string) {
+  noStore();
   const admin = getSupabaseAdminClient();
   const { data: user } = await admin.auth.admin.getUserById(id);
 
@@ -85,6 +95,13 @@ export async function adminGetUser(id: string) {
     .order("created_at", { ascending: false })
     .limit(20);
 
+  const plan =
+    typeof user.user.user_metadata?.plan === "string"
+      ? user.user.user_metadata.plan.toLowerCase()
+      : "free";
+  const normalizedPlan =
+    plan === "starter" || plan === "pro" ? plan : "free";
+
   return {
     id: user.user.id,
     email: user.user.email,
@@ -93,6 +110,7 @@ export async function adminGetUser(id: string) {
     role: profile?.role ?? "user",
     status: profile?.status ?? "active",
     admin_notes: profile?.admin_notes ?? "",
+    plan: normalizedPlan,
     runs: runs ?? []
   };
 }

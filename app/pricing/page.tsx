@@ -1,5 +1,7 @@
 import Link from "next/link";
 
+import LoadingLink from "@/components/LoadingLink";
+
 const tiers = [
   {
     name: "Free",
@@ -109,7 +111,7 @@ export default function PricingPage() {
                 <span className="text-sm font-medium text-[#7a7670]">/month</span>
               </p>
               <p className="mt-2 text-sm text-[#4c4b45]">{tier.description}</p>
-              <Link
+              <LoadingLink
                 href={tier.ctaHref}
                 className={`mt-5 inline-flex w-full items-center justify-center rounded-full px-4 py-2 text-xs font-semibold uppercase tracking-[0.3em] ${
                   tier.name === "Starter"
@@ -118,7 +120,7 @@ export default function PricingPage() {
                 }`}
               >
                 {tier.cta}
-              </Link>
+              </LoadingLink>
               <ul className="mt-5 space-y-2 text-sm text-[#4c4b45]">
                 {tier.highlights.map((item) => (
                   <li key={item} className="flex gap-2">

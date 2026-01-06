@@ -10,6 +10,7 @@ import { getSupabaseBrowserClient } from "@/lib/supabase/client";
 export default function SiteHeader() {
   const [user, setUser] = useState<User | null>(null);
   const [isReady, setIsReady] = useState(false);
+  const [isLoggingOut, setIsLoggingOut] = useState(false);
   const pathname = usePathname();
   const router = useRouter();
   const supabase = getSupabaseBrowserClient();
@@ -41,9 +42,17 @@ export default function SiteHeader() {
   }, [supabase]);
 
   const handleLogout = async () => {
-    await supabase.auth.signOut();
-    router.push("/login");
-    router.refresh();
+    if (isLoggingOut) {
+      return;
+    }
+    setIsLoggingOut(true);
+    try {
+      await supabase.auth.signOut();
+      router.push("/login");
+      router.refresh();
+    } catch {
+      setIsLoggingOut(false);
+    }
   };
 
   const linkBase =
@@ -80,8 +89,16 @@ export default function SiteHeader() {
               <button
                 type="button"
                 onClick={handleLogout}
-                className={`${linkBase} ${inactive}`}
+                className={`${linkBase} ${inactive} inline-flex items-center gap-2 disabled:opacity-60`}
+                disabled={isLoggingOut}
+                aria-busy={isLoggingOut}
               >
+                <span
+                  className={`h-3 w-3 rounded-full border-2 border-current border-t-transparent transition-opacity ${
+                    isLoggingOut ? "animate-spin opacity-100" : "opacity-0"
+                  }`}
+                  aria-hidden="true"
+                />
                 Logout
               </button>
             </>

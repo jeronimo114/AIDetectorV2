@@ -1,6 +1,7 @@
 import Link from "next/link";
 
 import ConfirmDialog from "@/components/admin/ConfirmDialog";
+import LoadingLink from "@/components/LoadingLink";
 import StatusPill from "@/components/admin/StatusPill";
 import { requireAdmin } from "@/lib/auth/requireRole";
 import { adminGetUser } from "@/lib/admin/users";
@@ -8,6 +9,7 @@ import {
   createImpersonationSession,
   hardDeleteUser,
   softDeleteUser,
+  updateUserPlan,
   updateAdminNotes,
   updateUserRole,
   updateUserStatus
@@ -21,6 +23,7 @@ type UserDetail = {
   role: "user" | "admin" | "super_admin";
   status: "active" | "suspended";
   admin_notes: string;
+  plan: "free" | "starter" | "pro";
   runs: { id: string; verdict: string | null; confidence: number | null; created_at: string }[];
 };
 
@@ -65,6 +68,32 @@ export default async function AdminUserDetailPage({
             <p>
               Status: <StatusPill tone={user.status === "active" ? "success" : "danger"} label={user.status} />
             </p>
+            <p>
+              Plan: <span className="text-[#1f1d18]">{user.plan}</span>
+            </p>
+          </div>
+
+          <div className="mt-4">
+            <form
+              action={updateUserPlan.bind(null, user.id)}
+              className="flex flex-wrap items-center gap-3"
+            >
+              <select
+                name="plan"
+                defaultValue={user.plan}
+                className="rounded-full border border-[#b9b4a6] bg-white px-4 py-2 text-xs"
+              >
+                <option value="free">Free</option>
+                <option value="starter">Starter</option>
+                <option value="pro">Pro</option>
+              </select>
+              <button
+                type="submit"
+                className="rounded-full bg-[#1f2a1f] px-4 py-2 text-xs font-semibold uppercase tracking-[0.2em] text-[#f6f5ef]"
+              >
+                Update plan
+              </button>
+            </form>
           </div>
 
           <div className="mt-6 flex flex-wrap gap-3">
@@ -129,12 +158,12 @@ export default async function AdminUserDetailPage({
             </li>
           ))}
         </ul>
-        <Link
+        <LoadingLink
           href={`/admin/reports/export?user_id=${user.id}`}
           className="mt-4 inline-flex rounded-full border border-[#b9b4a6] px-4 py-2 text-xs font-semibold uppercase tracking-[0.2em] text-[#4f4a40]"
         >
           Export CSV
-        </Link>
+        </LoadingLink>
       </div>
 
       {isSuperAdmin && (

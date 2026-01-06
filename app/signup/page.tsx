@@ -103,7 +103,14 @@ export default function SignupPage() {
               type="submit"
               className="inline-flex w-full items-center justify-center gap-2 rounded-full bg-[#2f3e4e] px-6 py-3 text-xs font-semibold uppercase tracking-[0.3em] text-[#f7f7f4] transition hover:bg-[#3b4d60] disabled:cursor-not-allowed disabled:opacity-50"
               disabled={isLoading}
+              aria-busy={isLoading}
             >
+              <span
+                className={`h-4 w-4 rounded-full border-2 border-[#f7f7f4]/40 border-t-[#f7f7f4] transition-opacity ${
+                  isLoading ? "animate-spin opacity-100" : "opacity-0"
+                }`}
+                aria-hidden="true"
+              />
               {isLoading ? "Creating..." : "Sign up"}
             </button>
           </form>
