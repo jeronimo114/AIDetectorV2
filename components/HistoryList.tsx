@@ -75,8 +75,8 @@ export default function HistoryList({ initialRuns }: HistoryListProps) {
 
   if (runs.length === 0) {
     return (
-      <div className="rounded-3xl border border-[#d6d2c6] bg-white/80 p-6 text-sm text-[#6a6459]">
-        No runs yet. Analyze a sample to populate your history.
+      <div className="rounded-3xl border border-[#d8d6cf] bg-white/85 p-6 text-sm text-[#4c4b45]">
+        No runs yet. Run a check to populate your history.
       </div>
     );
   }
@@ -93,18 +93,18 @@ export default function HistoryList({ initialRuns }: HistoryListProps) {
               onClick={() => setSelectedId(run.id)}
               className={`w-full rounded-2xl border px-4 py-4 text-left transition ${
                 isSelected
-                  ? "border-[#1f2a1f] bg-[#f6f3ea]"
-                  : "border-[#d6d2c6] bg-white/70 hover:border-[#bdb7aa]"
+                  ? "border-[#2f3e4e] bg-[#edf2f5]"
+                  : "border-[#d8d6cf] bg-white/85 hover:border-[#c4c1b8]"
               }`}
             >
-              <div className="flex items-center justify-between text-xs uppercase tracking-[0.2em] text-[#7b756a]">
+              <div className="flex items-center justify-between text-xs uppercase tracking-[0.2em] text-[#7a7670]">
                 <span>{new Date(run.created_at).toLocaleString()}</span>
                 <span>{Math.round(run.result_score * 100)}%</span>
               </div>
-              <p className="mt-2 text-sm font-semibold text-[#1f1d18]">
+              <p className="mt-2 text-sm font-semibold text-[#1f1f1c]">
                 {formatLabel(run.result_label)}
               </p>
-              <p className="mt-2 text-sm text-[#6a6459]">
+              <p className="mt-2 text-sm text-[#7a7670]">
                 {run.input_text.slice(0, 80)}
                 {run.input_text.length > 80 ? "..." : ""}
               </p>
@@ -113,52 +113,52 @@ export default function HistoryList({ initialRuns }: HistoryListProps) {
         })}
       </div>
 
-      <div className="rounded-3xl border border-[#d6d2c6] bg-white/80 p-6">
+      <div className="rounded-3xl border border-[#d8d6cf] bg-white/85 p-6">
         {selectedRun ? (
           <div className="space-y-4">
             <div>
-              <p className="text-xs uppercase tracking-[0.3em] text-[#7b756a]">
+              <p className="text-xs uppercase tracking-[0.3em] text-[#7a7670]">
                 Details
               </p>
-              <p className="mt-2 text-2xl font-semibold text-[#1f1d18]">
+              <p className="mt-2 text-2xl font-semibold text-[#1f1f1c]">
                 {formatLabel(selectedRun.result_label)}
               </p>
-              <p className="mt-1 text-sm text-[#6a6459]">
+              <p className="mt-1 text-sm text-[#7a7670]">
                 {Math.round(selectedRun.result_score * 100)}% confidence
               </p>
             </div>
 
-            <div className="text-sm text-[#4f4a40]">
-              <p className="text-xs uppercase tracking-[0.3em] text-[#7b756a]">
+            <div className="text-sm text-[#4c4b45]">
+              <p className="text-xs uppercase tracking-[0.3em] text-[#7a7670]">
                 Input
               </p>
-              <p className="mt-2 whitespace-pre-wrap text-sm text-[#1f1d18]">
+              <p className="mt-2 whitespace-pre-wrap text-sm text-[#1f1f1c]">
                 {selectedRun.input_text}
               </p>
             </div>
 
-            <div className="grid gap-3 text-sm text-[#4f4a40]">
+            <div className="grid gap-3 text-sm text-[#4c4b45]">
               <div>
-                <p className="text-xs uppercase tracking-[0.3em] text-[#7b756a]">
+                <p className="text-xs uppercase tracking-[0.3em] text-[#7a7670]">
                   Explanation
                 </p>
-                <p className="mt-2 text-sm text-[#1f1d18]">
+                <p className="mt-2 text-sm text-[#1f1f1c]">
                   {selectedRun.explanation || "No explanation provided."}
                 </p>
               </div>
               <div>
-                <p className="text-xs uppercase tracking-[0.3em] text-[#7b756a]">
+                <p className="text-xs uppercase tracking-[0.3em] text-[#7a7670]">
                   Metadata
                 </p>
-                <p className="mt-2 text-sm text-[#1f1d18]">
+                <p className="mt-2 text-sm text-[#1f1f1c]">
                   Provider: {selectedRun.provider ?? "Unknown"}
                 </p>
                 {selectedRun.model && (
-                  <p className="text-sm text-[#1f1d18]">
+                  <p className="text-sm text-[#1f1f1c]">
                     Model: {selectedRun.model}
                   </p>
                 )}
-                <p className="mt-1 text-xs text-[#6a6459]">
+                <p className="mt-1 text-xs text-[#7a7670]">
                   {new Date(selectedRun.created_at).toLocaleString()}
                 </p>
               </div>
@@ -168,18 +168,18 @@ export default function HistoryList({ initialRuns }: HistoryListProps) {
               <button
                 type="button"
                 onClick={() => handleDelete(selectedRun.id)}
-                className="rounded-full border border-[#d1a9a1] px-4 py-2 text-xs font-semibold uppercase tracking-[0.2em] text-[#712d21] transition hover:border-[#b98075] disabled:cursor-not-allowed disabled:opacity-50"
+                className="rounded-full border border-[#d6b8ae] px-4 py-2 text-xs font-semibold uppercase tracking-[0.2em] text-[#6a4033] transition hover:border-[#c7a297] disabled:cursor-not-allowed disabled:opacity-50"
                 disabled={deletingId === selectedRun.id}
               >
                 {deletingId === selectedRun.id ? "Deleting..." : "Delete"}
               </button>
               {error && (
-                <span className="text-xs text-[#8d3b2f]">{error}</span>
+                <span className="text-xs text-[#6a4033]">{error}</span>
               )}
             </div>
           </div>
         ) : (
-          <p className="text-sm text-[#6a6459]">Select a run to view details.</p>
+          <p className="text-sm text-[#7a7670]">Select a run to view details.</p>
         )}
       </div>
     </div>

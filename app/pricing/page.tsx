@@ -4,22 +4,22 @@ const tiers = [
   {
     name: "Free",
     price: "$0",
-    label: "Try it",
-    description: "Trust and habit, not extraction.",
+    label: "Free",
+    description: "For occasional checks.",
     cta: "Start free",
     ctaHref: "/signup",
     highlights: [
       "5 analyses included per day",
       "Up to 1,500 characters per run",
       "Basic verdict + confidence",
-      "History: last 5 runs"
+      "Last 5 runs saved"
     ]
   },
   {
     name: "Starter",
     price: "$4",
-    label: "Most popular",
-    description: "For people who edit, not just check.",
+    label: "Recommended",
+    description: "For regular revisions and guidance.",
     cta: "Upgrade to Starter",
     ctaHref: "/signup",
     highlights: [
@@ -34,9 +34,9 @@ const tiers = [
   {
     name: "Pro",
     price: "$12",
-    label: "Serious option",
-    description: "Proof, iteration, and control.",
-    cta: "Go Pro",
+    label: "Pro",
+    description: "For higher volume and exports.",
+    cta: "Upgrade to Pro",
     ctaHref: "/signup",
     highlights: [
       "500 analyses included per month",
@@ -54,7 +54,7 @@ const tiers = [
 const featureRows = [
   ["Basic verdict", "✓", "✓", "✓"],
   ["Confidence score", "✓", "✓", "✓"],
-  ["Signal breakdown", "✕", "✓", "✓"],
+  ["Signal explanations", "✕", "✓", "✓"],
   ["Edit and recheck", "✕", "✓", "✓"],
   ["What changed feedback", "✕", "✓", "✓"],
   ["Full run history", "✕", "✓", "✓"],
@@ -66,23 +66,23 @@ const featureRows = [
 
 export default function PricingPage() {
   return (
-    <main className="relative min-h-screen overflow-hidden bg-[#f8f7f1]">
+    <main className="relative min-h-screen overflow-hidden bg-[#f7f7f4]">
       <div className="pointer-events-none absolute inset-0">
-        <div className="absolute -top-24 left-1/3 h-64 w-64 -translate-x-1/2 rounded-full bg-[#e5edd8] opacity-60 blur-3xl" />
-        <div className="absolute bottom-10 right-10 h-64 w-64 rounded-full bg-[#f3e3cf] opacity-70 blur-3xl" />
+        <div className="absolute -top-24 left-1/3 h-64 w-64 -translate-x-1/2 rounded-full bg-[#e6ecf1] opacity-60 blur-3xl" />
+        <div className="absolute bottom-10 right-10 h-64 w-64 rounded-full bg-[#edf2f5] opacity-70 blur-3xl" />
       </div>
 
       <div className="relative mx-auto flex w-full max-w-[1000px] flex-col px-6 pb-20 pt-14">
         <header className="max-w-2xl">
-          <p className="text-xs uppercase tracking-[0.4em] text-[#7b756a]">
+          <p className="text-xs uppercase tracking-[0.4em] text-[#7a7670]">
             Pricing
           </p>
-          <h1 className="mt-4 text-4xl font-semibold text-[#1f1d18]">
-            Know what changed. Not just what it is.
+          <h1 className="mt-4 text-4xl font-semibold text-[#1f1f1c]">
+            See the signals. Decide what to change.
           </h1>
-          <p className="mt-4 text-base text-[#4f4a40]">
-            AI Detector helps you understand how small edits affect AI detection.
-            Built for iteration, not guesswork.
+          <p className="mt-4 text-base text-[#4c4b45]">
+            Veridict explains how edits shift detection signals. It supports calm
+            iteration.
           </p>
         </header>
 
@@ -90,39 +90,39 @@ export default function PricingPage() {
           {tiers.map((tier) => (
             <div
               key={tier.name}
-              className={`rounded-3xl border border-[#d6d2c6] bg-white/80 p-6 shadow-[0_18px_60px_rgba(27,24,19,0.08)] backdrop-blur ${
-                tier.name === "Starter" ? "ring-1 ring-[#1f2a1f]" : ""
+              className={`rounded-3xl border border-[#d8d6cf] bg-white/85 p-6 shadow-[0_18px_60px_rgba(27,24,19,0.08)] backdrop-blur ${
+                tier.name === "Starter" ? "ring-1 ring-[#2f3e4e]" : ""
               }`}
             >
               <div className="flex items-center justify-between">
-                <p className="text-xs uppercase tracking-[0.3em] text-[#7b756a]">
+                <p className="text-xs uppercase tracking-[0.3em] text-[#7a7670]">
                   {tier.name}
                 </p>
                 {tier.name === "Starter" && (
-                  <span className="rounded-full border border-[#1f2a1f] px-3 py-1 text-xs uppercase tracking-[0.2em] text-[#1f2a1f]">
-                    Most popular
+                  <span className="rounded-full border border-[#2f3e4e] px-3 py-1 text-xs uppercase tracking-[0.2em] text-[#2f3e4e]">
+                    Recommended
                   </span>
                 )}
               </div>
-              <p className="mt-4 text-3xl font-semibold text-[#1f1d18]">
+              <p className="mt-4 text-3xl font-semibold text-[#1f1f1c]">
                 {tier.price}
-                <span className="text-sm font-medium text-[#6a6459]">/month</span>
+                <span className="text-sm font-medium text-[#7a7670]">/month</span>
               </p>
-              <p className="mt-2 text-sm text-[#4f4a40]">{tier.description}</p>
+              <p className="mt-2 text-sm text-[#4c4b45]">{tier.description}</p>
               <Link
                 href={tier.ctaHref}
                 className={`mt-5 inline-flex w-full items-center justify-center rounded-full px-4 py-2 text-xs font-semibold uppercase tracking-[0.3em] ${
                   tier.name === "Starter"
-                    ? "bg-[#1f2a1f] text-[#f6f5ef]"
-                    : "border border-[#b9b4a6] text-[#4f4a40]"
+                    ? "bg-[#2f3e4e] text-[#f7f7f4]"
+                    : "border border-[#c4c1b8] text-[#4c4b45]"
                 }`}
               >
                 {tier.cta}
               </Link>
-              <ul className="mt-5 space-y-2 text-sm text-[#4f4a40]">
+              <ul className="mt-5 space-y-2 text-sm text-[#4c4b45]">
                 {tier.highlights.map((item) => (
                   <li key={item} className="flex gap-2">
-                    <span className="mt-2 h-1.5 w-1.5 rounded-full bg-[#1f2a1f]" />
+                    <span className="mt-2 h-1.5 w-1.5 rounded-full bg-[#2f3e4e]" />
                     <span>{item}</span>
                   </li>
                 ))}
@@ -131,13 +131,13 @@ export default function PricingPage() {
           ))}
         </section>
 
-        <section className="mt-12 rounded-3xl border border-[#d6d2c6] bg-white/80 p-6 shadow-[0_18px_60px_rgba(27,24,19,0.08)] backdrop-blur">
-          <p className="text-xs uppercase tracking-[0.3em] text-[#7b756a]">
+        <section className="mt-12 rounded-3xl border border-[#d8d6cf] bg-white/85 p-6 shadow-[0_18px_60px_rgba(27,24,19,0.08)] backdrop-blur">
+          <p className="text-xs uppercase tracking-[0.3em] text-[#7a7670]">
             Feature ladder
           </p>
           <div className="mt-5 overflow-x-auto">
             <table className="min-w-full text-left text-sm">
-              <thead className="text-xs uppercase tracking-[0.2em] text-[#7b756a]">
+              <thead className="text-xs uppercase tracking-[0.2em] text-[#7a7670]">
                 <tr>
                   <th className="py-2">Feature</th>
                   <th className="py-2">Free</th>
@@ -145,9 +145,9 @@ export default function PricingPage() {
                   <th className="py-2">Pro</th>
                 </tr>
               </thead>
-              <tbody className="text-[#4f4a40]">
+              <tbody className="text-[#4c4b45]">
                 {featureRows.map((row) => (
-                  <tr key={row[0]} className="border-t border-[#eee9db]">
+                  <tr key={row[0]} className="border-t border-[#ebe7de]">
                     <td className="py-2">{row[0]}</td>
                     <td className="py-2">{row[1]}</td>
                     <td className="py-2">{row[2]}</td>
@@ -159,24 +159,24 @@ export default function PricingPage() {
           </div>
         </section>
 
-        <section className="mt-12 rounded-3xl border border-[#d6d2c6] bg-white/80 p-6 shadow-[0_18px_60px_rgba(27,24,19,0.08)] backdrop-blur">
-          <p className="text-xs uppercase tracking-[0.3em] text-[#7b756a]">
+        <section className="mt-12 rounded-3xl border border-[#d8d6cf] bg-white/85 p-6 shadow-[0_18px_60px_rgba(27,24,19,0.08)] backdrop-blur">
+          <p className="text-xs uppercase tracking-[0.3em] text-[#7a7670]">
             Why people pay
           </p>
-          <div className="mt-4 space-y-2 text-sm text-[#4f4a40]">
-            <p>Detection is probabilistic, not binary.</p>
-            <p>Edits matter more than verdicts.</p>
-            <p>Confidence comes from iteration.</p>
+          <div className="mt-4 space-y-2 text-sm text-[#4c4b45]">
+            <p>Explanations over conclusions.</p>
+            <p>Signals over accusations.</p>
+            <p>Probability over certainty.</p>
           </div>
         </section>
 
-        <section className="mt-12 rounded-3xl border border-[#d6d2c6] bg-[#f6f3ea] p-6 text-sm text-[#4f4a40]">
-          <p className="text-xs uppercase tracking-[0.3em] text-[#7b756a]">
+        <section className="mt-12 rounded-3xl border border-[#d8d6cf] bg-[#f3f3ef] p-6 text-sm text-[#4c4b45]">
+          <p className="text-xs uppercase tracking-[0.3em] text-[#7a7670]">
             Need scale?
           </p>
           <p className="mt-3">
             Need bulk analysis, datasets, or institutional access?{" "}
-            <Link href="mailto:hello@aidetector.app" className="font-semibold text-[#1f1d18]">
+            <Link href="mailto:hello@aidetector.app" className="font-semibold text-[#1f1f1c]">
               Contact us.
             </Link>
           </p>

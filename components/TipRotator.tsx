@@ -3,20 +3,16 @@
 import { useEffect, useState } from "react";
 
 const TIPS = [
-  "If you want it to read more human, vary sentence length.",
-  "Avoid repeating the same transition words each paragraph.",
-  "Add one concrete detail that only you would know.",
-  "Keep punctuation natural, not perfectly uniform.",
-  "Use mild imperfections: a parenthetical aside, a short fragment.",
-  "Balance concise lines with one longer, reflective sentence.",
-  "Mix specific examples with general statements.",
-  "Read it out loud and tweak any robotic phrasing.",
-  "Swap a synonym or two to prevent patterned wording.",
-  "Let your voice show with subtle opinions or preferences.",
-  "Break up long paragraphs for easier scanning.",
-  "Vary the opening words of successive sentences.",
-  "Use purposeful verbs instead of repeated \"is/are\" structures.",
-  "Consider adding a small sensory detail or observation."
+  "Vary sentence length.",
+  "Add a concrete detail that is specific to you.",
+  "Reduce repeated sentence openings.",
+  "Use natural transitions between ideas.",
+  "Mix short and long sentences.",
+  "Read it aloud and adjust rigid phrasing.",
+  "Use precise verbs instead of repeated \"is/are\" forms.",
+  "Add a brief line of personal context.",
+  "Avoid identical sentence structures.",
+  "Keep punctuation natural."
 ];
 
 type TipRotatorProps = {
@@ -44,9 +40,9 @@ export default function TipRotator({ isActive }: TipRotatorProps) {
   }
 
   return (
-    <div className="mt-4 rounded-2xl border border-[#ded8ca] bg-[#f6f3ea] px-4 py-3 text-sm text-[#4f4a40]">
-      <span className="text-xs uppercase tracking-[0.25em] text-[#7b756a]">
-        Tip:
+    <div className="mt-4 rounded-2xl border border-[#d8d6cf] bg-[#f3f3ef] px-4 py-3 text-sm text-[#4c4b45]">
+      <span className="text-xs uppercase tracking-[0.25em] text-[#7a7670]">
+        Guidance:
       </span>
       <span className="ml-2">{TIPS[index]}</span>
     </div>

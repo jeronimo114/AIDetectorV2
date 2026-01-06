@@ -43,40 +43,40 @@ export default async function DashboardPage() {
     : "No runs yet";
 
   return (
-    <main className="relative min-h-screen overflow-hidden bg-[#f8f7f1]">
+    <main className="relative min-h-screen overflow-hidden bg-[#f7f7f4]">
       <div className="pointer-events-none absolute inset-0">
-        <div className="absolute -top-24 left-1/3 h-64 w-64 -translate-x-1/2 rounded-full bg-[#e5edd8] opacity-60 blur-3xl" />
-        <div className="absolute bottom-10 right-10 h-64 w-64 rounded-full bg-[#f3e3cf] opacity-70 blur-3xl" />
+        <div className="absolute -top-24 left-1/3 h-64 w-64 -translate-x-1/2 rounded-full bg-[#e6ecf1] opacity-60 blur-3xl" />
+        <div className="absolute bottom-10 right-10 h-64 w-64 rounded-full bg-[#edf2f5] opacity-70 blur-3xl" />
       </div>
 
       <div className="relative mx-auto flex min-h-screen w-full max-w-[960px] flex-col px-6 pb-16 pt-12">
         <header>
-          <p className="text-xs uppercase tracking-[0.3em] text-[#7b756a]">
+          <p className="text-xs uppercase tracking-[0.3em] text-[#7a7670]">
             Dashboard
           </p>
-          <h1 className="mt-4 text-4xl font-semibold text-[#1f1d18]">
+          <h1 className="mt-4 text-4xl font-semibold text-[#1f1f1c]">
             Run history
           </h1>
-          <p className="mt-3 text-sm text-[#4f4a40]">
-            Review your recent AI detector results and metadata.
+          <p className="mt-3 text-sm text-[#4c4b45]">
+            Review your recent Veridict runs and metadata.
           </p>
         </header>
 
-        <section className="mt-8 rounded-3xl border border-[#d6d2c6] bg-white/80 p-6 shadow-[0_18px_60px_rgba(27,24,19,0.08)] backdrop-blur">
+        <section className="mt-8 rounded-3xl border border-[#d8d6cf] bg-white/85 p-6 shadow-[0_18px_60px_rgba(27,24,19,0.08)] backdrop-blur">
           <div className="flex flex-wrap items-center justify-between gap-4">
             <div>
-              <p className="text-xs uppercase tracking-[0.3em] text-[#7b756a]">
+              <p className="text-xs uppercase tracking-[0.3em] text-[#7a7670]">
                 Summary
               </p>
-              <p className="mt-2 text-2xl font-semibold text-[#1f1d18]">
+              <p className="mt-2 text-2xl font-semibold text-[#1f1f1c]">
                 {`${runCount} runs`}
               </p>
             </div>
             <div className="text-right">
-              <p className="text-xs uppercase tracking-[0.3em] text-[#7b756a]">
+              <p className="text-xs uppercase tracking-[0.3em] text-[#7a7670]">
                 Last run
               </p>
-              <p className="mt-2 text-sm text-[#1f1d18]">
+              <p className="mt-2 text-sm text-[#1f1f1c]">
                 {lastRunTime}
               </p>
             </div>
@@ -84,7 +84,7 @@ export default async function DashboardPage() {
         </section>
 
         {error && (
-          <div className="mt-6 rounded-2xl border border-[#e3c5b9] bg-[#f7e8e4] p-4 text-sm text-[#5a1e14]">
+          <div className="mt-6 rounded-2xl border border-[#e2ccc2] bg-[#f0e4de] p-4 text-sm text-[#6a4033]">
             Unable to load run history. {error}
           </div>
         )}

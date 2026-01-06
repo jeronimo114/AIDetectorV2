@@ -47,18 +47,18 @@ export default function SiteHeader() {
   };
 
   const linkBase =
-    "text-xs uppercase tracking-[0.3em] transition hover:text-[#1f1d18]";
-  const active = "text-[#1f1d18]";
-  const inactive = "text-[#7b756a]";
+    "text-xs uppercase tracking-[0.3em] transition hover:text-[#1f1f1c]";
+  const active = "text-[#1f1f1c]";
+  const inactive = "text-[#7a7670]";
 
   return (
-    <header className="sticky top-0 z-20 border-b border-[#ded8ca]/80 bg-[#f8f7f1]/80 backdrop-blur">
+    <header className="sticky top-0 z-20 border-b border-[#d8d6cf]/80 bg-[#f7f7f4]/85 backdrop-blur">
       <div className="mx-auto flex w-full max-w-[960px] items-center justify-between px-6 py-4">
         <Link
           href="/"
-          className="text-xs font-semibold uppercase tracking-[0.35em] text-[#1f1d18]"
+          className="text-xs font-semibold uppercase tracking-[0.35em] text-[#1f1f1c]"
         >
-          AI Detector
+          Veridict
         </Link>
         <nav className="flex items-center gap-6">
           <Link

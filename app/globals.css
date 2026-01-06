@@ -7,9 +7,9 @@
 }
 
 body {
-  @apply bg-[#f8f7f1] text-[#1c1b17] antialiased;
+  @apply bg-[#f7f7f4] text-[#1f1f1c] antialiased;
 }
 
 ::selection {
-  background: #dfe4d3;
+  background: #e6ecf1;
 }

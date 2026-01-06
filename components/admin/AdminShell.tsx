@@ -35,7 +35,7 @@ export default function AdminShell({ role, email, impersonating, children }: Adm
         <div className="mx-auto flex w-full max-w-[1200px] items-center justify-between px-6 py-4">
           <div>
             <p className="text-xs uppercase tracking-[0.3em] text-[#7b756a]">Admin</p>
-            <p className="mt-1 text-sm font-semibold text-[#1f1d18]">AI Detector</p>
+            <p className="mt-1 text-sm font-semibold text-[#1f1f1c]">Veridict</p>
           </div>
           <div className="text-right">
             <p className="text-xs uppercase tracking-[0.2em] text-[#7b756a]">

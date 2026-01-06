@@ -55,24 +55,62 @@ const verdictLabelMap: Record<Verdict, string> = {
 const toneStyles: Record<VerdictTone, { pill: string; bar: string; text: string }> =
   {
     positive: {
-      pill: "bg-[#e6f2dd] text-[#1f3b1f] border border-[#c6e0b5]",
-      bar: "bg-[#87b37a]",
-      text: "text-[#1f3b1f]"
+      pill: "bg-[#e5efe7] text-[#2f4b3a] border border-[#cfe0d6]",
+      bar: "bg-[#7fa793]",
+      text: "text-[#2f4b3a]"
     },
     neutral: {
-      pill: "bg-[#efe9d9] text-[#6a5b3f] border border-[#e0d6bf]",
-      bar: "bg-[#c9b58b]",
-      text: "text-[#6a5b3f]"
+      pill: "bg-[#eef1f3] text-[#4a5560] border border-[#d8dde2]",
+      bar: "bg-[#b7c1c9]",
+      text: "text-[#4a5560]"
     },
     caution: {
-      pill: "bg-[#f7d9d2] text-[#712d21] border border-[#edb8aa]",
-      bar: "bg-[#d48a78]",
-      text: "text-[#712d21]"
+      pill: "bg-[#f0e4de] text-[#6a4033] border border-[#e2ccc2]",
+      bar: "bg-[#c98c79]",
+      text: "text-[#6a4033]"
     }
   };
 
+const IMPROVEMENT_TIPS = [
+  "Vary sentence length to reduce uniform cadence.",
+  "Add personal context or a concrete detail.",
+  "Reduce repeated structures and transitions.",
+  "Use natural transitions between ideas."
+];
+
 const clamp = (value: number, min: number, max: number) =>
   Math.min(Math.max(value, min), max);
+
+const normalizeSignal = (signal: string) => {
+  const trimmed = signal.trim();
+  if (!trimmed) {
+    return "this pattern";
+  }
+  if (
+    trimmed.length > 1 &&
+    trimmed[0] === trimmed[0].toUpperCase() &&
+    trimmed[1] === trimmed[1].toUpperCase()
+  ) {
+    return trimmed;
+  }
+  return trimmed[0].toLowerCase() + trimmed.slice(1);
+};
+
+const buildSignalDetails = (signal: string, useRawSignal = false) => ({
+  meaning: useRawSignal ? signal : `Your text shows ${normalizeSignal(signal)}.`,
+  why: "This pattern is commonly associated with AI-assisted or highly uniform writing.",
+  impact: "It influences the confidence score alongside the other signals."
+});
+
+const buildSummaryLine = (verdict: Verdict) => {
+  if (verdict === "Likely AI") {
+    return "Signals suggest patterns commonly associated with AI-generated text.";
+  }
+  if (verdict === "Likely Human") {
+    return "Signals suggest patterns commonly associated with human writing.";
+  }
+  return "Signals suggest a mixed pattern across common detectors.";
+};
 
 const isPreferredResponse = (value: unknown): value is PreferredResponse => {
   if (!value || typeof value !== "object") {
@@ -192,6 +230,35 @@ export default function Home() {
     }
 
     return Math.round(clamp(result.data.confidence, 0, 1) * 100);
+  }, [result]);
+
+  const summaryLine = useMemo(() => {
+    if (!result || result.type !== "preferred") {
+      return "";
+    }
+    return buildSummaryLine(result.data.verdict);
+  }, [result]);
+
+  const detectedSignals = useMemo(() => {
+    if (!result || result.type !== "preferred") {
+      return [];
+    }
+    const signals = (result.data.signals ?? [])
+      .map((signal) => signal.trim())
+      .filter(Boolean);
+    if (signals.length > 0) {
+      return signals;
+    }
+    return (result.data.breakdown ?? [])
+      .map((item) => item.trim())
+      .filter(Boolean);
+  }, [result]);
+
+  const usesBreakdownSignals = useMemo(() => {
+    if (!result || result.type !== "preferred") {
+      return false;
+    }
+    return !result.data.signals || result.data.signals.length === 0;
   }, [result]);
 
   const handleClear = () => {
@@ -319,7 +386,7 @@ export default function Home() {
 
     if (isWebhookMissing) {
       setRequestError(
-        "Missing NEXT_PUBLIC_N8N_WEBHOOK_URL. Add it to your environment to analyze text."
+        "Analysis endpoint is not configured. Add NEXT_PUBLIC_N8N_WEBHOOK_URL to enable checks."
       );
       return;
     }
@@ -330,7 +397,7 @@ export default function Home() {
     }
 
     if (underMin) {
-      setRequestError(`Please enter at least ${MIN_CHARS} characters to analyze.`);
+      setRequestError(`Please enter at least ${MIN_CHARS} characters to check.`);
       return;
     }
 
@@ -353,7 +420,7 @@ export default function Home() {
         body: JSON.stringify({
           text: trimmed,
           meta: {
-            source: "ai-detector-frontend",
+            source: "veridict-frontend",
             timestamp: new Date().toISOString()
           }
         }),
@@ -428,13 +495,13 @@ export default function Home() {
       }
     } catch (error) {
       if (error instanceof DOMException && error.name === "AbortError") {
-        setRequestError(`The request timed out after ${Math.round(timeoutMs / 1000)} seconds. Try again.`);
+        setRequestError(`The request timed out after ${Math.round(timeoutMs / 1000)} seconds. Run it again.`);
         void persistErrorRun("timeout", "Request timeout");
       } else if (error instanceof Error) {
-        setRequestError(error.message || "Something went wrong. Try again.");
+        setRequestError(error.message || "Something went wrong. Run it again.");
         void persistErrorRun("error", error.message || "Request error");
       } else {
-        setRequestError("Something went wrong. Try again.");
+        setRequestError("Something went wrong. Run it again.");
         void persistErrorRun("error", "Unknown error");
       }
     } finally {
@@ -468,76 +535,94 @@ export default function Home() {
     result?.type === "preferred" ? verdictToneMap[result.data.verdict] : "neutral";
 
   return (
-    <main className="relative min-h-screen overflow-hidden bg-[#f8f7f1]">
+    <main className="relative min-h-screen overflow-hidden bg-[#f7f7f4]">
       <div className="pointer-events-none absolute inset-0">
-        <div className="absolute -top-32 left-1/2 h-80 w-80 -translate-x-1/2 rounded-full bg-[#e5edd8] opacity-70 blur-3xl" />
-        <div className="absolute top-40 right-6 h-56 w-56 rounded-full bg-[#f3e3cf] opacity-70 blur-3xl" />
-        <div className="absolute bottom-0 left-10 h-72 w-72 rounded-full bg-[#e6e2f2] opacity-40 blur-3xl" />
+        <div className="absolute -top-32 left-1/2 h-80 w-80 -translate-x-1/2 rounded-full bg-[#e6ecf1] opacity-70 blur-3xl" />
+        <div className="absolute top-40 right-6 h-56 w-56 rounded-full bg-[#edf2f5] opacity-60 blur-3xl" />
+        <div className="absolute bottom-0 left-10 h-72 w-72 rounded-full bg-[#e9eef2] opacity-50 blur-3xl" />
       </div>
 
       <div className="relative mx-auto flex min-h-screen w-full max-w-[720px] flex-col px-6 pb-16 pt-14">
         <header className="opacity-0 animate-fade-up">
-          <p className="text-xs uppercase tracking-[0.4em] text-[#7b756a]">
-            Signal Lab
+          <p className="text-xs uppercase tracking-[0.4em] text-[#7a7670]">
+            Veridict
           </p>
-          <h1 className="mt-4 text-4xl font-semibold text-[#1f1d18] sm:text-5xl">
-            AI Detector
+          <h1 className="mt-4 text-4xl font-semibold text-[#1f1f1c] sm:text-5xl">
+            Check your work before you submit it.
           </h1>
-          <p className="mt-4 max-w-xl text-base text-[#4f4a40]">
-            Paste text to estimate likelihood of AI generation.
+          <p className="mt-4 max-w-xl text-base text-[#4c4b45]">
+            Understand AI detection signals and avoid surprises when it matters.
           </p>
+          <p className="mt-3 max-w-xl text-sm text-[#7a7670]">
+            Built for students who want clarity, not accusations.
+          </p>
+          <div className="mt-6 flex flex-wrap gap-3">
+            <button
+              type="button"
+              className="inline-flex items-center justify-center rounded-full bg-[#2f3e4e] px-5 py-2 text-xs font-semibold uppercase tracking-[0.3em] text-[#f7f7f4] transition hover:bg-[#3b4d60]"
+              onClick={focusTextarea}
+            >
+              Run a check
+            </button>
+            <a
+              href="#how-it-works"
+              className="inline-flex items-center justify-center rounded-full border border-[#c4c1b8] px-5 py-2 text-xs font-semibold uppercase tracking-[0.3em] text-[#4c4b45] transition hover:border-[#9b978f]"
+            >
+              See how it works
+            </a>
+          </div>
         </header>
 
         <section
-          className="mt-10 rounded-3xl border border-[#d6d2c6] bg-white/70 p-5 shadow-[0_18px_60px_rgba(27,24,19,0.08)] backdrop-blur opacity-0 animate-fade-up"
+          className="mt-10 rounded-3xl border border-[#d8d6cf] bg-white/85 p-5 shadow-[0_18px_60px_rgba(27,24,19,0.08)] backdrop-blur opacity-0 animate-fade-up"
           style={{ animationDelay: "120ms" }}
         >
-          <div className="flex items-center justify-between text-xs uppercase tracking-[0.3em] text-[#7b756a]">
-            <span>Input</span>
-            <span className={`font-mono ${exceedsMax ? "text-[#8d3b2f]" : ""}`}>
+          <div className="flex items-center justify-between text-xs uppercase tracking-[0.3em] text-[#7a7670]">
+            <span>Your text</span>
+            <span className={`font-mono ${exceedsMax ? "text-[#6a4033]" : ""}`}>
               {charCount}/{maxChars}
             </span>
           </div>
           {pendingEdit && (
-            <p className="mt-3 text-xs uppercase tracking-[0.25em] text-[#8b857a]">
+            <p className="mt-3 text-xs uppercase tracking-[0.25em] text-[#7a7670]">
               Editing previous run from {new Date(pendingEdit.receivedAt).toLocaleString()}
             </p>
           )}
           <textarea
             ref={textareaRef}
-            className="mt-4 min-h-[260px] w-full resize-none rounded-2xl border border-[#d6d2c6] bg-white/80 p-4 text-base leading-relaxed text-[#1f1d18] shadow-sm transition focus:border-[#a8b09a] focus:outline-none focus:ring-4 focus:ring-[#dfe4d3] disabled:opacity-70"
-            placeholder="Paste or type your text here."
+            className="mt-4 min-h-[260px] w-full resize-none rounded-2xl border border-[#d8d6cf] bg-white/90 p-4 text-base leading-relaxed text-[#1f1f1c] shadow-sm transition focus:border-[#8fa3b5] focus:outline-none focus:ring-4 focus:ring-[#d7e1ea] disabled:opacity-70"
+            placeholder="Paste or type your draft here."
             value={text}
             onChange={(event) => setText(event.target.value)}
             disabled={isLoading}
           />
           <div className="mt-4 flex flex-wrap items-center justify-between gap-4">
             <p
-              className={`text-sm ${exceedsMax ? "text-[#8d3b2f]" : "text-[#6a6459]"}`}
+              className={`text-sm ${exceedsMax ? "text-[#6a4033]" : "text-[#4c4b45]"}`}
             >
               {exceedsMax
                 ? `Maximum ${maxChars} characters exceeded.`
-                : `Minimum ${MIN_CHARS} characters to analyze.`}
+                : `Minimum ${MIN_CHARS} characters to check.`}
             </p>
             <div className="flex flex-wrap items-center gap-3">
               <button
                 type="button"
-                className="inline-flex items-center justify-center gap-2 rounded-full bg-[#1f2a1f] px-6 py-3 text-xs font-semibold uppercase tracking-[0.3em] text-[#f6f5ef] transition hover:bg-[#2b3a2b] disabled:cursor-not-allowed disabled:opacity-50"
+                className="inline-flex items-center justify-center gap-2 rounded-full bg-[#2f3e4e] px-6 py-3 text-xs font-semibold uppercase tracking-[0.3em] text-[#f7f7f4] transition hover:bg-[#3b4d60] disabled:cursor-not-allowed disabled:opacity-50"
                 onClick={handleAnalyze}
                 disabled={!canAnalyze}
               >
                 {isLoading ? (
                   <>
-                    <span className="h-4 w-4 animate-spin rounded-full border-2 border-[#f6f5ef]/40 border-t-[#f6f5ef]" />
-                    Analyzing...
+                    <span className="h-4 w-4 animate-spin rounded-full border-2 border-[#f7f7f4]/40 border-t-[#f7f7f4]" />
+                    Checking...
                   </>
                 ) : (
-                  "Analyze"
+                  "Run a check"
                 )}
               </button>
               <button
                 type="button"
-                className="inline-flex items-center justify-center rounded-full border border-[#b9b4a6] px-5 py-3 text-xs font-semibold uppercase tracking-[0.3em] text-[#4f4a40] transition hover:border-[#8f8a7c] disabled:cursor-not-allowed disabled:opacity-50"
+                className="inline-flex items-center justify-center rounded-full border border-[#c4c1b8] px-5 py-3 text-xs font-semibold uppercase tracking-[0.3em] text-[#4c4b45] transition hover:border-[#9b978f] disabled:cursor-not-allowed disabled:opacity-50"
                 onClick={handleClear}
                 disabled={isLoading || text.length === 0}
               >
@@ -550,28 +635,28 @@ export default function Home() {
 
         {isWebhookMissing && (
           <div
-            className="mt-6 rounded-2xl border border-[#e3c5b9] bg-[#f7e8e4] p-4 text-sm text-[#5a1e14] opacity-0 animate-fade-in"
+            className="mt-6 rounded-2xl border border-[#e2ccc2] bg-[#f0e4de] p-4 text-sm text-[#6a4033] opacity-0 animate-fade-in"
             style={{ animationDelay: "160ms" }}
           >
-            Missing NEXT_PUBLIC_N8N_WEBHOOK_URL. Add it to your environment to
-            enable analysis.
+            Analysis endpoint is not configured. Add NEXT_PUBLIC_N8N_WEBHOOK_URL to
+            enable checks.
           </div>
         )}
 
         {requestError && !isWebhookMissing && (
           <div
-            className="mt-6 rounded-2xl border border-[#e3c5b9] bg-[#f7e8e4] p-4 text-sm text-[#5a1e14] opacity-0 animate-fade-in"
+            className="mt-6 rounded-2xl border border-[#e2ccc2] bg-[#f0e4de] p-4 text-sm text-[#6a4033] opacity-0 animate-fade-in"
             style={{ animationDelay: "160ms" }}
           >
             <div className="flex flex-wrap items-center justify-between gap-3">
               <span>{requestError}</span>
               <button
                 type="button"
-                className="rounded-full border border-[#5a1e14]/30 px-4 py-1 text-xs font-semibold uppercase tracking-[0.2em] text-[#5a1e14]"
+                className="rounded-full border border-[#c7b1a7] px-4 py-1 text-xs font-semibold uppercase tracking-[0.2em] text-[#6a4033]"
                 onClick={handleAnalyze}
                 disabled={isLoading}
               >
-                Try again
+                Run again
               </button>
             </div>
           </div>
@@ -579,13 +664,13 @@ export default function Home() {
 
         {result?.type === "preferred" && (
           <section
-            className="mt-10 rounded-3xl border border-[#d6d2c6] bg-white/80 p-6 shadow-[0_20px_80px_rgba(24,22,18,0.1)] backdrop-blur opacity-0 animate-fade-up"
+            className="mt-10 rounded-3xl border border-[#d8d6cf] bg-white/90 p-6 shadow-[0_20px_80px_rgba(24,22,18,0.1)] backdrop-blur opacity-0 animate-fade-up"
             style={{ animationDelay: "200ms" }}
           >
             <div className="flex flex-wrap items-start justify-between gap-6">
-              <div>
-                <p className="text-xs uppercase tracking-[0.3em] text-[#7b756a]">
-                  Verdict
+              <div className="max-w-xl">
+                <p className="text-xs uppercase tracking-[0.3em] text-[#7a7670]">
+                  Verdict summary
                 </p>
                 <div
                   className={`mt-3 inline-flex items-center rounded-full px-4 py-1 text-sm font-semibold ${
@@ -594,23 +679,36 @@ export default function Home() {
                 >
                   {result.data.verdict}
                 </div>
+                <p className="mt-3 text-sm text-[#4c4b45]">{summaryLine}</p>
               </div>
               <div className="text-right">
-                <p className="text-xs uppercase tracking-[0.3em] text-[#7b756a]">
-                  Confidence
-                </p>
-                <p className="mt-3 text-3xl font-semibold text-[#1f1d18]">
+                <div className="flex items-center justify-end gap-2 text-xs uppercase tracking-[0.3em] text-[#7a7670]">
+                  <span>Confidence</span>
+                  <span
+                    className="inline-flex h-5 w-5 items-center justify-center rounded-full border border-[#c4c1b8] text-[10px] text-[#4c4b45]"
+                    title="The confidence score reflects probability, not certainty."
+                  >
+                    i
+                  </span>
+                </div>
+                <p className="mt-3 text-3xl font-semibold text-[#1f1f1c]">
                   {confidencePercent}%
                 </p>
+                <p className="mt-1 text-xs text-[#7a7670]">
+                  The confidence score reflects probability, not certainty.
+                </p>
                 {result.data.model && (
-                  <p className="mt-1 text-xs uppercase tracking-[0.2em] text-[#7b756a]">
+                  <p className="mt-2 text-xs uppercase tracking-[0.2em] text-[#7a7670]">
                     Model: {result.data.model}
                   </p>
                 )}
+                <p className="mt-2 text-xs text-[#7a7670]">
+                  Generated at {new Date(result.receivedAt).toLocaleTimeString()}.
+                </p>
               </div>
             </div>
 
-            <div className="mt-4 h-2 w-full rounded-full bg-[#e6e2d6]">
+            <div className="mt-4 h-2 w-full rounded-full bg-[#e3e1db]">
               <div
                 className={`h-2 rounded-full transition-all ${
                   toneStyles[verdictTone].bar
@@ -619,65 +717,104 @@ export default function Home() {
               />
             </div>
 
-            <div className="mt-6 grid gap-6 md:grid-cols-[1.3fr_0.7fr]">
-              <div>
-                <p className="text-xs uppercase tracking-[0.3em] text-[#7b756a]">
-                  Breakdown
-                </p>
-                <ul className="mt-3 space-y-2 text-sm text-[#2a2822]">
-                  {result.data.breakdown.map((item, index) => (
-                    <li key={`${item}-${index}`} className="flex gap-3">
-                      <span className="mt-2 h-1.5 w-1.5 rounded-full bg-[#1f2a1f]" />
-                      <span>{item}</span>
-                    </li>
-                  ))}
+            <div className="mt-8">
+              <div className="flex items-center justify-between">
+                <span className="text-xs uppercase tracking-[0.3em] text-[#7a7670]">
+                  Detected signals
+                </span>
+                <span
+                  className="inline-flex h-5 w-5 items-center justify-center rounded-full border border-[#c4c1b8] text-[10px] text-[#4c4b45]"
+                  title="Each signal includes what it means, why it matters, and how it affects the score."
+                >
+                  i
+                </span>
+              </div>
+              {detectedSignals.length > 0 ? (
+                <ul className="mt-4 space-y-3">
+                  {detectedSignals.map((signal, index) => {
+                    const details = buildSignalDetails(signal, usesBreakdownSignals);
+                    return (
+                      <li
+                        key={`${signal}-${index}`}
+                        className="rounded-2xl border border-[#d8d6cf] bg-white/95 p-4"
+                      >
+                        <details className="group">
+                          <summary className="flex cursor-pointer list-none items-start justify-between gap-3">
+                            <div className="flex items-start gap-3">
+                              <span className="mt-2 h-1.5 w-1.5 rounded-full bg-[#2f3e4e]" />
+                              <span className="text-sm text-[#1f1f1c]">{signal}</span>
+                            </div>
+                            <span className="text-xs uppercase tracking-[0.2em] text-[#7a7670]">
+                              Details
+                            </span>
+                          </summary>
+                          <div className="mt-3 space-y-2 text-sm text-[#4c4b45]">
+                            <p>
+                              <span className="font-semibold text-[#1f1f1c]">
+                                What it means:
+                              </span>{" "}
+                              {details.meaning}
+                            </p>
+                            <p>
+                              <span className="font-semibold text-[#1f1f1c]">
+                                Why it matters:
+                              </span>{" "}
+                              {details.why}
+                            </p>
+                            <p>
+                              <span className="font-semibold text-[#1f1f1c]">
+                                How it affects the score:
+                              </span>{" "}
+                              {details.impact}
+                            </p>
+                          </div>
+                        </details>
+                      </li>
+                    );
+                  })}
                 </ul>
-              </div>
-              <div className="space-y-4">
-                <div>
-                  <p className="text-xs uppercase tracking-[0.3em] text-[#7b756a]">
-                    Confidence Notes
-                  </p>
-                  <p className="mt-2 text-sm text-[#4f4a40]">
-                    Generated at {new Date(result.receivedAt).toLocaleTimeString()}.
-                  </p>
+              ) : (
+                <div className="mt-4 rounded-2xl border border-[#d8d6cf] bg-[#f3f3ef] p-4 text-sm text-[#4c4b45]">
+                  No signal list was returned. Review the verdict summary and consider another run.
                 </div>
-                {result.data.signals && result.data.signals.length > 0 && (
-                  <div>
-                    <p className="text-xs uppercase tracking-[0.3em] text-[#7b756a]">
-                      Signals
-                    </p>
-                    <ul className="mt-3 space-y-2 text-sm text-[#2a2822]">
-                      {result.data.signals.map((signal, index) => (
-                        <li key={`${signal}-${index}`} className="flex gap-3">
-                          <span className="mt-2 h-1.5 w-1.5 rounded-full bg-[#6a6459]" />
-                          <span>{signal}</span>
-                        </li>
-                      ))}
-                    </ul>
-                  </div>
-                )}
-              </div>
+              )}
+            </div>
+
+            <div className="mt-8 rounded-2xl border border-[#d8d6cf] bg-[#f3f3ef] p-4">
+              <p className="text-xs uppercase tracking-[0.3em] text-[#7a7670]">
+                What you can improve
+              </p>
+              <p className="mt-2 text-sm text-[#4c4b45]">
+                You may want to review the following.
+              </p>
+              <ul className="mt-3 space-y-2 text-sm text-[#4c4b45]">
+                {IMPROVEMENT_TIPS.map((tip) => (
+                  <li key={tip} className="flex gap-3">
+                    <span className="mt-2 h-1.5 w-1.5 rounded-full bg-[#2f3e4e]" />
+                    <span>{tip}</span>
+                  </li>
+                ))}
+              </ul>
             </div>
 
             <div className="mt-6 flex flex-wrap gap-3">
               <button
                 type="button"
-                className="inline-flex items-center justify-center rounded-full bg-[#1f2a1f] px-5 py-2 text-xs font-semibold uppercase tracking-[0.3em] text-[#f6f5ef]"
+                className="inline-flex items-center justify-center rounded-full bg-[#2f3e4e] px-5 py-2 text-xs font-semibold uppercase tracking-[0.3em] text-[#f7f7f4]"
                 onClick={() => startEditFromSnapshot(latestSnapshot)}
               >
                 Edit and recheck
               </button>
               {!canEdit && (
-                <span className="inline-flex items-center rounded-full border border-[#e0d6bf] bg-[#efe9d9] px-3 py-1 text-xs uppercase tracking-[0.2em] text-[#6a5b3f]">
+                <span className="inline-flex items-center rounded-full border border-[#d8dde2] bg-[#eef1f3] px-3 py-1 text-xs uppercase tracking-[0.2em] text-[#4a5560]">
                   Free plan
                 </span>
               )}
             </div>
 
             {authReady && !user && (
-              <div className="mt-6 rounded-2xl border border-[#d6d2c6] bg-[#f8f7f1] px-4 py-3 text-sm text-[#6a6459]">
-                <Link href="/login" className="font-semibold text-[#1f1d18]">
+              <div className="mt-6 rounded-2xl border border-[#d8d6cf] bg-[#f7f7f4] px-4 py-3 text-sm text-[#4c4b45]">
+                <Link href="/login" className="font-semibold text-[#1f1f1c]">
                   Log in
                 </Link>{" "}
                 to save your history.
@@ -685,37 +822,37 @@ export default function Home() {
             )}
 
             {authReady && user && saveError && (
-              <p className="mt-4 text-xs text-[#8d3b2f]">{saveError}</p>
+              <p className="mt-4 text-xs text-[#6a4033]">{saveError}</p>
             )}
           </section>
         )}
 
         {result?.type === "raw" && (
           <section
-            className="mt-10 rounded-3xl border border-[#d6d2c6] bg-white/80 p-6 shadow-[0_20px_80px_rgba(24,22,18,0.1)] backdrop-blur opacity-0 animate-fade-up"
+            className="mt-10 rounded-3xl border border-[#d8d6cf] bg-white/90 p-6 shadow-[0_20px_80px_rgba(24,22,18,0.1)] backdrop-blur opacity-0 animate-fade-up"
             style={{ animationDelay: "200ms" }}
           >
             <div className="flex flex-wrap items-center justify-between gap-4">
               <div>
-                <p className="text-xs uppercase tracking-[0.3em] text-[#7b756a]">
+                <p className="text-xs uppercase tracking-[0.3em] text-[#7a7670]">
                   Response
                 </p>
-                <p className="mt-3 text-lg font-semibold text-[#1f1d18]">
+                <p className="mt-3 text-lg font-semibold text-[#1f1f1c]">
                   Analysis received
                 </p>
-                <p className="mt-1 text-sm text-[#4f4a40]">
+                <p className="mt-1 text-sm text-[#4c4b45]">
                   The response did not match the expected schema.
                 </p>
               </div>
-              <p className="text-xs uppercase tracking-[0.3em] text-[#7b756a]">
+              <p className="text-xs uppercase tracking-[0.3em] text-[#7a7670]">
                 {new Date(result.receivedAt).toLocaleTimeString()}
               </p>
             </div>
-            <details className="mt-4 rounded-2xl border border-[#d6d2c6] bg-[#f8f7f1]/80 p-4">
-              <summary className="cursor-pointer text-sm font-semibold text-[#4f4a40]">
+            <details className="mt-4 rounded-2xl border border-[#d8d6cf] bg-[#f7f7f4]/80 p-4">
+              <summary className="cursor-pointer text-sm font-semibold text-[#4c4b45]">
                 Raw output
               </summary>
-              <pre className="mt-3 max-h-80 overflow-auto rounded-xl bg-[#f1eee6] p-3 text-xs text-[#2a2822]">
+              <pre className="mt-3 max-h-80 overflow-auto rounded-xl bg-[#f1f1ec] p-3 text-xs text-[#2a2924]">
 {JSON.stringify(result.data, null, 2)}
               </pre>
             </details>
@@ -723,21 +860,21 @@ export default function Home() {
             <div className="mt-6 flex flex-wrap gap-3">
               <button
                 type="button"
-                className="inline-flex items-center justify-center rounded-full bg-[#1f2a1f] px-5 py-2 text-xs font-semibold uppercase tracking-[0.3em] text-[#f6f5ef]"
+                className="inline-flex items-center justify-center rounded-full bg-[#2f3e4e] px-5 py-2 text-xs font-semibold uppercase tracking-[0.3em] text-[#f7f7f4]"
                 onClick={() => startEditFromSnapshot(latestSnapshot)}
               >
                 Edit and recheck
               </button>
               {!canEdit && (
-                <span className="inline-flex items-center rounded-full border border-[#e0d6bf] bg-[#efe9d9] px-3 py-1 text-xs uppercase tracking-[0.2em] text-[#6a5b3f]">
+                <span className="inline-flex items-center rounded-full border border-[#d8dde2] bg-[#eef1f3] px-3 py-1 text-xs uppercase tracking-[0.2em] text-[#4a5560]">
                   Free plan
                 </span>
               )}
             </div>
 
             {authReady && !user && (
-              <div className="mt-6 rounded-2xl border border-[#d6d2c6] bg-[#f8f7f1] px-4 py-3 text-sm text-[#6a6459]">
-                <Link href="/login" className="font-semibold text-[#1f1d18]">
+              <div className="mt-6 rounded-2xl border border-[#d8d6cf] bg-[#f7f7f4] px-4 py-3 text-sm text-[#4c4b45]">
+                <Link href="/login" className="font-semibold text-[#1f1f1c]">
                   Log in
                 </Link>{" "}
                 to save your history.
@@ -745,7 +882,7 @@ export default function Home() {
             )}
 
             {authReady && user && saveError && (
-              <p className="mt-4 text-xs text-[#8d3b2f]">{saveError}</p>
+              <p className="mt-4 text-xs text-[#6a4033]">{saveError}</p>
             )}
           </section>
         )}
@@ -759,19 +896,19 @@ export default function Home() {
 
         {!canEdit && upgradeIntent && (
           <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/35 p-6 backdrop-blur-sm transition-opacity duration-200 animate-fade-in">
-            <div className="w-full max-w-2xl rounded-3xl border border-[#e0d6bf] bg-[#efe9d9] p-6 shadow-[0_22px_70px_rgba(27,24,19,0.2)] transition-all duration-200 ease-out animate-fade-up">
+            <div className="w-full max-w-2xl rounded-3xl border border-[#d8d6cf] bg-[#f3f3ef] p-6 shadow-[0_22px_70px_rgba(27,24,19,0.2)] transition-all duration-200 ease-out animate-fade-up">
               <div className="flex items-start justify-between gap-4">
                 <div>
-                  <p className="text-sm font-semibold text-[#1f1d18]">
+                  <p className="text-sm font-semibold text-[#1f1f1c]">
                     Edit feedback helps you understand why a result changed.
                   </p>
-                  <p className="mt-1 text-xs uppercase tracking-[0.2em] text-[#6a5b3f]">
-                    Unlock edit recheck + what changed
+                  <p className="mt-1 text-xs uppercase tracking-[0.2em] text-[#7a7670]">
+                    Edit recheck and change tracking
                   </p>
                 </div>
                 <button
                   type="button"
-                  className="rounded-full border border-[#b9b4a6] px-3 py-1 text-xs font-semibold uppercase tracking-[0.2em] text-[#4f4a40] transition hover:border-[#8f8a7c]"
+                  className="rounded-full border border-[#c4c1b8] px-3 py-1 text-xs font-semibold uppercase tracking-[0.2em] text-[#4c4b45] transition hover:border-[#9b978f]"
                   onClick={() => setUpgradeIntent(null)}
                 >
                   Close
@@ -780,7 +917,7 @@ export default function Home() {
               <div className="mt-4 flex flex-wrap items-center gap-3">
                 <Link
                   href="/pricing"
-                  className="rounded-full bg-[#1f2a1f] px-5 py-2 text-xs font-semibold uppercase tracking-[0.3em] text-[#f6f5ef] transition hover:bg-[#2b3a2b]"
+                  className="rounded-full bg-[#2f3e4e] px-5 py-2 text-xs font-semibold uppercase tracking-[0.3em] text-[#f7f7f4] transition hover:bg-[#3b4d60]"
                 >
                   Upgrade to Starter
                 </Link>
@@ -793,16 +930,31 @@ export default function Home() {
           <div className="mt-8 flex flex-wrap gap-3">
             <button
               type="button"
-              className="rounded-full border border-[#b9b4a6] px-4 py-2 text-xs font-semibold uppercase tracking-[0.2em] text-[#4f4a40]"
+              className="rounded-full border border-[#c4c1b8] px-4 py-2 text-xs font-semibold uppercase tracking-[0.2em] text-[#4c4b45]"
               onClick={() => startEditFromSnapshot(latestSnapshot)}
             >
-              Try another edit
+              Check another edit
             </button>
           </div>
         )}
 
+        <section
+          id="how-it-works"
+          className="mt-12 rounded-3xl border border-[#d8d6cf] bg-white/85 p-6 shadow-[0_18px_60px_rgba(27,24,19,0.08)] backdrop-blur opacity-0 animate-fade-up"
+          style={{ animationDelay: "220ms" }}
+        >
+          <p className="text-xs uppercase tracking-[0.3em] text-[#7a7670]">
+            How it works
+          </p>
+          <div className="mt-4 space-y-2 text-sm text-[#4c4b45]">
+            <p>Paste your draft.</p>
+            <p>Review signals and probability.</p>
+            <p>Decide what to adjust before submission.</p>
+          </div>
+        </section>
+
         <footer
-          className="mt-auto pt-12 text-xs uppercase tracking-[0.3em] text-[#8a8479] opacity-0 animate-fade-in"
+          className="mt-auto pt-12 text-xs uppercase tracking-[0.3em] text-[#7a7670] opacity-0 animate-fade-in"
           style={{ animationDelay: "240ms" }}
         >
           Text is sent to your analysis endpoint.

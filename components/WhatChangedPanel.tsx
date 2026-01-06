@@ -15,33 +15,33 @@ const renderDelta = (delta: number) => {
 };
 
 const blockTone = {
-  unchanged: "border-[#d6d2c6] bg-white/70 text-[#4f4a40]",
-  modified: "border-[#edb8aa] bg-[#f7e8e4] text-[#5a1e14]",
-  added: "border-[#c6e0b5] bg-[#e6f2dd] text-[#1f3b1f]"
+  unchanged: "border-[#d8d6cf] bg-white/85 text-[#4c4b45]",
+  modified: "border-[#e2ccc2] bg-[#f0e4de] text-[#6a4033]",
+  added: "border-[#cfe0d6] bg-[#e5efe7] text-[#2f4b3a]"
 };
 
 export default function WhatChangedPanel({ comparison, parentLabel }: WhatChangedPanelProps) {
   const [showText, setShowText] = useState(false);
 
   return (
-    <section className="mt-8 rounded-3xl border border-[#d6d2c6] bg-white/80 p-6 shadow-[0_18px_60px_rgba(27,24,19,0.08)] backdrop-blur">
-      <p className="text-xs uppercase tracking-[0.3em] text-[#7b756a]">What changed</p>
-      <p className="mt-2 text-sm text-[#4f4a40]">Compared to {parentLabel}.</p>
+    <section className="mt-8 rounded-3xl border border-[#d8d6cf] bg-white/90 p-6 shadow-[0_18px_60px_rgba(27,24,19,0.08)] backdrop-blur">
+      <p className="text-xs uppercase tracking-[0.3em] text-[#7a7670]">What changed</p>
+      <p className="mt-2 text-sm text-[#4c4b45]">Compared to {parentLabel}.</p>
 
       <div className="mt-5 grid gap-4 md:grid-cols-2">
-        <div className="rounded-2xl border border-[#d6d2c6] bg-white/70 p-4 text-sm text-[#4f4a40]">
-          <p className="text-xs uppercase tracking-[0.3em] text-[#7b756a]">Verdict delta</p>
-          <p className="mt-2 text-sm text-[#1f1d18]">
+        <div className="rounded-2xl border border-[#d8d6cf] bg-white/85 p-4 text-sm text-[#4c4b45]">
+          <p className="text-xs uppercase tracking-[0.3em] text-[#7a7670]">Verdict delta</p>
+          <p className="mt-2 text-sm text-[#1f1f1c]">
             {comparison.verdict.changed
               ? `${comparison.verdict.from} → ${comparison.verdict.to}`
               : "Verdict unchanged"}
           </p>
         </div>
-        <div className="rounded-2xl border border-[#d6d2c6] bg-white/70 p-4 text-sm text-[#4f4a40]">
-          <p className="text-xs uppercase tracking-[0.3em] text-[#7b756a]">
+        <div className="rounded-2xl border border-[#d8d6cf] bg-white/85 p-4 text-sm text-[#4c4b45]">
+          <p className="text-xs uppercase tracking-[0.3em] text-[#7a7670]">
             Confidence movement
           </p>
-          <p className="mt-2 text-sm text-[#1f1d18]">
+          <p className="mt-2 text-sm text-[#1f1f1c]">
             {Math.round(comparison.confidence.from * 100)}% →{" "}
             {Math.round(comparison.confidence.to * 100)}% ({renderDelta(comparison.confidence.delta)})
           </p>
@@ -56,15 +56,15 @@ export default function WhatChangedPanel({ comparison, parentLabel }: WhatChange
         ].map((section) => (
           <div
             key={section.label}
-            className={`rounded-2xl border border-[#d6d2c6] bg-white/70 p-4 text-sm text-[#4f4a40] ${
+            className={`rounded-2xl border border-[#d8d6cf] bg-white/85 p-4 text-sm text-[#4c4b45] ${
               section.items.length === 0 ? "opacity-70" : ""
             }`}
           >
-            <p className="text-xs uppercase tracking-[0.3em] text-[#7b756a]">{section.label}</p>
+            <p className="text-xs uppercase tracking-[0.3em] text-[#7a7670]">{section.label}</p>
             {section.items.length === 0 ? (
-              <p className="mt-2 text-xs text-[#6a6459]">No changes.</p>
+              <p className="mt-2 text-xs text-[#7a7670]">No changes.</p>
             ) : (
-              <ul className="mt-2 space-y-1 text-sm text-[#1f1d18]">
+              <ul className="mt-2 space-y-1 text-sm text-[#1f1f1c]">
                 {section.items.map((item) => (
                   <li key={item}>• {item}</li>
                 ))}
@@ -77,7 +77,7 @@ export default function WhatChangedPanel({ comparison, parentLabel }: WhatChange
       <div className="mt-6">
         <button
           type="button"
-          className="rounded-full border border-[#b9b4a6] px-4 py-2 text-xs font-semibold uppercase tracking-[0.2em] text-[#4f4a40]"
+          className="rounded-full border border-[#c4c1b8] px-4 py-2 text-xs font-semibold uppercase tracking-[0.2em] text-[#4c4b45]"
           onClick={() => setShowText((prev) => !prev)}
         >
           {showText ? "Hide text changes" : "Show text changes"}
