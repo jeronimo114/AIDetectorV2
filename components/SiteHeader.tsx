@@ -18,26 +18,42 @@ export default function SiteHeader() {
   useEffect(() => {
     let isMounted = true;
 
-    supabase.auth.getSession().then(({ data }) => {
+    const refreshUser = async () => {
+      const { data, error } = await supabase.auth.getUser();
       if (!isMounted) {
         return;
       }
-      setUser(data.session?.user ?? null);
+      if (error) {
+        setUser(null);
+      } else {
+        setUser(data.user ?? null);
+      }
       setIsReady(true);
+    };
+
+    void refreshUser();
+
+    const { data: authListener } = supabase.auth.onAuthStateChange(() => {
+      if (!isMounted) {
+        return;
+      }
+      void refreshUser();
     });
 
-    const { data: authListener } = supabase.auth.onAuthStateChange(
-      (_event, session) => {
-        if (!isMounted) {
-          return;
-        }
-        setUser(session?.user ?? null);
+    const handleVisibility = () => {
+      if (document.visibilityState === "visible") {
+        void refreshUser();
       }
-    );
+    };
+
+    window.addEventListener("focus", handleVisibility);
+    document.addEventListener("visibilitychange", handleVisibility);
 
     return () => {
       isMounted = false;
       authListener.subscription.unsubscribe();
+      window.removeEventListener("focus", handleVisibility);
+      document.removeEventListener("visibilitychange", handleVisibility);
     };
   }, [supabase]);
 
@@ -59,6 +75,23 @@ export default function SiteHeader() {
     "text-xs uppercase tracking-[0.3em] transition hover:text-[#1f1f1c]";
   const active = "text-[#1f1f1c]";
   const inactive = "text-[#7a7670]";
+  const plan =
+    typeof user?.user_metadata?.plan === "string"
+      ? user.user_metadata.plan.toLowerCase()
+      : "free";
+  const normalizedPlan = plan === "starter" || plan === "pro" ? plan : "free";
+  const planLabel =
+    normalizedPlan === "pro"
+      ? "Pro member"
+      : normalizedPlan === "starter"
+        ? "Starter member"
+        : "Free plan";
+  const planStyles =
+    normalizedPlan === "pro"
+      ? "border-[#b8c7d4] bg-[#e6ecf1] text-[#1f2a36]"
+      : normalizedPlan === "starter"
+        ? "border-[#c9d5de] bg-[#edf2f5] text-[#2f3e4e]"
+        : "border-[#d8d6cf] bg-[#f3f3ef] text-[#4c4b45]";
 
   return (
     <header className="sticky top-0 z-20 border-b border-[#d8d6cf]/80 bg-[#f7f7f4]/85 backdrop-blur">
@@ -70,6 +103,14 @@ export default function SiteHeader() {
           Veridict
         </Link>
         <nav className="flex items-center gap-6">
+          {isReady && user && (
+            <span
+              className={`inline-flex items-center rounded-full border px-3 py-1 text-[10px] font-semibold uppercase tracking-[0.25em] ${planStyles}`}
+              title={`Current plan: ${planLabel}.`}
+            >
+              {planLabel}
+            </span>
+          )}
           <Link
             href="/pricing"
             className={`${linkBase} ${pathname === "/pricing" ? active : inactive}`}

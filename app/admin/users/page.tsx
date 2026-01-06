@@ -17,6 +17,7 @@ type UserRow = {
   created_at: string;
   role: "user" | "admin" | "super_admin";
   status: "active" | "suspended";
+  plan: "free" | "starter" | "pro";
   runs_count: number;
 };
 
@@ -50,10 +51,14 @@ export default async function AdminUsersPage({
           created_at: String(user.created_at),
           role: roleValue,
           status: statusValue,
+          plan: user.plan === "starter" || user.plan === "pro" ? user.plan : "free",
           runs_count: typeof user.runs_count === "number" ? user.runs_count : 0
         };
       })
     : [];
+
+  const formatPlan = (plan: UserRow["plan"]) =>
+    plan.charAt(0).toUpperCase() + plan.slice(1);
 
   const params = new URLSearchParams();
   if (q) params.set("q", q);
@@ -113,6 +118,7 @@ export default async function AdminUsersPage({
               <th className="py-3">User</th>
               <th className="py-3">Role</th>
               <th className="py-3">Status</th>
+              <th className="py-3">Plan</th>
               <th className="py-3">Runs</th>
               <th className="py-3">Created</th>
             </tr>
@@ -132,6 +138,7 @@ export default async function AdminUsersPage({
                     label={user.status}
                   />
                 </td>
+                <td className="py-3 text-[#4f4a40]">{formatPlan(user.plan)}</td>
                 <td className="py-3 text-[#4f4a40]">{user.runs_count}</td>
                 <td className="py-3 text-[#4f4a40]">
                   {new Date(user.created_at).toLocaleDateString()}

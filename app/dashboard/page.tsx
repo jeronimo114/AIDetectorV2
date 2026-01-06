@@ -1,6 +1,8 @@
 import { redirect } from "next/navigation";
 
 import HistoryList from "@/components/HistoryList";
+import LoadingLink from "@/components/LoadingLink";
+import { formatDateTimeUTC } from "@/lib/format";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
 
 type DetectorRun = {
@@ -39,8 +41,29 @@ export default async function DashboardPage() {
   const error = runsError?.message ?? null;
   const runCount = runs.length;
   const lastRunTime = runs[0]?.created_at
-    ? new Date(runs[0].created_at).toLocaleString()
+    ? formatDateTimeUTC(runs[0].created_at)
     : "No runs yet";
+  const rawPlan =
+    typeof user.user_metadata?.plan === "string"
+      ? user.user_metadata.plan.toLowerCase()
+      : "free";
+  const plan = rawPlan === "starter" || rawPlan === "pro" ? rawPlan : "free";
+  const planTitle = plan === "pro" ? "Pro" : plan === "starter" ? "Starter" : "Free";
+  const planBadge =
+    plan === "pro" ? "Pro member" : plan === "starter" ? "Starter member" : "Free member";
+  const planDescription =
+    plan === "pro"
+      ? "Higher limits and advanced workflows."
+      : plan === "starter"
+        ? "Regular revisions and deeper signal guidance."
+        : "Occasional checks and basic coverage.";
+  const planStyles =
+    plan === "pro"
+      ? "border-[#b8c7d4] bg-[#e6ecf1] text-[#1f2a36]"
+      : plan === "starter"
+        ? "border-[#c9d5de] bg-[#edf2f5] text-[#2f3e4e]"
+        : "border-[#d8d6cf] bg-[#f3f3ef] text-[#4c4b45]";
+  const memberSince = new Date(user.created_at).toLocaleDateString();
 
   return (
     <main className="relative min-h-screen overflow-hidden bg-[#f7f7f4]">
@@ -62,23 +85,53 @@ export default async function DashboardPage() {
           </p>
         </header>
 
-        <section className="mt-8 rounded-3xl border border-[#d8d6cf] bg-white/85 p-6 shadow-[0_18px_60px_rgba(27,24,19,0.08)] backdrop-blur">
-          <div className="flex flex-wrap items-center justify-between gap-4">
-            <div>
-              <p className="text-xs uppercase tracking-[0.3em] text-[#7a7670]">
-                Summary
-              </p>
-              <p className="mt-2 text-2xl font-semibold text-[#1f1f1c]">
-                {`${runCount} runs`}
-              </p>
+        <section className="mt-8 grid gap-4 lg:grid-cols-[1.1fr_0.9fr]">
+          <div className="rounded-3xl border border-[#d8d6cf] bg-white/85 p-6 shadow-[0_18px_60px_rgba(27,24,19,0.08)] backdrop-blur">
+            <div className="flex flex-wrap items-center justify-between gap-4">
+              <div>
+                <p className="text-xs uppercase tracking-[0.3em] text-[#7a7670]">
+                  Summary
+                </p>
+                <p className="mt-2 text-2xl font-semibold text-[#1f1f1c]">
+                  {`${runCount} runs`}
+                </p>
+              </div>
+              <div className="text-right">
+                <p className="text-xs uppercase tracking-[0.3em] text-[#7a7670]">
+                  Last run
+                </p>
+                <p className="mt-2 text-sm text-[#1f1f1c]">
+                  {lastRunTime}
+                </p>
+              </div>
             </div>
-            <div className="text-right">
-              <p className="text-xs uppercase tracking-[0.3em] text-[#7a7670]">
-                Last run
+          </div>
+
+          <div className="rounded-3xl border border-[#d8d6cf] bg-white/85 p-6 shadow-[0_18px_60px_rgba(27,24,19,0.08)] backdrop-blur">
+            <p className="text-xs uppercase tracking-[0.3em] text-[#7a7670]">
+              Plan
+            </p>
+            <div className="mt-2 flex flex-wrap items-center gap-3">
+              <p className="text-2xl font-semibold text-[#1f1f1c]">
+                {planTitle}
               </p>
-              <p className="mt-2 text-sm text-[#1f1f1c]">
-                {lastRunTime}
-              </p>
+              <span
+                className={`inline-flex items-center rounded-full border px-3 py-1 text-[10px] font-semibold uppercase tracking-[0.25em] ${planStyles}`}
+              >
+                {planBadge}
+              </span>
+            </div>
+            <p className="mt-2 text-sm text-[#4c4b45]">{planDescription}</p>
+            <div className="mt-4 flex flex-wrap items-center gap-3">
+              <LoadingLink
+                href="/pricing"
+                className="rounded-full bg-[#2f3e4e] px-4 py-2 text-xs font-semibold uppercase tracking-[0.2em] text-[#f7f7f4]"
+              >
+                Manage plan
+              </LoadingLink>
+              <span className="text-xs text-[#7a7670]">
+                Member since {memberSince}.
+              </span>
             </div>
           </div>
         </section>

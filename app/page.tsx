@@ -155,26 +155,42 @@ export default function Home() {
   useEffect(() => {
     let isMounted = true;
 
-    supabase.auth.getSession().then(({ data }) => {
+    const refreshUser = async () => {
+      const { data, error } = await supabase.auth.getUser();
       if (!isMounted) {
         return;
       }
-      setUser(data.session?.user ?? null);
+      if (error) {
+        setUser(null);
+      } else {
+        setUser(data.user ?? null);
+      }
       setAuthReady(true);
+    };
+
+    void refreshUser();
+
+    const { data: authListener } = supabase.auth.onAuthStateChange(() => {
+      if (!isMounted) {
+        return;
+      }
+      void refreshUser();
     });
 
-    const { data: authListener } = supabase.auth.onAuthStateChange(
-      (_event, session) => {
-        if (!isMounted) {
-          return;
-        }
-        setUser(session?.user ?? null);
+    const handleVisibility = () => {
+      if (document.visibilityState === "visible") {
+        void refreshUser();
       }
-    );
+    };
+
+    window.addEventListener("focus", handleVisibility);
+    document.addEventListener("visibilitychange", handleVisibility);
 
     return () => {
       isMounted = false;
       authListener.subscription.unsubscribe();
+      window.removeEventListener("focus", handleVisibility);
+      document.removeEventListener("visibilitychange", handleVisibility);
     };
   }, [supabase]);
 

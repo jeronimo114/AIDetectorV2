@@ -3,6 +3,7 @@
 import { useEffect, useMemo, useState } from "react";
 
 import { getSupabaseBrowserClient } from "@/lib/supabase/client";
+import { formatDateTimeUTC } from "@/lib/format";
 
 type DetectorRun = {
   id: string;
@@ -98,7 +99,7 @@ export default function HistoryList({ initialRuns }: HistoryListProps) {
               }`}
             >
               <div className="flex items-center justify-between text-xs uppercase tracking-[0.2em] text-[#7a7670]">
-                <span>{new Date(run.created_at).toLocaleString()}</span>
+                <span>{formatDateTimeUTC(run.created_at)}</span>
                 <span>{Math.round(run.result_score * 100)}%</span>
               </div>
               <p className="mt-2 text-sm font-semibold text-[#1f1f1c]">
@@ -159,7 +160,7 @@ export default function HistoryList({ initialRuns }: HistoryListProps) {
                   </p>
                 )}
                 <p className="mt-1 text-xs text-[#7a7670]">
-                  {new Date(selectedRun.created_at).toLocaleString()}
+                  {formatDateTimeUTC(selectedRun.created_at)}
                 </p>
               </div>
             </div>

@@ -46,6 +46,11 @@ export async function adminListUsers(params: z.infer<typeof listSchema>) {
 
   const enriched = users.map((user) => {
     const profile = profileMap.get(user.id);
+    const plan =
+      typeof user.user_metadata?.plan === "string"
+        ? user.user_metadata.plan.toLowerCase()
+        : "free";
+    const normalizedPlan = plan === "starter" || plan === "pro" ? plan : "free";
     return {
       id: user.id,
       email: user.email,
@@ -53,6 +58,7 @@ export async function adminListUsers(params: z.infer<typeof listSchema>) {
       last_sign_in_at: user.last_sign_in_at,
       role: profile?.role ?? "user",
       status: profile?.status ?? "active",
+      plan: normalizedPlan,
       runs_count: countMap.get(user.id) ?? 0
     };
   });
