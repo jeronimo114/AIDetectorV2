@@ -786,8 +786,8 @@ export default function Home() {
             className="mt-10 rounded-3xl border border-[#d8d6cf] bg-white/90 p-6 shadow-[0_20px_80px_rgba(24,22,18,0.1)] backdrop-blur opacity-0 animate-fade-up"
             style={{ animationDelay: "200ms" }}
           >
-            <div className="flex flex-wrap items-start justify-between gap-6">
-              <div className="max-w-xl">
+            <div className="grid gap-6 lg:grid-cols-[minmax(0,1fr)_280px] lg:items-start">
+              <div>
                 <p className="text-xs uppercase tracking-[0.3em] text-[#7a7670]">
                   Verdict summary
                 </p>
@@ -800,8 +800,8 @@ export default function Home() {
                 </div>
                 <p className="mt-3 text-sm text-[#4c4b45]">{summaryLine}</p>
               </div>
-              <div className="text-right">
-                <div className="flex items-center justify-end gap-2 text-xs uppercase tracking-[0.3em] text-[#7a7670]">
+              <div className="rounded-2xl border border-[#d8d6cf] bg-[#f7f7f4] p-4">
+                <div className="flex items-center justify-between gap-2 text-xs uppercase tracking-[0.3em] text-[#7a7670]">
                   <span>Confidence</span>
                   <span
                     className="inline-flex h-5 w-5 items-center justify-center rounded-full border border-[#c4c1b8] text-[10px] text-[#4c4b45]"
@@ -827,7 +827,7 @@ export default function Home() {
               </div>
             </div>
 
-            <div className="mt-4 h-2 w-full rounded-full bg-[#e3e1db]">
+            <div className="mt-6 h-2 w-full rounded-full bg-[#e3e1db]">
               <div
                 className={`h-2 rounded-full transition-all ${
                   toneStyles[verdictTone].bar
