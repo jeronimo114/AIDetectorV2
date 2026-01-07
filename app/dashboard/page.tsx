@@ -59,91 +59,112 @@ export default async function DashboardPage() {
         : "Occasional checks and basic coverage.";
   const planStyles =
     plan === "pro"
-      ? "border-[#b8c7d4] bg-[#e6ecf1] text-[#1f2a36]"
+      ? "bg-orange-50 text-orange-700 border-orange-200"
       : plan === "starter"
-        ? "border-[#c9d5de] bg-[#edf2f5] text-[#2f3e4e]"
-        : "border-[#d8d6cf] bg-[#f3f3ef] text-[#4c4b45]";
+        ? "bg-blue-50 text-blue-700 border-blue-200"
+        : "bg-gray-100 text-gray-600 border-gray-200";
   const memberSince = new Date(user.created_at).toLocaleDateString();
 
   return (
-    <main className="relative min-h-screen overflow-hidden bg-[#f7f7f4]">
-      <div className="pointer-events-none absolute inset-0">
-        <div className="absolute -top-24 left-1/3 h-64 w-64 -translate-x-1/2 rounded-full bg-[#e6ecf1] opacity-60 blur-3xl" />
-        <div className="absolute bottom-10 right-10 h-64 w-64 rounded-full bg-[#edf2f5] opacity-70 blur-3xl" />
-      </div>
-
-      <div className="relative mx-auto flex min-h-screen w-full max-w-[960px] flex-col px-6 pb-16 pt-12">
+    <main className="relative min-h-screen bg-gray-50">
+      <div className="mx-auto flex min-h-screen w-full max-w-[1000px] flex-col px-6 pb-16 pt-10">
         <header>
-          <p className="text-xs uppercase tracking-[0.3em] text-[#7a7670]">
-            Dashboard
-          </p>
-          <h1 className="mt-4 text-4xl font-semibold text-[#1f1f1c]">
-            Run history
+          <div className="inline-flex items-center gap-2 rounded-full border border-orange-200 bg-orange-50 px-4 py-2">
+            <span className="h-2 w-2 rounded-full bg-orange-500" />
+            <span className="text-sm font-medium text-orange-700">Dashboard</span>
+          </div>
+          <h1 className="mt-5 text-3xl font-bold text-gray-900">
+            Run History
           </h1>
-          <p className="mt-3 text-sm text-[#4c4b45]">
+          <p className="mt-2 text-gray-600">
             Review your recent Veridict runs and metadata.
           </p>
         </header>
 
-        <section className="mt-8 grid gap-4 lg:grid-cols-[1.1fr_0.9fr]">
-          <div className="rounded-3xl border border-[#d8d6cf] bg-white/85 p-6 shadow-[0_18px_60px_rgba(27,24,19,0.08)] backdrop-blur">
+        <section className="mt-8 grid gap-4 lg:grid-cols-2">
+          <div className="rounded-2xl border border-gray-200 bg-white p-6 shadow-sm">
             <div className="flex flex-wrap items-center justify-between gap-4">
               <div>
-                <p className="text-xs uppercase tracking-[0.3em] text-[#7a7670]">
+                <p className="text-xs font-medium uppercase tracking-wider text-gray-400">
                   Summary
                 </p>
-                <p className="mt-2 text-2xl font-semibold text-[#1f1f1c]">
-                  {`${runCount} runs`}
+                <p className="mt-2 text-3xl font-bold text-gray-900">
+                  {runCount} runs
                 </p>
               </div>
               <div className="text-right">
-                <p className="text-xs uppercase tracking-[0.3em] text-[#7a7670]">
+                <p className="text-xs font-medium uppercase tracking-wider text-gray-400">
                   Last run
                 </p>
-                <p className="mt-2 text-sm text-[#1f1f1c]">
+                <p className="mt-2 text-sm text-gray-700">
                   {lastRunTime}
                 </p>
               </div>
             </div>
           </div>
 
-          <div className="rounded-3xl border border-[#d8d6cf] bg-white/85 p-6 shadow-[0_18px_60px_rgba(27,24,19,0.08)] backdrop-blur">
-            <p className="text-xs uppercase tracking-[0.3em] text-[#7a7670]">
+          <div className="rounded-2xl border border-gray-200 bg-white p-6 shadow-sm">
+            <p className="text-xs font-medium uppercase tracking-wider text-gray-400">
               Plan
             </p>
             <div className="mt-2 flex flex-wrap items-center gap-3">
-              <p className="text-2xl font-semibold text-[#1f1f1c]">
+              <p className="text-2xl font-bold text-gray-900">
                 {planTitle}
               </p>
               <span
-                className={`inline-flex items-center rounded-full border px-3 py-1 text-[10px] font-semibold uppercase tracking-[0.25em] ${planStyles}`}
+                className={`inline-flex items-center rounded-full border px-3 py-1 text-xs font-medium ${planStyles}`}
               >
                 {planBadge}
               </span>
             </div>
-            <p className="mt-2 text-sm text-[#4c4b45]">{planDescription}</p>
+            <p className="mt-2 text-sm text-gray-600">{planDescription}</p>
             <div className="mt-4 flex flex-wrap items-center gap-3">
               <LoadingLink
                 href="/pricing"
-                className="rounded-full bg-[#2f3e4e] px-4 py-2 text-xs font-semibold uppercase tracking-[0.2em] text-[#f7f7f4]"
+                className="rounded-full bg-orange-500 px-4 py-2 text-sm font-semibold text-white shadow-sm transition-all hover:bg-orange-600"
               >
                 Manage plan
               </LoadingLink>
-              <span className="text-xs text-[#7a7670]">
-                Member since {memberSince}.
+              <span className="text-sm text-gray-500">
+                Member since {memberSince}
               </span>
             </div>
           </div>
         </section>
 
         {error && (
-          <div className="mt-6 rounded-2xl border border-[#e2ccc2] bg-[#f0e4de] p-4 text-sm text-[#6a4033]">
+          <div className="mt-6 rounded-xl border border-red-200 bg-red-50 p-4 text-sm text-red-700">
             Unable to load run history. {error}
           </div>
         )}
 
         <section className="mt-8">
           <HistoryList initialRuns={runs} />
+        </section>
+
+        {/* Quick Actions */}
+        <section className="mt-8 rounded-2xl border border-gray-200 bg-white p-6 shadow-sm">
+          <h2 className="font-semibold text-gray-900">Quick Actions</h2>
+          <div className="mt-4 flex flex-wrap gap-3">
+            <LoadingLink
+              href="/detector"
+              className="inline-flex items-center gap-2 rounded-full bg-orange-500 px-5 py-2.5 text-sm font-semibold text-white shadow-sm transition-all hover:bg-orange-600"
+            >
+              <svg viewBox="0 0 20 20" fill="none" className="h-4 w-4">
+                <rect x="3" y="3" width="5" height="5" rx="1" stroke="currentColor" strokeWidth="1.5" />
+                <rect x="12" y="3" width="5" height="5" rx="1" stroke="currentColor" strokeWidth="1.5" />
+                <rect x="3" y="12" width="5" height="5" rx="1" stroke="currentColor" strokeWidth="1.5" />
+                <rect x="12" y="12" width="5" height="5" rx="1" stroke="currentColor" strokeWidth="1.5" />
+              </svg>
+              New Analysis
+            </LoadingLink>
+            <LoadingLink
+              href="/pricing"
+              className="inline-flex items-center gap-2 rounded-full border border-gray-200 bg-white px-5 py-2.5 text-sm font-medium text-gray-700 transition-all hover:bg-gray-50"
+            >
+              View Plans
+            </LoadingLink>
+          </div>
         </section>
       </div>
     </main>

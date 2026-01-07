@@ -284,7 +284,7 @@ export default function HomePage() {
                     <div className="h-8 w-8 rounded-full border-2 border-white bg-blue-100" />
                   </div>
                   <div>
-                    <p className="text-sm font-semibold text-gray-900">2M+ Customers</p>
+                    <p className="text-sm font-semibold text-gray-900">2k+ Customers</p>
                     <p className="text-xs text-gray-500">trust us daily!</p>
                   </div>
                 </div>
@@ -384,9 +384,9 @@ export default function HomePage() {
               </div>
               {/* Floating trust badge */}
               <div className="absolute -bottom-6 left-6 rounded-xl border border-gray-100 bg-white p-4 shadow-lg">
-                <p className="text-xs font-medium text-gray-500">Trusted by 2M+ Customers</p>
+                <p className="text-xs font-medium text-gray-500">Trusted by 2k+ Customers</p>
                 <p className="mt-1 text-sm text-gray-600">
-                  Join over <span className="font-semibold text-orange-500">+16,500</span> new customers who choose our product every day!
+                  Join <span className="font-semibold text-orange-500">2k+</span> students who use Veridict to review their writing.
                 </p>
                 <div className="mt-2 flex items-center gap-1">
                   {[...Array(5)].map((_, i) => (
@@ -394,7 +394,7 @@ export default function HomePage() {
                       <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
                     </svg>
                   ))}
-                  <span className="ml-1 text-xs text-gray-500">34k+ Reviews</span>
+                  <span className="ml-1 text-xs text-gray-500">2k+ Reviews</span>
                 </div>
               </div>
             </div>

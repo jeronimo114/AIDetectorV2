@@ -66,24 +66,27 @@ const DEMO_RESULT: PreferredResponse = {
   model: "DETECTOR-V1"
 };
 
-const toneStyles: Record<VerdictTone, { pill: string; bar: string; text: string; glow: string }> = {
+const toneStyles: Record<VerdictTone, { pill: string; bar: string; text: string; icon: string; bg: string }> = {
   positive: {
-    pill: "bg-emerald-500/10 text-emerald-400 border border-emerald-500/30",
+    pill: "bg-emerald-50 text-emerald-700 border border-emerald-200",
     bar: "bg-gradient-to-r from-emerald-500 to-emerald-400",
-    text: "text-emerald-400",
-    glow: "shadow-[0_0_20px_rgba(16,185,129,0.3)]"
+    text: "text-emerald-600",
+    icon: "text-emerald-500",
+    bg: "bg-emerald-50"
   },
   neutral: {
-    pill: "bg-amber-500/10 text-amber-400 border border-amber-500/30",
+    pill: "bg-amber-50 text-amber-700 border border-amber-200",
     bar: "bg-gradient-to-r from-amber-500 to-amber-400",
-    text: "text-amber-400",
-    glow: "shadow-[0_0_20px_rgba(245,158,11,0.3)]"
+    text: "text-amber-600",
+    icon: "text-amber-500",
+    bg: "bg-amber-50"
   },
   caution: {
-    pill: "bg-red-500/10 text-red-400 border border-red-500/30",
+    pill: "bg-red-50 text-red-700 border border-red-200",
     bar: "bg-gradient-to-r from-red-500 to-red-400",
-    text: "text-red-400",
-    glow: "shadow-[0_0_20px_rgba(239,68,68,0.3)]"
+    text: "text-red-600",
+    icon: "text-red-500",
+    bg: "bg-red-50"
   }
 };
 
@@ -666,67 +669,59 @@ export default function Home() {
   const lockResults = showLockedResults && !user;
 
   return (
-    <main className="relative min-h-screen overflow-hidden">
+    <main className="relative min-h-screen bg-gray-50">
       {/* Loading overlay */}
       {isLoading && (
-        <div className="fixed inset-0 z-[60] flex items-center justify-center bg-[#050810]/95 backdrop-blur-xl">
+        <div className="fixed inset-0 z-[60] flex items-center justify-center bg-white/95 backdrop-blur-sm">
           <div className="w-full max-w-md px-6 text-center" role="status" aria-live="polite">
-            {/* Orbital animation */}
-            <div className="relative mx-auto mb-8 h-24 w-24">
-              <div className="absolute inset-0 rounded-full border border-amber-500/20 animate-pulse" />
-              <div className="absolute inset-2 rounded-full border border-amber-500/30" />
-              <div className="absolute inset-4 rounded-full border border-amber-500/40" />
-              <div className="absolute inset-0 animate-spin" style={{ animationDuration: '3s' }}>
-                <div className="absolute top-0 left-1/2 -ml-1.5 h-3 w-3 rounded-full bg-amber-500 shadow-[0_0_15px_rgba(245,158,11,0.6)]" />
-              </div>
+            {/* Spinner animation */}
+            <div className="relative mx-auto mb-8 h-20 w-20">
+              <div className="absolute inset-0 rounded-full border-4 border-gray-100" />
+              <div className="absolute inset-0 rounded-full border-4 border-orange-500 border-t-transparent animate-spin" />
               <div className="absolute inset-0 flex items-center justify-center">
-                <div className="h-4 w-4 rounded-full bg-amber-500/80 shadow-[0_0_20px_rgba(245,158,11,0.5)]" />
+                <div className="h-10 w-10 rounded-full bg-orange-50 flex items-center justify-center">
+                  <svg viewBox="0 0 24 24" fill="none" className="h-5 w-5 text-orange-500">
+                    <path d="M9 12l2 2 4-4" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" />
+                  </svg>
+                </div>
               </div>
             </div>
-            <p className="font-mono text-xs uppercase tracking-[0.3em] text-amber-500/80">
+            <p className="text-sm font-medium uppercase tracking-wider text-orange-600">
               Processing
             </p>
-            <p className="mt-3 font-serif text-2xl font-semibold text-white">
-              Analyzing signals...
+            <p className="mt-2 text-2xl font-bold text-gray-900">
+              Analyzing your text...
             </p>
-            <div className="mt-6 h-1 w-full overflow-hidden rounded-full bg-slate-800">
-              <div className="h-full w-1/2 rounded-full bg-gradient-to-r from-amber-500 to-amber-600 animate-[loading-bar_2s_ease-in-out_infinite]" />
+            <div className="mt-6 h-2 w-full overflow-hidden rounded-full bg-gray-100">
+              <div className="h-full w-1/2 rounded-full bg-gradient-to-r from-orange-500 to-orange-400 animate-[loading-bar_2s_ease-in-out_infinite]" />
             </div>
-            <p className="mt-4 text-sm text-slate-500">
+            <p className="mt-4 text-sm text-gray-500">
               This may take a few seconds.
             </p>
           </div>
         </div>
       )}
 
-      {/* Background decorations */}
-      <div className="pointer-events-none absolute inset-0 overflow-hidden">
-        <div className="absolute -top-[30%] left-1/2 h-[600px] w-[600px] -translate-x-1/2 rounded-full bg-amber-500/5 blur-[100px]" />
-        <div className="absolute top-[50%] -right-[15%] h-[400px] w-[400px] rounded-full bg-blue-500/5 blur-[80px]" />
-        <div className="absolute top-[30%] -left-[10%] h-[300px] w-[300px] rounded-full bg-purple-500/5 blur-[60px]" />
-        <div className="absolute inset-0 grid-pattern opacity-20" />
-      </div>
-
-      <div className="relative mx-auto flex min-h-screen w-full max-w-[800px] flex-col px-6 pb-16 pt-14">
+      <div className="mx-auto flex min-h-screen w-full max-w-[900px] flex-col px-6 pb-20 pt-10">
         {/* Header */}
         <header className="opacity-0 animate-fade-up">
-          <div className="inline-flex items-center gap-2 rounded-full border border-amber-500/20 bg-amber-500/5 px-4 py-2">
-            <span className="h-2 w-2 rounded-full bg-amber-500 animate-pulse" />
-            <span className="font-mono text-xs uppercase tracking-wider text-amber-400">
+          <div className="inline-flex items-center gap-2 rounded-full border border-orange-200 bg-orange-50 px-4 py-2">
+            <span className="h-2 w-2 rounded-full bg-orange-500 animate-pulse" />
+            <span className="text-sm font-medium text-orange-700">
               AI Writing Detector
             </span>
           </div>
-          <h1 className="mt-6 font-serif text-4xl font-bold leading-tight text-white sm:text-5xl">
+          <h1 className="mt-5 text-4xl font-bold text-gray-900 sm:text-5xl">
             Check your work before
-            <span className="block text-gradient">you submit it</span>
+            <span className="block text-orange-500">you submit it</span>
           </h1>
-          <p className="mt-4 max-w-xl text-lg text-slate-400">
+          <p className="mt-4 max-w-xl text-lg text-gray-600">
             Understand AI detection signals and avoid surprises when it matters.
           </p>
           <div className="mt-6 flex flex-wrap gap-3">
             <button
               type="button"
-              className="inline-flex items-center gap-2 rounded-full bg-gradient-to-r from-amber-500 to-amber-600 px-6 py-3 text-sm font-semibold text-[#050810] shadow-[0_4px_20px_-4px_rgba(245,158,11,0.4)] transition-all hover:shadow-[0_6px_30px_-4px_rgba(245,158,11,0.5)] hover:-translate-y-0.5"
+              className="inline-flex items-center gap-2 rounded-full bg-orange-500 px-6 py-3 text-sm font-semibold text-white shadow-md transition-all hover:bg-orange-600 hover:shadow-lg hover:-translate-y-0.5"
               onClick={focusTextarea}
             >
               <svg viewBox="0 0 20 20" fill="none" className="h-4 w-4">
@@ -739,7 +734,7 @@ export default function Home() {
             </button>
             <a
               href="#how-it-works"
-              className="inline-flex items-center gap-2 rounded-full border border-slate-700 bg-slate-800/50 px-6 py-3 text-sm font-medium text-white transition-all hover:border-slate-600 hover:bg-slate-800"
+              className="inline-flex items-center gap-2 rounded-full border border-gray-200 bg-white px-6 py-3 text-sm font-medium text-gray-700 transition-all hover:border-gray-300 hover:bg-gray-50"
             >
               How it works
             </a>
@@ -748,32 +743,32 @@ export default function Home() {
 
         {/* Input Section */}
         <section
-          className="mt-10 rounded-2xl glass-card p-6 opacity-0 animate-fade-up"
+          className="mt-10 rounded-2xl border border-gray-200 bg-white p-6 shadow-sm opacity-0 animate-fade-up"
           style={{ animationDelay: "120ms" }}
         >
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-3">
-              <div className="flex h-10 w-10 items-center justify-center rounded-full bg-amber-500/10">
-                <svg viewBox="0 0 24 24" fill="none" className="h-5 w-5 text-amber-500">
+              <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-orange-50">
+                <svg viewBox="0 0 24 24" fill="none" className="h-5 w-5 text-orange-500">
                   <path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
                   <path d="M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
                 </svg>
               </div>
               <div>
-                <p className="font-mono text-xs uppercase tracking-wider text-slate-500">Input</p>
-                <p className="text-lg font-semibold text-white">Your Text</p>
+                <p className="text-xs font-medium uppercase tracking-wider text-gray-400">Input</p>
+                <p className="text-lg font-semibold text-gray-900">Your Text</p>
               </div>
             </div>
-            <span className={`font-mono text-sm ${exceedsMax ? "text-red-400" : "text-slate-500"}`}>
-              {charCount}/{maxChars}
+            <span className={`text-sm font-medium ${exceedsMax ? "text-red-500" : "text-gray-400"}`}>
+              {charCount.toLocaleString()}/{maxChars.toLocaleString()}
             </span>
           </div>
 
           <div className="mt-4 flex flex-wrap items-center justify-between gap-3">
-            <div className="flex flex-wrap items-center gap-2 text-sm text-slate-500">
+            <div className="flex flex-wrap items-center gap-2 text-sm text-gray-500">
               <span>Upload .txt or .md</span>
               {uploadedFileName && (
-                <span className="max-w-[200px] truncate text-amber-400" title={uploadedFileName}>
+                <span className="max-w-[200px] truncate rounded-full bg-orange-50 px-3 py-1 text-orange-700" title={uploadedFileName}>
                   {uploadedFileName}
                 </span>
               )}
@@ -788,32 +783,40 @@ export default function Home() {
               />
               <button
                 type="button"
-                className="inline-flex items-center gap-2 rounded-lg border border-slate-700 bg-slate-800/50 px-4 py-2 text-sm text-slate-300 transition-colors hover:border-slate-600 hover:bg-slate-800 disabled:opacity-50"
+                className="inline-flex items-center gap-2 rounded-lg border border-gray-200 bg-white px-4 py-2 text-sm font-medium text-gray-700 transition-colors hover:bg-gray-50 disabled:opacity-50"
                 onClick={() => fileInputRef.current?.click()}
                 disabled={isLoading || isFileLoading}
                 aria-busy={isFileLoading}
               >
-                <span
-                  className={`h-3 w-3 rounded-full border-2 border-current border-t-transparent transition-opacity ${
-                    isFileLoading ? "animate-spin opacity-100" : "opacity-0 absolute"
-                  }`}
-                  aria-hidden="true"
-                />
-                {isFileLoading ? "Loading..." : "Choose file"}
+                {isFileLoading ? (
+                  <>
+                    <span className="h-3 w-3 animate-spin rounded-full border-2 border-gray-300 border-t-gray-600" />
+                    Loading...
+                  </>
+                ) : (
+                  <>
+                    <svg viewBox="0 0 20 20" fill="none" className="h-4 w-4">
+                      <path d="M3 16v1a2 2 0 002 2h10a2 2 0 002-2v-1M14 6l-4-4m0 0L6 6m4-4v12" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+                    </svg>
+                    Choose file
+                  </>
+                )}
               </button>
             </div>
           </div>
 
-          {fileError && <p className="mt-2 text-sm text-red-400">{fileError}</p>}
+          {fileError && (
+            <p className="mt-3 rounded-lg bg-red-50 px-3 py-2 text-sm text-red-600">{fileError}</p>
+          )}
           {pendingEdit && (
-            <p className="mt-3 font-mono text-xs uppercase tracking-wider text-amber-500/80">
+            <p className="mt-3 rounded-lg bg-orange-50 px-3 py-2 text-sm font-medium text-orange-700">
               Editing previous run from {new Date(pendingEdit.receivedAt).toLocaleString()}
             </p>
           )}
 
           <textarea
             ref={textareaRef}
-            className="mt-4 min-h-[260px] w-full resize-none rounded-xl input-field p-4 text-base leading-relaxed placeholder:text-slate-600 disabled:opacity-70"
+            className="mt-4 min-h-[260px] w-full resize-none rounded-xl border border-gray-200 bg-gray-50 p-4 text-base leading-relaxed text-gray-900 placeholder:text-gray-400 focus:border-orange-300 focus:bg-white focus:outline-none focus:ring-2 focus:ring-orange-100 disabled:opacity-70 transition-all"
             placeholder="Paste or type your draft here..."
             value={text}
             onChange={(event) => {
@@ -824,21 +827,21 @@ export default function Home() {
           />
 
           <div className="mt-4 flex flex-wrap items-center justify-between gap-4">
-            <p className={`text-sm ${exceedsMax ? "text-red-400" : "text-slate-500"}`}>
+            <p className={`text-sm ${exceedsMax ? "text-red-500" : "text-gray-500"}`}>
               {exceedsMax
-                ? `Maximum ${maxChars} characters exceeded.`
+                ? `Maximum ${maxChars.toLocaleString()} characters exceeded.`
                 : `Minimum ${MIN_CHARS} characters to analyze.`}
             </p>
             <div className="flex flex-wrap items-center gap-3">
               <button
                 type="button"
-                className="inline-flex items-center gap-2 rounded-full bg-gradient-to-r from-amber-500 to-amber-600 px-6 py-3 text-sm font-semibold text-[#050810] shadow-[0_4px_20px_-4px_rgba(245,158,11,0.4)] transition-all hover:shadow-[0_6px_30px_-4px_rgba(245,158,11,0.5)] disabled:opacity-50 disabled:cursor-not-allowed"
+                className="inline-flex items-center gap-2 rounded-full bg-orange-500 px-6 py-3 text-sm font-semibold text-white shadow-md transition-all hover:bg-orange-600 hover:shadow-lg disabled:opacity-50 disabled:cursor-not-allowed"
                 onClick={handleAnalyze}
                 disabled={!canAnalyze}
               >
                 {isLoading ? (
                   <>
-                    <span className="h-4 w-4 animate-spin rounded-full border-2 border-[#050810]/40 border-t-[#050810]" />
+                    <span className="h-4 w-4 animate-spin rounded-full border-2 border-white/40 border-t-white" />
                     Analyzing...
                   </>
                 ) : (
@@ -847,7 +850,7 @@ export default function Home() {
               </button>
               <button
                 type="button"
-                className="inline-flex items-center rounded-lg border border-slate-700 bg-slate-800/50 px-5 py-3 text-sm font-medium text-slate-300 transition-all hover:border-slate-600 hover:bg-slate-800 disabled:opacity-50"
+                className="inline-flex items-center rounded-lg border border-gray-200 bg-white px-5 py-3 text-sm font-medium text-gray-700 transition-all hover:bg-gray-50 disabled:opacity-50"
                 onClick={handleClear}
                 disabled={isLoading || isFileLoading || text.length === 0}
               >
@@ -861,7 +864,7 @@ export default function Home() {
         {/* Error Messages */}
         {isWebhookMissing && (
           <div
-            className="mt-6 rounded-xl border border-red-500/30 bg-red-500/10 p-4 text-sm text-red-400 opacity-0 animate-fade-in"
+            className="mt-6 rounded-xl border border-red-200 bg-red-50 p-4 text-sm text-red-700 opacity-0 animate-fade-in"
             style={{ animationDelay: "160ms" }}
           >
             Analysis endpoint is not configured. Add NEXT_PUBLIC_N8N_WEBHOOK_URL to enable checks.
@@ -870,14 +873,14 @@ export default function Home() {
 
         {requestError && !isWebhookMissing && (
           <div
-            className="mt-6 rounded-xl border border-red-500/30 bg-red-500/10 p-4 text-sm text-red-400 opacity-0 animate-fade-in"
+            className="mt-6 rounded-xl border border-red-200 bg-red-50 p-4 text-sm text-red-700 opacity-0 animate-fade-in"
             style={{ animationDelay: "160ms" }}
           >
             <div className="flex flex-wrap items-center justify-between gap-3">
               <span>{requestError}</span>
               <button
                 type="button"
-                className="rounded-lg border border-red-500/30 px-4 py-1.5 text-sm font-medium text-red-400 transition-colors hover:bg-red-500/10"
+                className="rounded-lg border border-red-200 bg-white px-4 py-1.5 text-sm font-medium text-red-600 transition-colors hover:bg-red-50"
                 onClick={handleAnalyze}
                 disabled={isLoading}
               >
@@ -890,40 +893,40 @@ export default function Home() {
         {/* Results Section */}
         {result?.type === "preferred" && (
           <section
-            className="relative mt-10 rounded-2xl glass-card p-6 opacity-0 animate-fade-up"
+            className="relative mt-10 rounded-2xl border border-gray-200 bg-white p-6 shadow-sm opacity-0 animate-fade-up"
             style={{ animationDelay: "200ms" }}
           >
             <div className={lockResults ? "pointer-events-none blur-sm" : ""}>
               {/* Verdict & Confidence */}
               <div className="grid gap-6 lg:grid-cols-[1fr_280px] lg:items-start">
                 <div>
-                  <p className="font-mono text-xs uppercase tracking-wider text-slate-500">
+                  <p className="text-xs font-medium uppercase tracking-wider text-gray-400">
                     Verdict Summary
                   </p>
                   <div className={`mt-3 inline-flex items-center rounded-full px-4 py-2 text-sm font-semibold ${toneStyles[verdictTone].pill}`}>
                     <span className={`mr-2 h-2 w-2 rounded-full ${verdictTone === 'positive' ? 'bg-emerald-500' : verdictTone === 'caution' ? 'bg-red-500' : 'bg-amber-500'}`} />
                     {result.data.verdict}
                   </div>
-                  <p className="mt-3 text-sm text-slate-400">{summaryLine}</p>
+                  <p className="mt-3 text-sm text-gray-600">{summaryLine}</p>
                 </div>
-                <div className="rounded-xl border border-slate-800 bg-slate-900/50 p-4">
+                <div className={`rounded-xl border p-4 ${toneStyles[verdictTone].bg} border-transparent`}>
                   <div className="flex items-center justify-between text-xs">
-                    <span className="font-mono uppercase tracking-wider text-slate-500">Confidence</span>
+                    <span className="font-medium uppercase tracking-wider text-gray-500">Confidence</span>
                     <span
-                      className="inline-flex h-5 w-5 items-center justify-center rounded-full border border-slate-700 text-[10px] text-slate-400"
+                      className="inline-flex h-5 w-5 items-center justify-center rounded-full border border-gray-300 bg-white text-[10px] text-gray-400 cursor-help"
                       title="The confidence score reflects probability, not certainty."
                     >
                       ?
                     </span>
                   </div>
-                  <p className={`mt-3 font-mono text-4xl font-bold ${toneStyles[verdictTone].text}`}>
+                  <p className={`mt-3 text-4xl font-bold ${toneStyles[verdictTone].text}`}>
                     {confidencePercent}%
                   </p>
-                  <p className="mt-1 text-xs text-slate-500">
+                  <p className="mt-1 text-xs text-gray-500">
                     Probability, not certainty.
                   </p>
                   {result.data.model && (
-                    <p className="mt-2 font-mono text-xs text-slate-600">
+                    <p className="mt-2 text-xs text-gray-400">
                       Model: {result.data.model}
                     </p>
                   )}
@@ -931,9 +934,9 @@ export default function Home() {
               </div>
 
               {/* Confidence Bar */}
-              <div className="mt-6 h-2 w-full rounded-full bg-slate-800">
+              <div className="mt-6 h-3 w-full rounded-full bg-gray-100">
                 <div
-                  className={`h-2 rounded-full transition-all ${toneStyles[verdictTone].bar} ${toneStyles[verdictTone].glow}`}
+                  className={`h-3 rounded-full transition-all ${toneStyles[verdictTone].bar}`}
                   style={{ width: `${confidencePercent}%` }}
                 />
               </div>
@@ -941,11 +944,11 @@ export default function Home() {
               {/* Detected Signals */}
               <div className="mt-8">
                 <div className="flex items-center justify-between">
-                  <span className="font-mono text-xs uppercase tracking-wider text-slate-500">
+                  <span className="text-xs font-medium uppercase tracking-wider text-gray-400">
                     Detected Signals
                   </span>
                   <span
-                    className="inline-flex h-5 w-5 items-center justify-center rounded-full border border-slate-700 text-[10px] text-slate-400"
+                    className="inline-flex h-5 w-5 items-center justify-center rounded-full border border-gray-300 bg-white text-[10px] text-gray-400 cursor-help"
                     title="Each signal includes what it means, why it matters, and how it affects the score."
                   >
                     ?
@@ -958,31 +961,31 @@ export default function Home() {
                       return (
                         <li
                           key={`${signal}-${index}`}
-                          className="rounded-xl border border-slate-800 bg-slate-900/50 overflow-hidden"
+                          className="rounded-xl border border-gray-200 bg-white overflow-hidden"
                         >
                           <details className="group">
-                            <summary className="flex cursor-pointer items-start justify-between gap-3 p-4 [&::-webkit-details-marker]:hidden">
+                            <summary className="flex cursor-pointer items-start justify-between gap-3 p-4 hover:bg-gray-50 transition-colors [&::-webkit-details-marker]:hidden">
                               <div className="flex items-start gap-3">
-                                <span className="mt-1.5 h-2 w-2 rounded-full bg-amber-500" />
-                                <span className="text-sm text-white">{signal}</span>
+                                <span className="mt-1.5 h-2 w-2 rounded-full bg-orange-500 flex-shrink-0" />
+                                <span className="text-sm font-medium text-gray-900">{signal}</span>
                               </div>
-                              <span className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full border border-slate-700 text-slate-400 transition-all group-open:border-amber-500/50 group-open:bg-amber-500/10 group-open:text-amber-500">
+                              <span className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full border border-gray-200 text-gray-400 transition-all group-open:border-orange-200 group-open:bg-orange-50 group-open:text-orange-500">
                                 <svg viewBox="0 0 16 16" fill="none" className="h-3 w-3 transition-transform group-open:rotate-180">
                                   <path d="M4 6l4 4 4-4" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
                                 </svg>
                               </span>
                             </summary>
-                            <div className="border-t border-slate-800 px-4 py-4 space-y-2 text-sm text-slate-400">
+                            <div className="border-t border-gray-100 bg-gray-50 px-4 py-4 space-y-2 text-sm text-gray-600">
                               <p>
-                                <span className="font-medium text-white">What it means:</span>{" "}
+                                <span className="font-medium text-gray-900">What it means:</span>{" "}
                                 {details.meaning}
                               </p>
                               <p>
-                                <span className="font-medium text-white">Why it matters:</span>{" "}
+                                <span className="font-medium text-gray-900">Why it matters:</span>{" "}
                                 {details.why}
                               </p>
                               <p>
-                                <span className="font-medium text-white">How it affects the score:</span>{" "}
+                                <span className="font-medium text-gray-900">How it affects the score:</span>{" "}
                                 {details.impact}
                               </p>
                             </div>
@@ -992,22 +995,25 @@ export default function Home() {
                     })}
                   </ul>
                 ) : (
-                  <div className="mt-4 rounded-xl border border-slate-800 bg-slate-900/50 p-4 text-sm text-slate-400">
+                  <div className="mt-4 rounded-xl border border-gray-200 bg-gray-50 p-4 text-sm text-gray-600">
                     No signal list was returned. Review the verdict summary.
                   </div>
                 )}
               </div>
 
               {/* Improvement Tips */}
-              <div className="mt-8 rounded-xl border border-slate-800 bg-slate-900/50 p-4">
-                <p className="font-mono text-xs uppercase tracking-wider text-slate-500">
-                  Suggestions
+              <div className="mt-8 rounded-xl border border-orange-100 bg-orange-50 p-5">
+                <p className="text-xs font-semibold uppercase tracking-wider text-orange-700">
+                  Suggestions to Improve
                 </p>
                 <ul className="mt-3 space-y-2">
                   {IMPROVEMENT_TIPS.map((tip) => (
                     <li key={tip} className="flex items-start gap-3">
-                      <span className="mt-1.5 h-1.5 w-1.5 rounded-full bg-amber-500" />
-                      <span className="text-sm text-slate-300">{tip}</span>
+                      <svg viewBox="0 0 20 20" fill="none" className="h-5 w-5 flex-shrink-0 text-orange-500 mt-0.5">
+                        <path d="M10 18a8 8 0 100-16 8 8 0 000 16z" stroke="currentColor" strokeWidth="1.5" />
+                        <path d="M10 6v4l2 2" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
+                      </svg>
+                      <span className="text-sm text-gray-700">{tip}</span>
                     </li>
                   ))}
                 </ul>
@@ -1017,21 +1023,24 @@ export default function Home() {
               <div className="mt-6 flex flex-wrap items-center gap-3">
                 <button
                   type="button"
-                  className="inline-flex items-center gap-2 rounded-full bg-gradient-to-r from-amber-500 to-amber-600 px-5 py-2.5 text-sm font-semibold text-[#050810] shadow-[0_4px_20px_-4px_rgba(245,158,11,0.4)] transition-all hover:shadow-[0_6px_30px_-4px_rgba(245,158,11,0.5)]"
+                  className="inline-flex items-center gap-2 rounded-full bg-orange-500 px-5 py-2.5 text-sm font-semibold text-white shadow-md transition-all hover:bg-orange-600 hover:shadow-lg"
                   onClick={() => startEditFromSnapshot(latestSnapshot)}
                 >
+                  <svg viewBox="0 0 20 20" fill="none" className="h-4 w-4">
+                    <path d="M13.586 3.586a2 2 0 112.828 2.828l-.793.793-2.828-2.828.793-.793zM11.379 5.793L3 14.172V17h2.828l8.38-8.379-2.83-2.828z" fill="currentColor" />
+                  </svg>
                   Edit and recheck
                 </button>
                 {!canEdit && (
-                  <span className="inline-flex items-center rounded-full border border-slate-700 bg-slate-800/50 px-3 py-1.5 text-xs font-medium text-slate-400">
+                  <span className="inline-flex items-center rounded-full border border-gray-200 bg-gray-50 px-3 py-1.5 text-xs font-medium text-gray-500">
                     Free plan
                   </span>
                 )}
               </div>
 
               {authReady && !user && (
-                <div className="mt-6 rounded-xl border border-slate-800 bg-slate-900/50 px-4 py-3 text-sm text-slate-400">
-                  <Link href="/login" className="font-semibold text-amber-400 hover:text-amber-300">
+                <div className="mt-6 rounded-xl border border-gray-200 bg-gray-50 px-4 py-3 text-sm text-gray-600">
+                  <Link href="/login" className="font-semibold text-orange-600 hover:text-orange-500">
                     Log in
                   </Link>{" "}
                   to save your history.
@@ -1039,22 +1048,28 @@ export default function Home() {
               )}
 
               {authReady && user && saveError && (
-                <p className="mt-4 text-sm text-red-400">{saveError}</p>
+                <p className="mt-4 text-sm text-red-600">{saveError}</p>
               )}
             </div>
 
             {/* Lock overlay */}
             {lockResults && (
-              <div className="absolute inset-0 flex items-center justify-center rounded-2xl bg-[#050810]/80 backdrop-blur-sm">
-                <div className="mx-auto max-w-[280px] rounded-xl glass-card p-6 text-center">
-                  <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-full bg-amber-500/10">
-                    <svg viewBox="0 0 24 24" fill="none" className="h-6 w-6 text-amber-500">
+              <div className="absolute inset-0 flex items-center justify-center rounded-2xl bg-white/90 backdrop-blur-sm">
+                <div className="mx-auto max-w-[300px] rounded-2xl border border-gray-200 bg-white p-6 text-center shadow-lg">
+                  <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-full bg-orange-50">
+                    <svg viewBox="0 0 24 24" fill="none" className="h-7 w-7 text-orange-500">
                       <rect x="3" y="11" width="18" height="11" rx="2" stroke="currentColor" strokeWidth="2" />
                       <path d="M7 11V7a5 5 0 0110 0v4" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
                     </svg>
                   </div>
-                  <p className="mt-3 font-medium text-white">Create an account</p>
-                  <p className="mt-1 text-sm text-slate-400">to view your full report</p>
+                  <p className="mt-4 text-lg font-semibold text-gray-900">Create an account</p>
+                  <p className="mt-1 text-sm text-gray-600">to view your full report</p>
+                  <LoadingLink
+                    href="/signup?redirectedFrom=/detector"
+                    className="mt-4 block w-full rounded-full bg-orange-500 py-2.5 text-sm font-semibold text-white shadow-sm transition-all hover:bg-orange-600"
+                  >
+                    Get Started Free
+                  </LoadingLink>
                 </div>
               </div>
             )}
@@ -1064,26 +1079,26 @@ export default function Home() {
         {/* Raw result fallback */}
         {result?.type === "raw" && (
           <section
-            className="mt-10 rounded-2xl glass-card p-6 opacity-0 animate-fade-up"
+            className="mt-10 rounded-2xl border border-gray-200 bg-white p-6 shadow-sm opacity-0 animate-fade-up"
             style={{ animationDelay: "200ms" }}
           >
             <div className="flex flex-wrap items-center justify-between gap-4">
               <div>
-                <p className="font-mono text-xs uppercase tracking-wider text-slate-500">Response</p>
-                <p className="mt-2 text-lg font-semibold text-white">Analysis received</p>
-                <p className="mt-1 text-sm text-slate-400">
+                <p className="text-xs font-medium uppercase tracking-wider text-gray-400">Response</p>
+                <p className="mt-2 text-lg font-semibold text-gray-900">Analysis received</p>
+                <p className="mt-1 text-sm text-gray-600">
                   The response did not match the expected schema.
                 </p>
               </div>
-              <p className="font-mono text-xs text-slate-500">
+              <p className="text-xs text-gray-400">
                 {new Date(result.receivedAt).toLocaleTimeString()}
               </p>
             </div>
-            <details className="mt-4 rounded-xl border border-slate-800 bg-slate-900/50 overflow-hidden">
-              <summary className="cursor-pointer p-4 text-sm font-medium text-slate-300 [&::-webkit-details-marker]:hidden">
+            <details className="mt-4 rounded-xl border border-gray-200 overflow-hidden">
+              <summary className="cursor-pointer p-4 text-sm font-medium text-gray-700 hover:bg-gray-50 [&::-webkit-details-marker]:hidden">
                 View raw output
               </summary>
-              <pre className="border-t border-slate-800 p-4 max-h-80 overflow-auto font-mono text-xs text-slate-400">
+              <pre className="border-t border-gray-200 bg-gray-50 p-4 max-h-80 overflow-auto font-mono text-xs text-gray-600">
                 {JSON.stringify(result.data, null, 2)}
               </pre>
             </details>
@@ -1091,7 +1106,7 @@ export default function Home() {
             <div className="mt-6 flex flex-wrap gap-3">
               <button
                 type="button"
-                className="inline-flex items-center gap-2 rounded-full bg-gradient-to-r from-amber-500 to-amber-600 px-5 py-2.5 text-sm font-semibold text-[#050810]"
+                className="inline-flex items-center gap-2 rounded-full bg-orange-500 px-5 py-2.5 text-sm font-semibold text-white shadow-md"
                 onClick={() => startEditFromSnapshot(latestSnapshot)}
               >
                 Edit and recheck
@@ -1099,8 +1114,8 @@ export default function Home() {
             </div>
 
             {authReady && !user && (
-              <div className="mt-6 rounded-xl border border-slate-800 bg-slate-900/50 px-4 py-3 text-sm text-slate-400">
-                <Link href="/login" className="font-semibold text-amber-400">
+              <div className="mt-6 rounded-xl border border-gray-200 bg-gray-50 px-4 py-3 text-sm text-gray-600">
+                <Link href="/login" className="font-semibold text-orange-600">
                   Log in
                 </Link>{" "}
                 to save your history.
@@ -1118,20 +1133,20 @@ export default function Home() {
 
         {/* Upgrade Modal */}
         {!canEdit && upgradeIntent && (
-          <div className="fixed inset-0 z-50 flex items-center justify-center bg-[#050810]/80 p-6 backdrop-blur-xl animate-fade-in">
-            <div className="w-full max-w-lg rounded-2xl glass-card p-6 animate-scale-in">
+          <div className="fixed inset-0 z-50 flex items-center justify-center bg-gray-900/50 p-6 backdrop-blur-sm animate-fade-in">
+            <div className="w-full max-w-lg rounded-2xl border border-gray-200 bg-white p-6 shadow-xl animate-scale-in">
               <div className="flex items-start justify-between gap-4">
                 <div>
-                  <p className="text-lg font-semibold text-white">
+                  <p className="text-lg font-semibold text-gray-900">
                     Edit feedback helps you understand why a result changed.
                   </p>
-                  <p className="mt-1 font-mono text-xs uppercase tracking-wider text-slate-500">
+                  <p className="mt-1 text-sm text-gray-600">
                     Edit recheck and change tracking
                   </p>
                 </div>
                 <button
                   type="button"
-                  className="rounded-lg border border-slate-700 p-2 text-slate-400 transition-colors hover:bg-slate-800 hover:text-white"
+                  className="rounded-lg border border-gray-200 p-2 text-gray-400 transition-colors hover:bg-gray-50 hover:text-gray-600"
                   onClick={() => setUpgradeIntent(null)}
                 >
                   <svg viewBox="0 0 20 20" fill="none" className="h-4 w-4">
@@ -1142,9 +1157,12 @@ export default function Home() {
               <div className="mt-6">
                 <LoadingLink
                   href="/pricing"
-                  className="inline-flex items-center gap-2 rounded-full bg-gradient-to-r from-amber-500 to-amber-600 px-6 py-3 text-sm font-semibold text-[#050810] shadow-[0_4px_20px_-4px_rgba(245,158,11,0.4)]"
+                  className="inline-flex items-center gap-2 rounded-full bg-orange-500 px-6 py-3 text-sm font-semibold text-white shadow-md hover:bg-orange-600"
                 >
                   Upgrade to Starter
+                  <svg viewBox="0 0 16 16" fill="none" className="h-4 w-4">
+                    <path d="M6 12l4-4-4-4" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+                  </svg>
                 </LoadingLink>
               </div>
             </div>
@@ -1153,36 +1171,36 @@ export default function Home() {
 
         {/* Auth Gate Modal */}
         {showAuthGate && !user && (
-          <div className="fixed inset-0 z-50 flex items-center justify-center bg-[#050810]/80 p-6 backdrop-blur-xl">
-            <div className="w-full max-w-lg rounded-2xl glass-card p-8">
-              <div className="flex h-12 w-12 items-center justify-center rounded-full bg-amber-500/10">
-                <svg viewBox="0 0 24 24" fill="none" className="h-6 w-6 text-amber-500">
+          <div className="fixed inset-0 z-50 flex items-center justify-center bg-gray-900/50 p-6 backdrop-blur-sm">
+            <div className="w-full max-w-lg rounded-2xl border border-gray-200 bg-white p-8 shadow-xl">
+              <div className="flex h-14 w-14 items-center justify-center rounded-full bg-orange-50">
+                <svg viewBox="0 0 24 24" fill="none" className="h-7 w-7 text-orange-500">
                   <path d="M12 15v2m0-8v4m0 8c4.97 0 9-4.03 9-9s-4.03-9-9-9-9 4.03-9 9 4.03 9 9 9z" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
                 </svg>
               </div>
-              <h3 className="mt-4 font-serif text-2xl font-bold text-white">
+              <h3 className="mt-4 text-2xl font-bold text-gray-900">
                 View your full report
               </h3>
-              <p className="mt-2 text-slate-400">
+              <p className="mt-2 text-gray-600">
                 Create an account to unlock detailed signals, save your history, and track revisions over time.
               </p>
               <div className="mt-6 space-y-3">
                 <LoadingLink
                   href="/signup?redirectedFrom=/detector"
-                  className="block w-full rounded-xl bg-gradient-to-r from-amber-500 to-amber-600 py-3 text-center text-sm font-semibold text-[#050810] shadow-[0_4px_20px_-4px_rgba(245,158,11,0.4)]"
+                  className="block w-full rounded-full bg-orange-500 py-3 text-center text-sm font-semibold text-white shadow-md transition-all hover:bg-orange-600"
                 >
                   Create Free Account
                 </LoadingLink>
                 <LoadingLink
                   href="/login?redirectedFrom=/detector"
-                  className="block w-full rounded-xl border border-slate-700 bg-slate-800/50 py-3 text-center text-sm font-medium text-white transition-all hover:border-slate-600 hover:bg-slate-800"
+                  className="block w-full rounded-full border border-gray-200 bg-white py-3 text-center text-sm font-medium text-gray-700 transition-all hover:bg-gray-50"
                 >
                   Already have an account? Log in
                 </LoadingLink>
               </div>
               <button
                 type="button"
-                className="mt-4 w-full text-center text-sm text-slate-500 hover:text-slate-400 transition-colors"
+                className="mt-4 w-full text-center text-sm text-gray-500 hover:text-gray-700 transition-colors"
                 onClick={() => setShowAuthGate(false)}
               >
                 Maybe later
@@ -1196,7 +1214,7 @@ export default function Home() {
           <div className="mt-8 flex flex-wrap gap-3">
             <button
               type="button"
-              className="rounded-lg border border-slate-700 bg-slate-800/50 px-4 py-2 text-sm font-medium text-slate-300 transition-all hover:border-slate-600 hover:bg-slate-800"
+              className="rounded-lg border border-gray-200 bg-white px-4 py-2 text-sm font-medium text-gray-700 transition-all hover:bg-gray-50"
               onClick={() => startEditFromSnapshot(latestSnapshot)}
             >
               Check another edit
@@ -1207,24 +1225,38 @@ export default function Home() {
         {/* How it works section */}
         <section
           id="how-it-works"
-          className="mt-12 rounded-2xl glass-card p-6 opacity-0 animate-fade-up"
+          className="mt-12 rounded-2xl border border-gray-200 bg-white p-6 shadow-sm opacity-0 animate-fade-up"
           style={{ animationDelay: "220ms" }}
         >
-          <p className="font-mono text-xs uppercase tracking-wider text-amber-500">
+          <p className="text-xs font-semibold uppercase tracking-wider text-orange-600">
             How it works
           </p>
-          <div className="mt-4 grid gap-4 md:grid-cols-3">
+          <h2 className="mt-2 text-2xl font-bold text-gray-900">Three simple steps</h2>
+          <div className="mt-6 grid gap-6 md:grid-cols-3">
             {[
-              { step: "01", title: "Paste your draft", desc: "Enter or upload your text" },
-              { step: "02", title: "Review signals", desc: "See what patterns are detected" },
-              { step: "03", title: "Revise & recheck", desc: "Improve and verify your changes" }
+              { step: "01", title: "Paste your draft", desc: "Enter or upload your text", icon: (
+                <svg viewBox="0 0 24 24" fill="none" className="h-6 w-6">
+                  <path d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+                </svg>
+              )},
+              { step: "02", title: "Review signals", desc: "See what patterns are detected", icon: (
+                <svg viewBox="0 0 24 24" fill="none" className="h-6 w-6">
+                  <path d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+                </svg>
+              )},
+              { step: "03", title: "Revise & recheck", desc: "Improve and verify your changes", icon: (
+                <svg viewBox="0 0 24 24" fill="none" className="h-6 w-6">
+                  <path d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+                </svg>
+              )}
             ].map((item) => (
-              <div key={item.step} className="flex gap-4">
-                <span className="font-mono text-2xl font-bold text-amber-500/30">{item.step}</span>
-                <div>
-                  <p className="font-medium text-white">{item.title}</p>
-                  <p className="mt-1 text-sm text-slate-500">{item.desc}</p>
+              <div key={item.step} className="text-center">
+                <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-2xl bg-orange-50 text-orange-500">
+                  {item.icon}
                 </div>
+                <span className="mt-4 block text-xs font-bold text-orange-500">{item.step}</span>
+                <p className="mt-1 font-semibold text-gray-900">{item.title}</p>
+                <p className="mt-1 text-sm text-gray-600">{item.desc}</p>
               </div>
             ))}
           </div>
@@ -1232,10 +1264,10 @@ export default function Home() {
 
         {/* Footer */}
         <footer
-          className="mt-auto pt-12 text-center font-mono text-xs uppercase tracking-wider text-slate-600 opacity-0 animate-fade-in"
+          className="mt-auto pt-12 text-center text-sm text-gray-500 opacity-0 animate-fade-in"
           style={{ animationDelay: "240ms" }}
         >
-          Signals over accusations · Probability over certainty
+          <p className="font-medium">Signals over accusations · Probability over certainty</p>
         </footer>
       </div>
     </main>
