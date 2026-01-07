@@ -3,6 +3,7 @@
 import { useEffect, useRef, useState, type ChangeEvent } from "react";
 
 import LoadingLink from "@/components/LoadingLink";
+import JsonLd, { faqSchema } from "@/components/JsonLd";
 
 const FILE_ACCEPT =
   ".txt,.md,.doc,.docx,.pdf,text/plain,text/markdown,application/pdf,application/msword,application/vnd.openxmlformats-officedocument.wordprocessingml.document";
@@ -78,6 +79,34 @@ const PREVIEW_SIGNALS = [
   "Uniform sentence cadence",
   "Limited idiomatic variation",
   "Low burstiness across paragraphs"
+];
+
+const FAQS = [
+  {
+    question: "How accurate is AI detection?",
+    answer:
+      "AI detection tools analyze patterns in writing style, not the actual source. Veridict shows you which signals are being detected and their confidence levels, so you can understand what's being flagged and make informed revisions. No detector is 100% accurate, which is why we focus on transparency over verdicts."
+  },
+  {
+    question: "Will my essay be flagged if I used Grammarly or spell-check?",
+    answer:
+      "Grammar tools and spell-checkers generally don't trigger AI detection because they correct errors rather than generate new content. However, AI-powered rewriting tools that restructure sentences can sometimes create patterns that detectors flag. Veridict helps you identify these patterns before submission."
+  },
+  {
+    question: "How do I reduce AI detection signals in my writing?",
+    answer:
+      "Focus on varying sentence length, adding personal examples and concrete details, using natural transitions, and avoiding repetitive structures. Veridict's signal breakdown shows exactly which patterns are being detected, so you can target your revisions effectively."
+  },
+  {
+    question: "Is my text stored or shared?",
+    answer:
+      "Your text is processed securely and stored only in your account history so you can track revisions. We never share your content with third parties or use it for training. You can delete your history at any time from your dashboard."
+  },
+  {
+    question: "What's the difference between Veridict and other AI detectors?",
+    answer:
+      "Most detectors give you a verdict and leave you guessing. Veridict explains the signals behind the score, shows how edits change your results, and helps you revise with clarity. We focus on education and improvement, not accusation."
+  }
 ];
 
 type ImagePromptCardProps = {
@@ -510,6 +539,42 @@ export default function HomePage() {
                   </div>
                 </div>
               </div>
+            ))}
+          </div>
+        </section>
+
+        <section className="mt-16">
+          <JsonLd data={faqSchema(FAQS)} />
+          <p className="text-xs uppercase tracking-[0.3em] text-[#7a7670]">
+            Common questions
+          </p>
+          <h2 className="mt-3 text-2xl font-semibold text-[#1f1f1c]">
+            Frequently Asked Questions
+          </h2>
+          <div className="mt-8 space-y-4">
+            {FAQS.map((faq) => (
+              <details
+                key={faq.question}
+                className="group rounded-2xl border border-[#d8d6cf] bg-white/85 shadow-[0_8px_30px_rgba(27,24,19,0.06)]"
+              >
+                <summary className="flex cursor-pointer items-center justify-between gap-4 px-6 py-4 text-sm font-medium text-[#1f1f1c] [&::-webkit-details-marker]:hidden">
+                  {faq.question}
+                  <span className="text-[#7a7670] transition-transform group-open:rotate-180">
+                    <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+                      <path
+                        d="M4 6L8 10L12 6"
+                        stroke="currentColor"
+                        strokeWidth="1.5"
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                      />
+                    </svg>
+                  </span>
+                </summary>
+                <div className="border-t border-[#ebe7de] px-6 py-4 text-sm text-[#4c4b45]">
+                  {faq.answer}
+                </div>
+              </details>
             ))}
           </div>
         </section>

@@ -130,6 +130,25 @@ function SignupForm() {
             .
           </p>
         </div>
+
+        <div className="mt-8 space-y-4">
+          <div className="rounded-2xl border border-[#d8d6cf] bg-white/60 p-5">
+            <p className="text-sm text-[#4c4b45]">
+              "The signals list is clear. I can see what to fix without guessing."
+            </p>
+            <p className="mt-3 text-xs text-[#7a7670]">
+              Jordan K. · Graduate student, US
+            </p>
+          </div>
+          <div className="rounded-2xl border border-[#d8d6cf] bg-white/60 p-5">
+            <p className="text-sm text-[#4c4b45]">
+              "It is calm and direct. I can check a draft before I submit it."
+            </p>
+            <p className="mt-3 text-xs text-[#7a7670]">
+              Elena P. · Masters student, EU
+            </p>
+          </div>
+        </div>
       </div>
     </main>
   );

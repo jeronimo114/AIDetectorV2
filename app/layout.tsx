@@ -45,22 +45,13 @@ export const metadata: Metadata = {
     siteName: "Veridict",
     title: "Veridict | AI Writing Detector for Students",
     description:
-      "Check if your essay looks AI-generated before submitting. Get actionable signals to reduce false positives.",
-    images: [
-      {
-        url: "/og-image.png",
-        width: 1200,
-        height: 630,
-        alt: "Veridict - AI Writing Detector for Students"
-      }
-    ]
+      "Check if your essay looks AI-generated before submitting. Get actionable signals to reduce false positives."
   },
   twitter: {
     card: "summary_large_image",
     title: "Veridict | AI Writing Detector for Students",
     description:
-      "Check if your essay looks AI-generated before submitting. Get actionable signals to reduce false positives.",
-    images: ["/og-image.png"]
+      "Check if your essay looks AI-generated before submitting. Get actionable signals to reduce false positives."
   },
   robots: {
     index: true,
