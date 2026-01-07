@@ -14,6 +14,7 @@ import type { ToolConfig, DetectionResponse, TransformationResponse, ToolRespons
 import { getRelatedTools } from "@/lib/tools/config";
 import { getSupabaseBrowserClient } from "@/lib/supabase/client";
 import { formatNumber } from "@/lib/format";
+import { useScrollAnimation } from "@/hooks/useScrollAnimation";
 
 const TIMEOUT_MS = 20000;
 const FILE_ACCEPT = ".txt,.md,text/plain,text/markdown";
@@ -67,6 +68,8 @@ function isTransformationResponse(value: unknown): value is TransformationRespon
 }
 
 export default function ToolPage({ config }: ToolPageProps) {
+  useScrollAnimation();
+
   const supabase = getSupabaseBrowserClient();
   const textareaRef = useRef<HTMLTextAreaElement | null>(null);
   const fileInputRef = useRef<HTMLInputElement | null>(null);
@@ -580,12 +583,11 @@ export default function ToolPage({ config }: ToolPageProps) {
         {/* How it works section */}
         <section
           id="how-it-works"
-          className="mt-12 rounded-2xl border border-gray-200 bg-white p-6 shadow-sm opacity-0 animate-fade-up"
-          style={{ animationDelay: "220ms" }}
+          className="scroll-fade-up mt-12 rounded-2xl border border-gray-200 bg-white p-6 shadow-sm"
         >
           <p className="text-xs font-semibold uppercase tracking-wider text-orange-600">How it works</p>
           <h2 className="mt-2 text-2xl font-bold text-gray-900">Three simple steps</h2>
-          <div className="mt-6 grid gap-6 md:grid-cols-3">
+          <div className="stagger-children mt-6 grid gap-6 md:grid-cols-3">
             {[
               { step: "01", title: "Paste your text", desc: "Enter or upload your content", icon: (
                 <svg viewBox="0 0 24 24" fill="none" className="h-6 w-6">
@@ -622,10 +624,7 @@ export default function ToolPage({ config }: ToolPageProps) {
         <RelatedTools tools={relatedTools} />
 
         {/* Footer */}
-        <footer
-          className="mt-auto pt-12 text-center text-sm text-gray-500 opacity-0 animate-fade-in"
-          style={{ animationDelay: "340ms" }}
-        >
+        <footer className="scroll-fade-up mt-auto pt-12 text-center text-sm text-gray-500">
           <p className="font-medium">Signals over accusations · Probability over certainty</p>
         </footer>
       </div>

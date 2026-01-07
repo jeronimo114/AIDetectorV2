@@ -7,7 +7,7 @@ interface ToolCTAProps {
 
 export default function ToolCTA({ toolSlug, showMainDetectorLink = true }: ToolCTAProps) {
   return (
-    <section className="mt-12 rounded-2xl border border-gray-200 bg-gradient-to-br from-orange-50 to-white p-8 shadow-sm opacity-0 animate-fade-up" style={{ animationDelay: "280ms" }}>
+    <section className="scroll-fade-up mt-12 rounded-2xl border border-gray-200 bg-gradient-to-br from-orange-50 to-white p-8 shadow-sm">
       <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-6">
         <div>
           <h2 className="text-2xl font-bold text-gray-900">

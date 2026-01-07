@@ -9,9 +9,9 @@ export default function RelatedTools({ tools }: RelatedToolsProps) {
   if (tools.length === 0) return null;
 
   return (
-    <section className="mt-12 opacity-0 animate-fade-up" style={{ animationDelay: "320ms" }}>
+    <section className="scroll-fade-up mt-12">
       <h2 className="text-lg font-semibold text-gray-900 mb-4">Related Tools</h2>
-      <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+      <div className="stagger-children grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
         {tools.map((tool) => (
           <Link
             key={tool.slug}
