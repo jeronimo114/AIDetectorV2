@@ -85,6 +85,25 @@ const components = {
   strong: (props: React.HTMLAttributes<HTMLElement>) => (
     <strong className="font-semibold text-[#1f1f1c]" {...props} />
   ),
+  table: ({ children, ...props }: React.HTMLAttributes<HTMLTableElement>) => (
+    <div className="mt-6 overflow-x-auto">
+      <table
+        className="w-full border-collapse text-left text-sm text-[#4c4b45]"
+        {...props}
+      >
+        {children}
+      </table>
+    </div>
+  ),
+  thead: (props: React.HTMLAttributes<HTMLTableSectionElement>) => (
+    <thead className="bg-[#eef1f3] text-[#4a5560]" {...props} />
+  ),
+  th: (props: React.HTMLAttributes<HTMLTableCellElement>) => (
+    <th className="border border-[#d8d6cf] px-3 py-2 font-semibold" {...props} />
+  ),
+  td: (props: React.HTMLAttributes<HTMLTableCellElement>) => (
+    <td className="border border-[#d8d6cf] px-3 py-2 align-top" {...props} />
+  ),
   hr: () => <hr className="my-8 border-t border-[#d8d6cf]" />
 };
 

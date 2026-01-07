@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
-import { useState, type FormEvent } from "react";
+import { useEffect, useState, type FormEvent } from "react";
 
 import { getSupabaseBrowserClient } from "@/lib/supabase/client";
 
@@ -20,6 +20,20 @@ export default function LoginForm() {
   const [password, setPassword] = useState("");
   const [error, setError] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(false);
+  const [isOAuthLoading, setIsOAuthLoading] = useState(false);
+
+  useEffect(() => {
+    const { data: authListener } = supabase.auth.onAuthStateChange((event, session) => {
+      if ((event === "SIGNED_IN" || event === "INITIAL_SESSION") && session) {
+        router.push(safeRedirect);
+        router.refresh();
+      }
+    });
+
+    return () => {
+      authListener.subscription.unsubscribe();
+    };
+  }, [router, safeRedirect, supabase]);
 
   const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
@@ -39,6 +53,26 @@ export default function LoginForm() {
 
     router.push(safeRedirect);
     router.refresh();
+  };
+
+  const handleGoogleSignIn = async () => {
+    setError(null);
+    setIsOAuthLoading(true);
+
+    const redirectUrl = new URL("/login", window.location.origin);
+    redirectUrl.searchParams.set("redirectedFrom", safeRedirect);
+
+    const { error: oauthError } = await supabase.auth.signInWithOAuth({
+      provider: "google",
+      options: {
+        redirectTo: redirectUrl.toString()
+      }
+    });
+
+    if (oauthError) {
+      setError(oauthError.message);
+      setIsOAuthLoading(false);
+    }
   };
 
   return (
@@ -65,6 +99,32 @@ export default function LoginForm() {
               Please log in to access {redirectedFrom}.
             </div>
           )}
+
+          <div className="mt-6 space-y-4">
+            <button
+              type="button"
+              onClick={handleGoogleSignIn}
+              className="inline-flex w-full items-center justify-center gap-3 rounded-full border border-[#d8d6cf] bg-white/90 px-6 py-3 text-xs font-semibold uppercase tracking-[0.3em] text-[#2f3e4e] transition hover:border-[#c4c1b8] disabled:cursor-not-allowed disabled:opacity-60"
+              disabled={isOAuthLoading || isLoading}
+              aria-busy={isOAuthLoading}
+            >
+              <span
+                className={`h-4 w-4 rounded-full border-2 border-[#2f3e4e]/30 border-t-[#2f3e4e] transition-opacity ${
+                  isOAuthLoading ? "animate-spin opacity-100" : "opacity-0"
+                }`}
+                aria-hidden="true"
+              />
+              Continue with Google
+            </button>
+
+            <div className="flex items-center gap-3">
+              <span className="h-px flex-1 bg-[#d8d6cf]" />
+              <span className="text-[10px] uppercase tracking-[0.3em] text-[#7a7670]">
+                Or
+              </span>
+              <span className="h-px flex-1 bg-[#d8d6cf]" />
+            </div>
+          </div>
 
           <form onSubmit={handleSubmit} className="mt-6 space-y-5">
             <label className="block text-sm text-[#4c4b45]">
@@ -99,7 +159,7 @@ export default function LoginForm() {
             <button
               type="submit"
               className="inline-flex w-full items-center justify-center gap-2 rounded-full bg-[#2f3e4e] px-6 py-3 text-xs font-semibold uppercase tracking-[0.3em] text-[#f7f7f4] transition hover:bg-[#3b4d60] disabled:cursor-not-allowed disabled:opacity-50"
-              disabled={isLoading}
+              disabled={isLoading || isOAuthLoading}
               aria-busy={isLoading}
             >
               <span

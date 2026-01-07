@@ -2,6 +2,7 @@ import "./globals.css";
 import { Plus_Jakarta_Sans } from "next/font/google";
 import type { Metadata } from "next";
 import SiteHeader from "@/components/SiteHeader";
+import SiteFooter from "@/components/SiteFooter";
 import GoogleAnalytics from "@/components/GoogleAnalytics";
 import JsonLd, { organizationSchema, softwareApplicationSchema } from "@/components/JsonLd";
 
@@ -85,6 +86,7 @@ export default function RootLayout({
         <GoogleAnalytics />
         <SiteHeader />
         {children}
+        <SiteFooter />
       </body>
     </html>
   );
