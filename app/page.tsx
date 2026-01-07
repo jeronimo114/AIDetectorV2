@@ -162,9 +162,7 @@ export default function HomePage() {
               {/* Badge */}
               <div className="mb-6 inline-flex items-center gap-2 rounded-full bg-orange-50 px-4 py-2">
                 <span className="h-2 w-2 rounded-full bg-orange-500 animate-pulse" />
-                <span className="text-sm font-medium text-orange-700">
-                  Start Your 7-Day Free Trial
-                </span>
+                <span className="text-sm font-medium text-orange-700">Try for Free</span>
               </div>
 
               {/* Main heading */}
@@ -184,7 +182,7 @@ export default function HomePage() {
                   href="/signup?redirectedFrom=/detector"
                   className="inline-flex items-center gap-2 rounded-full bg-orange-500 px-6 py-3.5 text-sm font-semibold text-white shadow-lg shadow-orange-500/25 transition-all hover:bg-orange-600 hover:shadow-xl hover:shadow-orange-500/30 hover:-translate-y-0.5"
                 >
-                  Start 7 Days Free trial
+                  Try for Free
                 </LoadingLink>
                 <LoadingLink
                   href="/detector"
@@ -445,7 +443,7 @@ export default function HomePage() {
                 href="/signup"
                 className="mt-8 inline-flex items-center gap-2 rounded-full border border-gray-200 bg-white px-6 py-3 text-sm font-semibold text-gray-700 transition-all hover:bg-gray-50 hover:border-gray-300"
               >
-                Start 7 Days Free trial
+                Try for Free
               </LoadingLink>
 
               {/* Stats */}
