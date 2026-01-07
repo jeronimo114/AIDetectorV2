@@ -3,7 +3,7 @@ import { Plus_Jakarta_Sans } from "next/font/google";
 import type { Metadata } from "next";
 import SiteHeader from "@/components/SiteHeader";
 import SiteFooter from "@/components/SiteFooter";
-import GoogleAnalytics from "@/components/GoogleAnalytics";
+import CookieConsent from "@/components/CookieConsent";
 import JsonLd, { organizationSchema, softwareApplicationSchema } from "@/components/JsonLd";
 
 const plusJakarta = Plus_Jakarta_Sans({
@@ -71,22 +71,12 @@ export default function RootLayout({
       <head>
         <JsonLd data={organizationSchema} />
         <JsonLd data={softwareApplicationSchema} />
-        <script
-          type="text/javascript"
-          dangerouslySetInnerHTML={{
-            __html: `(function(c,l,a,r,i,t,y){
-    c[a]=c[a]||function(){(c[a].q=c[a].q||[]).push(arguments)};
-    t=l.createElement(r);t.async=1;t.src="https://www.clarity.ms/tag/"+i;
-    y=l.getElementsByTagName(r)[0];y.parentNode.insertBefore(t,y);
-})(window, document, "clarity", "script", "uxrvj4odd1");`
-          }}
-        />
       </head>
       <body className="font-sans bg-white text-gray-900">
-        <GoogleAnalytics />
         <SiteHeader />
         {children}
         <SiteFooter />
+        <CookieConsent />
       </body>
     </html>
   );
