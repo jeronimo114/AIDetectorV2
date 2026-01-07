@@ -10,6 +10,7 @@ import WhatChangedPanel from "@/components/WhatChangedPanel";
 import type { Comparison, Verdict } from "@/lib/analysis/compare";
 import { buildComparison } from "@/lib/analysis/compare";
 import { getSupabaseBrowserClient } from "@/lib/supabase/client";
+import { formatNumber } from "@/lib/format";
 
 const MIN_CHARS = 80;
 const MAX_CHARS = 12000;
@@ -760,7 +761,7 @@ export default function Home() {
               </div>
             </div>
             <span className={`text-sm font-medium ${exceedsMax ? "text-red-500" : "text-gray-400"}`}>
-              {charCount.toLocaleString()}/{maxChars.toLocaleString()}
+              {formatNumber(charCount)}/{formatNumber(maxChars)}
             </span>
           </div>
 
@@ -829,8 +830,8 @@ export default function Home() {
           <div className="mt-4 flex flex-wrap items-center justify-between gap-4">
             <p className={`text-sm ${exceedsMax ? "text-red-500" : "text-gray-500"}`}>
               {exceedsMax
-                ? `Maximum ${maxChars.toLocaleString()} characters exceeded.`
-                : `Minimum ${MIN_CHARS} characters to analyze.`}
+                ? `Maximum ${formatNumber(maxChars)} characters exceeded.`
+                : `Minimum ${formatNumber(MIN_CHARS)} characters to analyze.`}
             </p>
             <div className="flex flex-wrap items-center gap-3">
               <button
