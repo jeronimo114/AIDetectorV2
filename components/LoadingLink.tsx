@@ -54,34 +54,18 @@ export default function LoadingLink({
       aria-busy={isLoading}
       aria-disabled={isLoading}
     >
-      <span className="inline-flex items-center gap-2">
-        {leadingIcon ? (
-          <span className="relative flex h-3.5 w-3.5 items-center justify-center">
-            <span
-              className={`absolute inset-0 flex items-center justify-center transition-opacity ${
-                isLoading ? "opacity-0" : "opacity-100"
-              }`}
-              aria-hidden="true"
-            >
-              {leadingIcon}
-            </span>
-            <span
-              className={`absolute inset-0 h-3.5 w-3.5 rounded-full border-2 border-current border-t-transparent transition-opacity ${
-                isLoading ? "animate-spin opacity-100" : "opacity-0"
-              }`}
-              aria-hidden="true"
-            />
-          </span>
-        ) : (
-          <span
-            className={`h-3.5 w-3.5 rounded-full border-2 border-current border-t-transparent transition-opacity ${
-              isLoading ? "animate-spin opacity-100" : "opacity-0"
-            }`}
-            aria-hidden="true"
-          />
-        )}
-        <span>{children}</span>
-      </span>
+      {isLoading && (
+        <span
+          className="h-4 w-4 flex-shrink-0 rounded-full border-2 border-current border-t-transparent animate-spin"
+          aria-hidden="true"
+        />
+      )}
+      {leadingIcon && !isLoading && (
+        <span className="flex-shrink-0" aria-hidden="true">
+          {leadingIcon}
+        </span>
+      )}
+      {children}
     </Link>
   );
 }

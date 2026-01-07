@@ -4,6 +4,7 @@ import { useEffect, useRef, useState, type ChangeEvent } from "react";
 
 import LoadingLink from "@/components/LoadingLink";
 import JsonLd, { faqSchema } from "@/components/JsonLd";
+import { useScrollAnimation } from "@/hooks/useScrollAnimation";
 
 const FILE_ACCEPT =
   ".txt,.md,.doc,.docx,.pdf,text/plain,text/markdown,application/pdf,application/msword,application/vnd.openxmlformats-officedocument.wordprocessingml.document";
@@ -112,6 +113,9 @@ export default function HomePage() {
   const [isPreviewing, setIsPreviewing] = useState(false);
   const [showGate, setShowGate] = useState(false);
   const previewTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  // Initialize scroll animations
+  useScrollAnimation();
 
   const charCount = text.length;
   const canPreview = charCount >= MIN_CHARS;
@@ -306,10 +310,10 @@ export default function HomePage() {
       {/* Trust Section */}
       <section className="border-y border-gray-100 bg-gray-50/50 py-12">
         <div className="mx-auto max-w-[1200px] px-6">
-          <p className="text-center text-sm text-gray-500">
+          <p className="scroll-fade-up text-center text-sm text-gray-500">
             Trusted by students at over 100 universities worldwide
           </p>
-          <div className="mt-8 flex flex-wrap items-center justify-center gap-8 md:gap-12">
+          <div className="stagger-children mt-8 flex flex-wrap items-center justify-center gap-8 md:gap-12">
             {TRUST_LOGOS.map((logo) => (
               <div
                 key={logo.name}
@@ -328,7 +332,7 @@ export default function HomePage() {
       {/* Features Section */}
       <section className="py-20">
         <div className="mx-auto max-w-[1200px] px-6">
-          <div className="flex flex-col items-start gap-4 md:flex-row md:items-end md:justify-between">
+          <div className="scroll-fade-up flex flex-col items-start gap-4 md:flex-row md:items-end md:justify-between">
             <div>
               <div className="inline-flex items-center gap-2 rounded-full bg-orange-50 px-3 py-1">
                 <span className="h-1.5 w-1.5 rounded-full bg-orange-500" />
@@ -344,20 +348,20 @@ export default function HomePage() {
             </p>
           </div>
 
-          <div className="mt-12 grid gap-6 md:grid-cols-3">
+          <div className="stagger-children mt-12 grid gap-6 md:grid-cols-3">
             {FEATURES.map((feature) => (
               <div
                 key={feature.title}
-                className="group rounded-2xl border border-gray-100 bg-white p-6 transition-all hover:border-orange-100 hover:shadow-lg hover:shadow-orange-50"
+                className="hover-lift group rounded-2xl border border-gray-100 bg-white p-6 transition-all hover:border-orange-100 hover:shadow-lg hover:shadow-orange-50"
               >
                 <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-orange-50 text-orange-500 transition-colors group-hover:bg-orange-100">
                   {feature.icon}
                 </div>
                 <h3 className="mt-4 text-lg font-semibold text-gray-900">{feature.title}</h3>
                 <p className="mt-2 text-sm leading-relaxed text-gray-600">{feature.description}</p>
-                <button className="mt-4 inline-flex items-center gap-1 text-sm font-medium text-gray-600 transition-colors hover:text-orange-500">
+                <button className="mt-4 inline-flex items-center gap-1.5 text-sm font-medium text-gray-600 transition-colors hover:text-orange-500 hover:gap-2">
                   Learn More
-                  <svg viewBox="0 0 16 16" fill="none" className="h-4 w-4">
+                  <svg viewBox="0 0 16 16" fill="none" className="h-4 w-4 flex-shrink-0">
                     <path d="M6 12l4-4-4-4" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
                   </svg>
                 </button>
@@ -372,7 +376,7 @@ export default function HomePage() {
         <div className="mx-auto max-w-[1200px] px-6">
           <div className="grid items-center gap-12 lg:grid-cols-2">
             {/* Image placeholder */}
-            <div className="relative">
+            <div className="scroll-slide-right relative">
               <div className="aspect-[4/3] overflow-hidden rounded-2xl bg-gradient-to-br from-gray-200 to-gray-300">
                 <div className="flex h-full items-center justify-center text-gray-400">
                   <svg viewBox="0 0 24 24" fill="none" className="h-16 w-16">
@@ -383,7 +387,7 @@ export default function HomePage() {
                 </div>
               </div>
               {/* Floating trust badge */}
-              <div className="absolute -bottom-6 left-6 rounded-xl border border-gray-100 bg-white p-4 shadow-lg">
+              <div className="absolute -bottom-6 left-6 rounded-xl border border-gray-100 bg-white p-4 shadow-lg animate-float-slow">
                 <p className="text-xs font-medium text-gray-500">Trusted by 2k+ Customers</p>
                 <p className="mt-1 text-sm text-gray-600">
                   Join <span className="font-semibold text-orange-500">2k+</span> students who use Veridict to review their writing.
@@ -400,7 +404,7 @@ export default function HomePage() {
             </div>
 
             {/* Content */}
-            <div>
+            <div className="scroll-slide-left">
               <div className="inline-flex items-center gap-2 rounded-full bg-orange-50 px-3 py-1">
                 <span className="h-1.5 w-1.5 rounded-full bg-orange-500" />
                 <span className="text-xs font-medium text-orange-700">About Us</span>
@@ -414,25 +418,25 @@ export default function HomePage() {
 
               <div className="mt-6 grid grid-cols-2 gap-4">
                 <div className="flex items-center gap-2">
-                  <svg viewBox="0 0 20 20" fill="currentColor" className="h-5 w-5 text-orange-500">
+                  <svg viewBox="0 0 20 20" fill="currentColor" className="h-5 w-5 flex-shrink-0 text-orange-500">
                     <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
                   </svg>
                   <span className="text-sm text-gray-600">50+ Countries Worldwide</span>
                 </div>
                 <div className="flex items-center gap-2">
-                  <svg viewBox="0 0 20 20" fill="currentColor" className="h-5 w-5 text-orange-500">
+                  <svg viewBox="0 0 20 20" fill="currentColor" className="h-5 w-5 flex-shrink-0 text-orange-500">
                     <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
                   </svg>
                   <span className="text-sm text-gray-600">98% Customer Satisfaction</span>
                 </div>
                 <div className="flex items-center gap-2">
-                  <svg viewBox="0 0 20 20" fill="currentColor" className="h-5 w-5 text-orange-500">
+                  <svg viewBox="0 0 20 20" fill="currentColor" className="h-5 w-5 flex-shrink-0 text-orange-500">
                     <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
                   </svg>
                   <span className="text-sm text-gray-600">Over 500k+ Analyses</span>
                 </div>
                 <div className="flex items-center gap-2">
-                  <svg viewBox="0 0 20 20" fill="currentColor" className="h-5 w-5 text-orange-500">
+                  <svg viewBox="0 0 20 20" fill="currentColor" className="h-5 w-5 flex-shrink-0 text-orange-500">
                     <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
                   </svg>
                   <span className="text-sm text-gray-600">24/7 Customer Support</span>
@@ -469,7 +473,7 @@ export default function HomePage() {
       {/* Testimonials Section */}
       <section className="py-20">
         <div className="mx-auto max-w-[1200px] px-6">
-          <div className="text-center">
+          <div className="scroll-fade-up text-center">
             <div className="inline-flex items-center gap-2 rounded-full bg-orange-50 px-3 py-1">
               <span className="h-1.5 w-1.5 rounded-full bg-orange-500" />
               <span className="text-xs font-medium text-orange-700">Student Feedback</span>
@@ -479,11 +483,11 @@ export default function HomePage() {
             </h2>
           </div>
 
-          <div className="mt-12 grid gap-6 md:grid-cols-3">
+          <div className="stagger-children mt-12 grid gap-6 md:grid-cols-3">
             {TESTIMONIALS.map((item) => (
               <div
                 key={item.name}
-                className="rounded-2xl border border-gray-100 bg-white p-6 transition-all hover:shadow-lg"
+                className="hover-lift rounded-2xl border border-gray-100 bg-white p-6 transition-all hover:shadow-lg"
               >
                 <div className="flex gap-1">
                   {[...Array(item.rating)].map((_, i) => (
@@ -512,7 +516,7 @@ export default function HomePage() {
       <section className="bg-gray-50 py-20">
         <JsonLd data={faqSchema(FAQS)} />
         <div className="mx-auto max-w-[800px] px-6">
-          <div className="text-center">
+          <div className="scroll-fade-up text-center">
             <div className="inline-flex items-center gap-2 rounded-full bg-orange-50 px-3 py-1">
               <span className="h-1.5 w-1.5 rounded-full bg-orange-500" />
               <span className="text-xs font-medium text-orange-700">Questions</span>
@@ -522,7 +526,7 @@ export default function HomePage() {
             </h2>
           </div>
 
-          <div className="mt-12 space-y-4">
+          <div className="stagger-children mt-12 space-y-4">
             {FAQS.map((faq) => (
               <details
                 key={faq.question}
@@ -548,10 +552,10 @@ export default function HomePage() {
       {/* CTA Section */}
       <section className="py-20">
         <div className="mx-auto max-w-[1200px] px-6">
-          <div className="relative overflow-hidden rounded-3xl bg-gradient-to-r from-gray-900 to-gray-800 p-12 text-center">
+          <div className="scroll-scale relative overflow-hidden rounded-3xl bg-gradient-to-r from-gray-900 to-gray-800 p-12 text-center">
             {/* Decorative elements */}
-            <div className="absolute -left-20 -top-20 h-40 w-40 rounded-full bg-orange-500/20 blur-3xl" />
-            <div className="absolute -bottom-20 -right-20 h-40 w-40 rounded-full bg-orange-500/20 blur-3xl" />
+            <div className="absolute -left-20 -top-20 h-40 w-40 rounded-full bg-orange-500/20 blur-3xl animate-pulse-soft" />
+            <div className="absolute -bottom-20 -right-20 h-40 w-40 rounded-full bg-orange-500/20 blur-3xl animate-pulse-soft" style={{ animationDelay: "1s" }} />
 
             <div className="relative">
               <h2 className="text-3xl font-bold text-white sm:text-4xl">
@@ -563,13 +567,13 @@ export default function HomePage() {
               <div className="mt-8 flex flex-wrap items-center justify-center gap-4">
                 <LoadingLink
                   href="/signup?redirectedFrom=/detector"
-                  className="inline-flex items-center gap-2 rounded-full bg-orange-500 px-8 py-4 text-sm font-semibold text-white shadow-lg shadow-orange-500/25 transition-all hover:bg-orange-600 hover:shadow-xl"
+                  className="inline-flex items-center justify-center gap-2 rounded-full bg-orange-500 px-8 py-4 text-sm font-semibold text-white shadow-lg shadow-orange-500/25 transition-all hover:bg-orange-600 hover:shadow-xl hover:-translate-y-0.5"
                 >
                   Get Started Free
                 </LoadingLink>
                 <LoadingLink
                   href="/detector"
-                  className="inline-flex items-center gap-2 rounded-full border border-gray-600 bg-transparent px-8 py-4 text-sm font-semibold text-white transition-all hover:bg-white/10"
+                  className="inline-flex items-center justify-center gap-2 rounded-full border border-gray-600 bg-transparent px-8 py-4 text-sm font-semibold text-white transition-all hover:bg-white/10 hover:-translate-y-0.5"
                 >
                   Try Demo First
                 </LoadingLink>
