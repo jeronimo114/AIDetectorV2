@@ -1,6 +1,7 @@
 import type { MetadataRoute } from "next";
 
 import { getAllPosts } from "@/lib/blog";
+import { getAllToolSlugs } from "@/lib/tools/config";
 
 export default function sitemap(): MetadataRoute.Sitemap {
   const baseUrl = "https://veridict.com";
@@ -11,6 +12,14 @@ export default function sitemap(): MetadataRoute.Sitemap {
     lastModified: new Date(post.frontmatter.date),
     changeFrequency: "monthly" as const,
     priority: 0.7
+  }));
+
+  const toolSlugs = getAllToolSlugs();
+  const toolUrls = toolSlugs.map((slug) => ({
+    url: `${baseUrl}/tools/${slug}`,
+    lastModified: new Date(),
+    changeFrequency: "weekly" as const,
+    priority: 0.85
   }));
 
   return [
@@ -63,6 +72,13 @@ export default function sitemap(): MetadataRoute.Sitemap {
       priority: 0.3
     },
     ...blogUrls,
+    {
+      url: `${baseUrl}/tools`,
+      lastModified: new Date(),
+      changeFrequency: "weekly",
+      priority: 0.8
+    },
+    ...toolUrls,
     {
       url: `${baseUrl}/login`,
       lastModified: new Date(),
