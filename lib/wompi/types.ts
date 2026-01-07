@@ -220,6 +220,9 @@ export interface Subscription {
   plan_id: PlanId;
   status: "active" | "cancelled" | "past_due" | "expired";
   payment_source_id: number;
+  customer_email: string;
+  amount_cents: number;
+  currency: string;
   current_period_start: string;
   current_period_end: string;
   cancelled_at: string | null;
@@ -233,8 +236,14 @@ export interface Payment {
   user_id: string;
   subscription_id: string;
   wompi_transaction_id: string;
+  reference: string;
   amount_cents: number;
   currency: string;
   status: TransactionStatus;
+  payment_method_type: string | null;
+  card_last_four: string | null;
+  card_brand: string | null;
+  error_message: string | null;
   created_at: string;
+  updated_at: string;
 }

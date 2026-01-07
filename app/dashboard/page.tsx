@@ -2,8 +2,10 @@ import { redirect } from "next/navigation";
 
 import HistoryList from "@/components/HistoryList";
 import LoadingLink from "@/components/LoadingLink";
+import SubscriptionManager from "@/components/SubscriptionManager";
 import { formatDateTimeUTC } from "@/lib/format";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
+import type { Subscription, Payment } from "@/lib/wompi/types";
 
 type DetectorRun = {
   id: string;
@@ -28,35 +30,52 @@ export default async function DashboardPage() {
     redirect("/login");
   }
 
-  const { data, error: runsError } = await supabase
-    .from("detector_runs")
-    .select(
-      "id, input_text, result_label, result_score, explanation, provider, model, created_at, meta"
-    )
-    .eq("user_id", user.id)
-    .order("created_at", { ascending: false })
-    .limit(50);
+  // Fetch detector runs, subscription, and payments in parallel
+  const [runsResult, subscriptionResult, paymentsResult, profileResult] = await Promise.all([
+    supabase
+      .from("detector_runs")
+      .select(
+        "id, input_text, result_label, result_score, explanation, provider, model, created_at, meta"
+      )
+      .eq("user_id", user.id)
+      .order("created_at", { ascending: false })
+      .limit(50),
+    supabase
+      .from("subscriptions")
+      .select("*")
+      .eq("user_id", user.id)
+      .in("status", ["active", "past_due", "cancelled"])
+      .order("created_at", { ascending: false })
+      .limit(1)
+      .single(),
+    supabase
+      .from("payments")
+      .select("*")
+      .eq("user_id", user.id)
+      .order("created_at", { ascending: false })
+      .limit(10),
+    supabase
+      .from("profiles")
+      .select("plan")
+      .eq("id", user.id)
+      .single()
+  ]);
 
-  const runs = (data ?? []) as DetectorRun[];
-  const error = runsError?.message ?? null;
+  const runs = (runsResult.data ?? []) as DetectorRun[];
+  const error = runsResult.error?.message ?? null;
+  const subscription = subscriptionResult.data as Subscription | null;
+  const payments = (paymentsResult.data ?? []) as Payment[];
+  const profilePlan = profileResult.data?.plan || "free";
   const runCount = runs.length;
   const lastRunTime = runs[0]?.created_at
     ? formatDateTimeUTC(runs[0].created_at)
     : "No runs yet";
-  const rawPlan =
-    typeof user.user_metadata?.plan === "string"
-      ? user.user_metadata.plan.toLowerCase()
-      : "free";
-  const plan = rawPlan === "starter" || rawPlan === "pro" ? rawPlan : "free";
+
+  // Use profile plan from database
+  const plan = profilePlan === "starter" || profilePlan === "pro" ? profilePlan : "free";
   const planTitle = plan === "pro" ? "Pro" : plan === "starter" ? "Starter" : "Free";
   const planBadge =
     plan === "pro" ? "Pro member" : plan === "starter" ? "Starter member" : "Free member";
-  const planDescription =
-    plan === "pro"
-      ? "Higher limits and advanced workflows."
-      : plan === "starter"
-        ? "Regular revisions and deeper signal guidance."
-        : "Occasional checks and basic coverage.";
   const planStyles =
     plan === "pro"
       ? "bg-orange-50 text-orange-700 border-orange-200"
@@ -117,19 +136,21 @@ export default async function DashboardPage() {
                 {planBadge}
               </span>
             </div>
-            <p className="mt-2 text-sm text-gray-600">{planDescription}</p>
             <div className="mt-4 flex flex-wrap items-center gap-3">
-              <LoadingLink
-                href="/pricing"
-                className="rounded-full bg-orange-500 px-4 py-2 text-sm font-semibold text-white shadow-sm transition-all hover:bg-orange-600"
-              >
-                Manage plan
-              </LoadingLink>
               <span className="text-sm text-gray-500">
                 Member since {memberSince}
               </span>
             </div>
           </div>
+        </section>
+
+        {/* Subscription Management */}
+        <section className="mt-8">
+          <SubscriptionManager
+            subscription={subscription}
+            payments={payments}
+            userPlan={plan}
+          />
         </section>
 
         {error && (
@@ -139,6 +160,7 @@ export default async function DashboardPage() {
         )}
 
         <section className="mt-8">
+          <h2 className="mb-4 text-lg font-semibold text-gray-900">Analysis History</h2>
           <HistoryList initialRuns={runs} />
         </section>
 
