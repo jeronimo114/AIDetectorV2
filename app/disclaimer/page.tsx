@@ -54,8 +54,8 @@ export default function DisclaimerPage() {
         <h2 className="text-lg font-semibold text-[#1f1f1c]">Contact</h2>
         <p>
           If you have questions about this disclaimer, email us at{" "}
-          <a href="mailto:hello@aidetector.app" className="font-semibold text-[#1f1f1c]">
-            hello@aidetector.app
+          <a href="mailto:veridictaidetector@gmail.com" className="font-semibold text-[#1f1f1c]">
+            veridictaidetector@gmail.com
           </a>
           .
         </p>

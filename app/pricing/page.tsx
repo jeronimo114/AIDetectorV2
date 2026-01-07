@@ -190,7 +190,7 @@ export default function PricingPage() {
           </p>
           <p className="mt-3">
             Need bulk analysis, datasets, or institutional access?{" "}
-            <Link href="mailto:hello@aidetector.app" className="font-semibold text-[#1f1f1c]">
+            <Link href="mailto:veridictaidetector@gmail.com" className="font-semibold text-[#1f1f1c]">
               Contact us.
             </Link>
           </p>

@@ -20,10 +20,10 @@ export default function SiteFooter() {
               Medellin, Colombia. Calle 23 #54-46 Veridict.
             </p>
             <a
-              href="mailto:hello@aidetector.app"
+              href="mailto:veridictaidetector@gmail.com"
               className="mt-2 inline-flex text-xs font-semibold text-gray-900"
             >
-              hello@aidetector.app
+              veridictaidetector@gmail.com
             </a>
           </div>
           <div className="flex flex-wrap gap-3">
