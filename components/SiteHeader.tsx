@@ -124,6 +124,16 @@ export default function SiteHeader() {
             Detector
           </Link>
           <Link
+            href="/tools"
+            className={`rounded-lg px-4 py-2 text-sm font-medium transition-colors ${
+              pathname?.startsWith("/tools")
+                ? "bg-gray-100 text-gray-900"
+                : "text-gray-600 hover:bg-gray-50 hover:text-gray-900"
+            }`}
+          >
+            Tools
+          </Link>
+          <Link
             href="/pricing"
             className={`rounded-lg px-4 py-2 text-sm font-medium transition-colors ${
               pathname === "/pricing"
