@@ -64,6 +64,8 @@ export async function tokenizeCard(
 export async function createPaymentSource(
   request: CreatePaymentSourceRequest
 ): Promise<CreatePaymentSourceResponse> {
+  console.log("[Wompi] Creating payment source:", { type: request.type, customer_email: request.customer_email });
+
   const response = await fetch(`${BASE_URL}/payment_sources`, {
     method: "POST",
     headers: {
@@ -73,12 +75,15 @@ export async function createPaymentSource(
     body: JSON.stringify(request)
   });
 
+  const data = await response.json();
+
   if (!response.ok) {
-    const error = await response.json();
-    throw new Error(error.error?.reason || "Failed to create payment source");
+    console.error("[Wompi] Payment source error:", JSON.stringify(data, null, 2));
+    throw new Error(data.error?.reason || data.error?.message || JSON.stringify(data.error) || "Failed to create payment source");
   }
 
-  return response.json();
+  console.log("[Wompi] Payment source created:", data.data?.id);
+  return data;
 }
 
 /**
@@ -87,6 +92,13 @@ export async function createPaymentSource(
 export async function createTransaction(
   request: CreateTransactionRequest
 ): Promise<TransactionResponse> {
+  console.log("[Wompi] Creating transaction:", {
+    amount_in_cents: request.amount_in_cents,
+    currency: request.currency,
+    payment_source_id: request.payment_source_id,
+    recurrent: request.recurrent
+  });
+
   const response = await fetch(`${BASE_URL}/transactions`, {
     method: "POST",
     headers: {
@@ -96,12 +108,15 @@ export async function createTransaction(
     body: JSON.stringify(request)
   });
 
+  const data = await response.json();
+
   if (!response.ok) {
-    const error = await response.json();
-    throw new Error(error.error?.reason || "Failed to create transaction");
+    console.error("[Wompi] Transaction error:", JSON.stringify(data, null, 2));
+    throw new Error(data.error?.reason || data.error?.message || JSON.stringify(data.error) || "Failed to create transaction");
   }
 
-  return response.json();
+  console.log("[Wompi] Transaction created:", data.data?.id, "Status:", data.data?.status);
+  return data;
 }
 
 /**

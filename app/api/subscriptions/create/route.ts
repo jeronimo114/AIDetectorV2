@@ -53,6 +53,12 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: "Plan not found" }, { status: 400 });
     }
 
+    // Determine currency based on environment
+    // Wompi sandbox only supports COP, production can use USD
+    const isProduction = process.env.NEXT_PUBLIC_WOMPI_ENV === "production";
+    const currency = isProduction ? "USD" : "COP";
+    const amountCents = isProduction ? plan.priceUSD * 100 : plan.priceCOP;
+
     // Create subscription
     const result = await createSubscription({
       userId: user.id,
@@ -60,8 +66,8 @@ export async function POST(request: NextRequest) {
       cardToken,
       customerEmail: user.email || "",
       acceptanceToken,
-      amountCents: plan.priceUSD * 100, // Convert dollars to cents
-      currency: "USD"
+      amountCents,
+      currency
     });
 
     // Check if transaction was approved

@@ -29,10 +29,27 @@ interface FormErrors {
 
 const WOMPI_PUBLIC_KEY = process.env.NEXT_PUBLIC_WOMPI_PUBLIC_KEY || "";
 const WOMPI_ENV = process.env.NEXT_PUBLIC_WOMPI_ENV || "sandbox";
-const WOMPI_BASE_URL =
-  WOMPI_ENV === "production"
-    ? "https://production.wompi.co/v1"
-    : "https://sandbox.wompi.co/v1";
+const IS_PRODUCTION = WOMPI_ENV === "production";
+const WOMPI_BASE_URL = IS_PRODUCTION
+  ? "https://production.wompi.co/v1"
+  : "https://sandbox.wompi.co/v1";
+
+// Format currency based on environment
+function formatPrice(plan: { priceUSD: number; priceCOP: number }): string {
+  if (IS_PRODUCTION) {
+    return `$${plan.priceUSD}`;
+  }
+  return new Intl.NumberFormat("es-CO", {
+    style: "currency",
+    currency: "COP",
+    minimumFractionDigits: 0,
+    maximumFractionDigits: 0
+  }).format(plan.priceCOP);
+}
+
+function getCurrencyLabel(): string {
+  return IS_PRODUCTION ? "USD" : "COP";
+}
 
 // Format card number with spaces
 function formatCardNumber(value: string): string {
@@ -411,7 +428,7 @@ function CheckoutContent() {
               <div className="mt-4 rounded-xl bg-gray-50 p-4">
                 <div className="flex items-center justify-between">
                   <span className="font-medium text-gray-900">{plan.name} Plan</span>
-                  <span className="text-lg font-bold text-gray-900">${plan.priceUSD}/mo</span>
+                  <span className="text-lg font-bold text-gray-900">{formatPrice(plan)}/mo</span>
                 </div>
                 <p className="mt-1 text-sm text-gray-500">Monthly subscription</p>
               </div>
@@ -430,11 +447,11 @@ function CheckoutContent() {
               <div className="mt-6 border-t border-gray-200 pt-4">
                 <div className="flex items-center justify-between">
                   <span className="text-gray-600">Subtotal</span>
-                  <span className="font-medium text-gray-900">${plan.priceUSD}</span>
+                  <span className="font-medium text-gray-900">{formatPrice(plan)}</span>
                 </div>
                 <div className="mt-2 flex items-center justify-between text-lg font-bold">
                   <span className="text-gray-900">Total</span>
-                  <span className="text-orange-600">${plan.priceUSD} USD</span>
+                  <span className="text-orange-600">{formatPrice(plan)} {getCurrencyLabel()}</span>
                 </div>
                 <p className="mt-2 text-xs text-gray-500">
                   Billed monthly. Cancel anytime.
@@ -575,7 +592,7 @@ function CheckoutContent() {
                       >
                         terms and conditions
                       </a>{" "}
-                      and authorize Veridict to charge my card ${plan.priceUSD} USD monthly until I cancel.
+                      and authorize Veridict to charge my card {formatPrice(plan)} {getCurrencyLabel()} monthly until I cancel.
                     </span>
                   </label>
                   {errors.terms && <p className="mt-2 text-sm text-red-600">{errors.terms}</p>}
@@ -593,7 +610,7 @@ function CheckoutContent() {
                     Processing...
                   </span>
                 ) : (
-                  `Subscribe for $${plan.priceUSD}/month`
+                  `Subscribe for ${formatPrice(plan)}/month`
                 )}
               </button>
 
