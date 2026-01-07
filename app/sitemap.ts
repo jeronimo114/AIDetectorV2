@@ -1,7 +1,17 @@
 import type { MetadataRoute } from "next";
 
+import { getAllPosts } from "@/lib/blog";
+
 export default function sitemap(): MetadataRoute.Sitemap {
   const baseUrl = "https://veridict.com";
+
+  const posts = getAllPosts();
+  const blogUrls = posts.map((post) => ({
+    url: `${baseUrl}/blog/${post.frontmatter.slug}`,
+    lastModified: new Date(post.frontmatter.date),
+    changeFrequency: "monthly" as const,
+    priority: 0.7
+  }));
 
   return [
     {
@@ -22,6 +32,13 @@ export default function sitemap(): MetadataRoute.Sitemap {
       changeFrequency: "monthly",
       priority: 0.8
     },
+    {
+      url: `${baseUrl}/blog`,
+      lastModified: new Date(),
+      changeFrequency: "weekly",
+      priority: 0.8
+    },
+    ...blogUrls,
     {
       url: `${baseUrl}/login`,
       lastModified: new Date(),
