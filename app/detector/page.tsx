@@ -7,6 +7,8 @@ import type { User } from "@supabase/supabase-js";
 import LoadingLink from "@/components/LoadingLink";
 import TipRotator from "@/components/TipRotator";
 import WhatChangedPanel from "@/components/WhatChangedPanel";
+import AnimatedBar from "@/components/AnimatedBar";
+import AnimatedCounter from "@/components/AnimatedCounter";
 import type { Comparison, Verdict } from "@/lib/analysis/compare";
 import { buildComparison } from "@/lib/analysis/compare";
 import { getSupabaseBrowserClient } from "@/lib/supabase/client";
@@ -921,7 +923,13 @@ export default function Home() {
                     </span>
                   </div>
                   <p className={`mt-3 text-4xl font-bold ${toneStyles[verdictTone].text}`}>
-                    {confidencePercent}%
+                    <AnimatedCounter
+                      key={result.receivedAt}
+                      value={confidencePercent}
+                      suffix="%"
+                      duration={1200}
+                      startOnView={false}
+                    />
                   </p>
                   <p className="mt-1 text-xs text-gray-500">
                     Probability, not certainty.
@@ -935,12 +943,15 @@ export default function Home() {
               </div>
 
               {/* Confidence Bar */}
-              <div className="mt-6 h-3 w-full rounded-full bg-gray-100">
-                <div
-                  className={`h-3 rounded-full transition-all ${toneStyles[verdictTone].bar}`}
-                  style={{ width: `${confidencePercent}%` }}
-                />
-              </div>
+              <AnimatedBar
+                key={result.receivedAt}
+                percentage={confidencePercent}
+                duration={1200}
+                delay={100}
+                className="mt-6"
+                barClassName={toneStyles[verdictTone].bar}
+                startOnView={false}
+              />
 
               {/* Detected Signals */}
               <div className="mt-8">

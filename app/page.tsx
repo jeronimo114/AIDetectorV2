@@ -5,6 +5,9 @@ import { useEffect, useRef, useState, type ChangeEvent } from "react";
 import LoadingLink from "@/components/LoadingLink";
 import JsonLd, { faqSchema } from "@/components/JsonLd";
 import { useScrollAnimation } from "@/hooks/useScrollAnimation";
+import AnimatedStat from "@/components/AnimatedStat";
+import AnimatedCounter from "@/components/AnimatedCounter";
+import AnimatedBar from "@/components/AnimatedBar";
 
 const FILE_ACCEPT =
   ".txt,.md,.doc,.docx,.pdf,text/plain,text/markdown,application/pdf,application/msword,application/vnd.openxmlformats-officedocument.wordprocessingml.document";
@@ -219,7 +222,7 @@ export default function HomePage() {
                       </svg>
                     ))}
                   </div>
-                  <p className="text-sm text-gray-500">Trusted by 2k+ Customers</p>
+                  <p className="text-sm text-gray-500">Trusted by <AnimatedCounter value={2} suffix="k+" duration={1500} /> Customers</p>
                 </div>
               </div>
             </div>
@@ -252,25 +255,34 @@ export default function HomePage() {
                   <div className="flex items-end justify-between">
                     <div>
                       <p className="text-sm text-gray-500">Confidence Score</p>
-                      <p className="mt-1 text-4xl font-bold text-gray-900">87%</p>
+                      <p className="mt-1 text-4xl font-bold text-gray-900">
+                        <AnimatedCounter value={87} suffix="%" duration={1800} />
+                      </p>
                     </div>
                     <span className="rounded-lg bg-green-50 px-3 py-1.5 text-sm font-medium text-green-700">
                       Likely Human
                     </span>
                   </div>
-                  <div className="mt-4 h-3 w-full overflow-hidden rounded-full bg-gray-100">
-                    <div className="h-full w-[87%] rounded-full bg-gradient-to-r from-green-400 to-green-500" />
-                  </div>
+                  <AnimatedBar
+                    percentage={87}
+                    duration={1800}
+                    delay={200}
+                    barClassName="bg-gradient-to-r from-green-400 to-green-500"
+                  />
                 </div>
 
                 {/* Quick stats */}
                 <div className="mt-6 grid grid-cols-3 gap-4">
                   <div className="rounded-xl bg-gray-50 p-3 text-center">
-                    <p className="text-2xl font-bold text-gray-900">3</p>
+                    <p className="text-2xl font-bold text-gray-900">
+                      <AnimatedCounter value={3} duration={1200} />
+                    </p>
                     <p className="text-xs text-gray-500">Signals</p>
                   </div>
                   <div className="rounded-xl bg-gray-50 p-3 text-center">
-                    <p className="text-2xl font-bold text-gray-900">1.2s</p>
+                    <p className="text-2xl font-bold text-gray-900">
+                      <AnimatedCounter value={1.2} suffix="s" duration={1200} decimals={1} />
+                    </p>
                     <p className="text-xs text-gray-500">Analysis</p>
                   </div>
                   <div className="rounded-xl bg-gray-50 p-3 text-center">
@@ -288,7 +300,9 @@ export default function HomePage() {
                     <div className="h-8 w-8 rounded-full border-2 border-white bg-blue-100" />
                   </div>
                   <div>
-                    <p className="text-sm font-semibold text-gray-900">2k+ Customers</p>
+                    <p className="text-sm font-semibold text-gray-900">
+                      <AnimatedCounter value={2} suffix="k+ Customers" duration={1500} />
+                    </p>
                     <p className="text-xs text-gray-500">trust us daily!</p>
                   </div>
                 </div>
@@ -388,9 +402,9 @@ export default function HomePage() {
               </div>
               {/* Floating trust badge */}
               <div className="absolute -bottom-6 left-6 rounded-xl border border-gray-100 bg-white p-4 shadow-lg animate-float-slow">
-                <p className="text-xs font-medium text-gray-500">Trusted by 2k+ Customers</p>
+                <p className="text-xs font-medium text-gray-500">Trusted by <AnimatedCounter value={2} suffix="k+" duration={1500} /> Customers</p>
                 <p className="mt-1 text-sm text-gray-600">
-                  Join <span className="font-semibold text-orange-500">2k+</span> students who use Veridict to review their writing.
+                  Join <span className="font-semibold text-orange-500"><AnimatedCounter value={2} suffix="k+" duration={1500} /></span> students who use Veridict to review their writing.
                 </p>
                 <div className="mt-2 flex items-center gap-1">
                   {[...Array(5)].map((_, i) => (
@@ -398,7 +412,7 @@ export default function HomePage() {
                       <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
                     </svg>
                   ))}
-                  <span className="ml-1 text-xs text-gray-500">2k+ Reviews</span>
+                  <span className="ml-1 text-xs text-gray-500"><AnimatedCounter value={2} suffix="k+" duration={1500} /> Reviews</span>
                 </div>
               </div>
             </div>
@@ -453,15 +467,21 @@ export default function HomePage() {
               {/* Stats */}
               <div className="mt-10 flex gap-8 border-t border-gray-200 pt-8">
                 <div>
-                  <p className="text-3xl font-bold text-gray-900">24K+</p>
+                  <p className="text-3xl font-bold text-gray-900">
+                    <AnimatedCounter value={24} suffix="K+" duration={2000} />
+                  </p>
                   <p className="text-sm text-gray-500">Business</p>
                 </div>
                 <div>
-                  <p className="text-3xl font-bold text-gray-900">$16M+</p>
+                  <p className="text-3xl font-bold text-gray-900">
+                    <AnimatedCounter value={16} prefix="$" suffix="M+" duration={2000} />
+                  </p>
                   <p className="text-sm text-gray-500">Transaction</p>
                 </div>
                 <div>
-                  <p className="text-3xl font-bold text-gray-900">160M+</p>
+                  <p className="text-3xl font-bold text-gray-900">
+                    <AnimatedCounter value={160} suffix="M+" duration={2000} />
+                  </p>
                   <p className="text-sm text-gray-500">Transactions yearly</p>
                 </div>
               </div>

@@ -1,18 +1,10 @@
+"use client";
+
 import Link from "next/link";
-import type { Metadata } from "next";
 
 import LoadingLink from "@/components/LoadingLink";
-
-export const metadata: Metadata = {
-  title: "Pricing",
-  description:
-    "Simple pricing for AI writing detection. Free tier available. Starter at $4/month, Pro at $12/month. Check your essays before submitting.",
-  openGraph: {
-    title: "Pricing | Veridict",
-    description:
-      "Simple pricing for AI writing detection. Free tier available. Check your essays before submitting."
-  }
-};
+import AnimatedCounter from "@/components/AnimatedCounter";
+import AnimatedStat from "@/components/AnimatedStat";
 
 const tiers = [
   {
@@ -34,7 +26,7 @@ const tiers = [
     name: "Starter",
     price: "$4",
     period: "/month",
-    description: "For regular revisions and guidance.",
+    description: "Submit assignments with confidence and peace of mind.",
     cta: "Get Starter",
     ctaHref: "/signup",
     popular: true,
@@ -195,7 +187,9 @@ export default function PricingPage() {
           <div className="grid grid-cols-2 gap-8 md:grid-cols-4">
             {stats.map((stat) => (
               <div key={stat.label} className="text-center">
-                <p className="text-4xl font-bold text-gray-900">{stat.value}</p>
+                <p className="text-4xl font-bold text-gray-900">
+                  <AnimatedStat value={stat.value} duration={2000} />
+                </p>
                 <p className="mt-1 text-sm text-gray-600">{stat.label}</p>
               </div>
             ))}
@@ -289,9 +283,9 @@ export default function PricingPage() {
               </div>
               {/* Floating Trust Card */}
               <div className="absolute -bottom-6 -right-4 rounded-2xl border border-gray-200 bg-white p-5 shadow-lg sm:right-4">
-                <p className="text-xs font-medium text-gray-500">Trusted by 2k+ Customers</p>
+                <p className="text-xs font-medium text-gray-500">Trusted by <AnimatedCounter value={2} suffix="k+" duration={1500} /> Customers</p>
                 <p className="mt-1 text-sm text-gray-900">
-                  Join <span className="font-semibold text-orange-600">2k+</span> students who use Veridict to review their writing.
+                  Join <span className="font-semibold text-orange-600"><AnimatedCounter value={2} suffix="k+" duration={1500} /></span> students who use Veridict to review their writing.
                 </p>
                 <div className="mt-3 flex items-center gap-1">
                   {[...Array(5)].map((_, i) => (
@@ -299,7 +293,7 @@ export default function PricingPage() {
                       <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
                     </svg>
                   ))}
-                  <span className="ml-2 text-xs text-gray-500">2k+ Reviews</span>
+                  <span className="ml-2 text-xs text-gray-500"><AnimatedCounter value={2} suffix="k+" duration={1500} /> Reviews</span>
                 </div>
               </div>
             </div>
@@ -347,15 +341,21 @@ export default function PricingPage() {
           <div className="mt-20 border-t border-gray-200 pt-12">
             <div className="grid grid-cols-3 gap-8 text-center">
               <div>
-                <p className="text-4xl font-bold text-gray-900">24K+</p>
+                <p className="text-4xl font-bold text-gray-900">
+                  <AnimatedCounter value={24} suffix="K+" duration={2000} />
+                </p>
                 <p className="mt-1 text-sm text-gray-600">Business</p>
               </div>
               <div>
-                <p className="text-4xl font-bold text-gray-900">$16M+</p>
+                <p className="text-4xl font-bold text-gray-900">
+                  <AnimatedCounter value={16} prefix="$" suffix="M+" duration={2000} />
+                </p>
                 <p className="mt-1 text-sm text-gray-600">Transaction</p>
               </div>
               <div>
-                <p className="text-4xl font-bold text-gray-900">160M+</p>
+                <p className="text-4xl font-bold text-gray-900">
+                  <AnimatedCounter value={160} suffix="M+" duration={2000} />
+                </p>
                 <p className="mt-1 text-sm text-gray-600">Transactions yearly</p>
               </div>
             </div>
