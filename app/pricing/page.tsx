@@ -1,6 +1,18 @@
 import Link from "next/link";
+import type { Metadata } from "next";
 
 import LoadingLink from "@/components/LoadingLink";
+
+export const metadata: Metadata = {
+  title: "Pricing",
+  description:
+    "Simple pricing for AI writing detection. Free tier available. Starter at $4/month, Pro at $12/month. Check your essays before submitting.",
+  openGraph: {
+    title: "Pricing | Veridict",
+    description:
+      "Simple pricing for AI writing detection. Free tier available. Check your essays before submitting."
+  }
+};
 
 const tiers = [
   {

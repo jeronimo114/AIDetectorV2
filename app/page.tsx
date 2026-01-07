@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, type ChangeEvent } from "react";
+import { useEffect, useRef, useState, type ChangeEvent } from "react";
 
 import LoadingLink from "@/components/LoadingLink";
 
@@ -23,6 +23,13 @@ const LOGOS = [
   "UCL"
 ];
 
+const WHAT_YOU_GET = [
+  "Confidence score with context.",
+  "Clear explanations of signals.",
+  "Actionable edits to reduce AI risk.",
+  "Track changes and compare drafts."
+];
+
 const TESTIMONIALS = [
   {
     quote:
@@ -40,7 +47,7 @@ const TESTIMONIALS = [
     quote:
       "It is calm and direct. I can check a draft before I submit it.",
     name: "Elena P.",
-    detail: "Student, EU"
+    detail: "Masters student, EU"
   }
 ];
 
@@ -73,17 +80,63 @@ const PREVIEW_SIGNALS = [
   "Low burstiness across paragraphs"
 ];
 
+type ImagePromptCardProps = {
+  title: string;
+  prompt: string;
+  className?: string;
+};
+
+const ImagePromptCard = ({ title, prompt, className }: ImagePromptCardProps) => (
+  <div
+    className={`relative flex h-full flex-col overflow-hidden rounded-3xl border border-[#d8d6cf] bg-[#f3f3ef] p-6 shadow-[0_18px_60px_rgba(27,24,19,0.08)] ${
+      className ?? ""
+    }`}
+  >
+    <div className="absolute -top-16 right-6 h-36 w-36 rounded-full bg-white/70 blur-2xl" />
+    <div className="absolute bottom-6 left-6 h-16 w-16 rounded-full border border-white/60" />
+    <div className="relative flex h-full flex-col">
+      <p className="text-xs uppercase tracking-[0.3em] text-[#7a7670]">{title}</p>
+      <p className="mt-3 text-sm text-[#4c4b45]">Image prompt: {prompt}</p>
+      <div className="mt-auto grid grid-cols-3 gap-3">
+        <div className="h-16 rounded-2xl border border-[#d8d6cf] bg-white/70" />
+        <div className="h-16 rounded-2xl border border-[#d8d6cf] bg-white/70" />
+        <div className="h-16 rounded-2xl border border-[#d8d6cf] bg-white/70" />
+      </div>
+    </div>
+  </div>
+);
+
+const getInitials = (name: string) =>
+  name
+    .split(" ")
+    .map((part) => part.replace(/[^a-zA-Z]/g, "")[0])
+    .filter(Boolean)
+    .join("")
+    .slice(0, 2)
+    .toUpperCase();
+
 export default function HomePage() {
   const [text, setText] = useState("");
   const [fileName, setFileName] = useState<string | null>(null);
   const [fileNote, setFileNote] = useState<string | null>(null);
   const [fileError, setFileError] = useState<string | null>(null);
   const [isFileLoading, setIsFileLoading] = useState(false);
+  const [isPreviewing, setIsPreviewing] = useState(false);
+  const [showPreviewResults, setShowPreviewResults] = useState(false);
   const [showGate, setShowGate] = useState(false);
   const [previewError, setPreviewError] = useState<string | null>(null);
+  const previewTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   const charCount = text.length;
-  const hasInput = charCount > 0 || !!fileName;
+  const canPreview = charCount >= MIN_CHARS;
+
+  useEffect(() => {
+    return () => {
+      if (previewTimerRef.current) {
+        clearTimeout(previewTimerRef.current);
+      }
+    };
+  }, []);
 
   const handleFileChange = async (event: ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
@@ -98,6 +151,7 @@ export default function HomePage() {
     setFileName(file.name);
     setFileNote(null);
     setFileError(null);
+    setPreviewError(null);
 
     const isTextFile =
       file.type.startsWith("text/") ||
@@ -122,47 +176,77 @@ export default function HomePage() {
   };
 
   const handlePreview = () => {
-    if (!hasInput) {
-      setPreviewError("Add text or attach a document to run a preview.");
+    if (!canPreview) {
+      setPreviewError(`Paste at least ${MIN_CHARS} characters to run a preview.`);
       return;
     }
+    if (previewTimerRef.current) {
+      clearTimeout(previewTimerRef.current);
+    }
     setPreviewError(null);
-    setShowGate(true);
+    setShowGate(false);
+    setIsPreviewing(true);
+    setShowPreviewResults(false);
+    previewTimerRef.current = setTimeout(() => {
+      setIsPreviewing(false);
+      setShowPreviewResults(true);
+      setShowGate(true);
+    }, 1800);
   };
 
   return (
     <main className="relative min-h-screen overflow-hidden bg-[#f7f7f4]">
+      {isPreviewing && (
+        <div className="fixed inset-0 z-40 flex items-center justify-center bg-[#f7f7f4]/90 backdrop-blur">
+          <div className="w-full max-w-md px-6 text-center" role="status" aria-live="polite">
+            <p className="text-xs uppercase tracking-[0.3em] text-[#7a7670]">
+              Running preview
+            </p>
+            <p className="mt-3 text-lg font-semibold text-[#1f1f1c]">
+              Simulating detection...
+            </p>
+            <div className="mt-6 h-2 w-full overflow-hidden rounded-full bg-[#d8d6cf]">
+              <div className="h-full w-2/3 rounded-full bg-[#2f3e4e] animate-[loading-bar_2.4s_ease-in-out_infinite]" />
+            </div>
+            <p className="mt-4 text-xs text-[#7a7670]">
+              Preview mode is simulated. Create an account for a full check.
+            </p>
+          </div>
+        </div>
+      )}
       <div className="pointer-events-none absolute inset-0">
         <div className="absolute -top-24 left-1/4 h-72 w-72 -translate-x-1/2 rounded-full bg-[#e6ecf1] opacity-70 blur-3xl" />
         <div className="absolute bottom-10 right-10 h-72 w-72 rounded-full bg-[#edf2f5] opacity-70 blur-3xl" />
       </div>
 
-      <div className="relative mx-auto w-full max-w-[1060px] px-6 pb-20 pt-16">
-        <section className="grid gap-10 lg:grid-cols-[1.1fr_0.9fr]">
+      <div className="relative mx-auto w-full max-w-[1080px] px-6 pb-24 pt-16">
+        <section className="grid items-center gap-12 lg:grid-cols-[1.1fr_0.9fr]">
           <div>
             <p className="text-xs uppercase tracking-[0.3em] text-[#7a7670]">
-              Veridict for students
+              Veridict
             </p>
             <h1 className="mt-4 text-4xl font-semibold text-[#1f1f1c]">
-              Check your work before you submit it.
+              AI Writing Detector for Students
             </h1>
-            <p className="mt-4 text-base text-[#4c4b45]">
-              Veridict explains AI detection signals with calm, direct guidance.
-              It provides probabilities and practical edits so you can decide
-              what to improve.
+            <p className="mt-2 text-xl font-medium text-[#3d3d38]">
+              Check your work before you submit it.
+            </p>
+            <p className="mt-3 text-base text-[#4c4b45]">
+              See what AI detectors see, then revise with clarity. Get actionable
+              signals to reduce false positives on Turnitin and other checkers.
             </p>
             <div className="mt-6 flex flex-wrap items-center gap-3">
               <LoadingLink
                 href="/signup?redirectedFrom=/detector"
                 className="rounded-full bg-[#2f3e4e] px-6 py-3 text-xs font-semibold uppercase tracking-[0.3em] text-[#f7f7f4] shadow-[0_10px_28px_rgba(31,42,54,0.2)] transition hover:bg-[#3b4d60]"
               >
-                Create free account
+                Create Free Account
               </LoadingLink>
               <LoadingLink
                 href="/pricing"
                 className="rounded-full border border-[#c9d5de] bg-[#edf2f5] px-6 py-3 text-xs font-semibold uppercase tracking-[0.3em] text-[#2f3e4e] transition hover:border-[#b6c6d2]"
               >
-                See pricing
+                See Pricing
               </LoadingLink>
             </div>
             <p className="mt-4 text-xs uppercase tracking-[0.3em] text-[#7a7670]">
@@ -170,161 +254,205 @@ export default function HomePage() {
             </p>
           </div>
 
-          <div className="rounded-3xl border border-[#d8d6cf] bg-white/90 p-6 shadow-[0_18px_60px_rgba(27,24,19,0.08)] backdrop-blur">
-            <p className="text-xs uppercase tracking-[0.3em] text-[#7a7670]">
-              What you get
+          <ImagePromptCard
+            title="Hero visual"
+            prompt="student using laptop calmly"
+            className="min-h-[260px] lg:min-h-[320px]"
+          />
+        </section>
+
+        <section className="mt-16 grid items-center gap-10 lg:grid-cols-[1.1fr_0.9fr]">
+          <div>
+            <h2 className="text-2xl font-semibold text-[#1f1f1c]">
+              What You Get
+            </h2>
+            <p className="mt-3 text-sm text-[#4c4b45]">
+              Clear signals and calm guidance for every draft.
             </p>
-            <ul className="mt-4 space-y-3 text-sm text-[#4c4b45]">
-              <li className="flex gap-3">
-                <span className="mt-2 h-1.5 w-1.5 rounded-full bg-[#2f3e4e]" />
-                <span>Verdict with confidence score and clear context.</span>
-              </li>
-              <li className="flex gap-3">
-                <span className="mt-2 h-1.5 w-1.5 rounded-full bg-[#2f3e4e]" />
-                <span>Readable signals that explain why the score moved.</span>
-              </li>
-              <li className="flex gap-3">
-                <span className="mt-2 h-1.5 w-1.5 rounded-full bg-[#2f3e4e]" />
-                <span>Actionable edits to improve natural variation.</span>
-              </li>
-              <li className="flex gap-3">
-                <span className="mt-2 h-1.5 w-1.5 rounded-full bg-[#2f3e4e]" />
-                <span>History to compare drafts and track changes.</span>
-              </li>
+            <ul className="mt-6 space-y-3 text-sm text-[#4c4b45]">
+              {WHAT_YOU_GET.map((item) => (
+                <li key={item} className="flex gap-3">
+                  <span className="mt-2 h-1.5 w-1.5 rounded-full bg-[#2f3e4e]" />
+                  <span>{item}</span>
+                </li>
+              ))}
             </ul>
           </div>
+
+          <ImagePromptCard
+            title="Interface explanation"
+            prompt="interface explanation"
+            className="min-h-[220px]"
+          />
         </section>
 
-        <section className="mt-10 rounded-3xl border border-[#d8d6cf] bg-white/70 p-6 shadow-[0_14px_50px_rgba(27,24,19,0.06)] backdrop-blur">
-          <p className="text-xs uppercase tracking-[0.3em] text-[#7a7670]">
-            Designed for students across the world
-          </p>
-          <div className="mt-4 grid gap-3 text-sm text-[#4c4b45] sm:grid-cols-2 lg:grid-cols-4">
-            {LOGOS.map((logo) => (
-              <div
-                key={logo}
-                className="rounded-2xl border border-[#d8d6cf] bg-[#f7f7f4] px-4 py-3 text-center text-xs uppercase tracking-[0.2em] text-[#7a7670]"
-              >
-                {logo}
-              </div>
-            ))}
+        <section className="mt-16 grid items-center gap-10 lg:grid-cols-[0.9fr_1.1fr]">
+          <ImagePromptCard
+            title="Student context"
+            prompt="university students"
+            className="min-h-[220px]"
+          />
+          <div>
+            <h2 className="text-2xl font-semibold text-[#1f1f1c]">
+              Trusted by Students Across the World
+            </h2>
+            <p className="mt-3 text-sm text-[#4c4b45]">
+              Students in the United States and Europe check drafts before
+              submission and learn how their writing is perceived.
+            </p>
+            <div className="mt-6 grid gap-3 text-sm text-[#4c4b45] sm:grid-cols-2 lg:grid-cols-4">
+              {LOGOS.map((logo) => (
+                <div
+                  key={logo}
+                  className="rounded-2xl border border-[#d8d6cf] bg-[#f7f7f4] px-4 py-3 text-center text-xs uppercase tracking-[0.2em] text-[#7a7670]"
+                >
+                  {logo}
+                </div>
+              ))}
+            </div>
           </div>
         </section>
 
-        <section className="mt-12 grid gap-8 lg:grid-cols-[1.1fr_0.9fr]">
-          <div className="rounded-3xl border border-[#d8d6cf] bg-white/90 p-6 shadow-[0_18px_60px_rgba(27,24,19,0.08)] backdrop-blur">
-            <div className="flex items-start justify-between gap-3">
-              <div>
-                <p className="text-xs uppercase tracking-[0.3em] text-[#7a7670]">
-                  Detector preview
-                </p>
-                <p className="mt-2 text-lg font-semibold text-[#1f1f1c]">
-                  Paste text or upload a document.
-                </p>
+        <section className="mt-16">
+          <div>
+            <h2 className="text-2xl font-semibold text-[#1f1f1c]">
+              Try a Preview
+            </h2>
+            <p className="mt-3 text-sm text-[#4c4b45]">
+              Paste a paragraph to see a sample detection. Preview mode shows
+              the report layout before you create an account.
+            </p>
+          </div>
+
+          <div className="mt-8 grid gap-8 lg:grid-cols-[1.05fr_0.95fr]">
+            <div className="rounded-3xl border border-[#d8d6cf] bg-white/90 p-6 shadow-[0_18px_60px_rgba(27,24,19,0.08)] backdrop-blur">
+              <div className="flex items-start justify-between gap-3">
+                <div>
+                  <p className="text-xs uppercase tracking-[0.3em] text-[#7a7670]">
+                    Preview input
+                  </p>
+                  <p className="mt-2 text-lg font-semibold text-[#1f1f1c]">
+                    Paste text or upload a document.
+                  </p>
+                </div>
+                <span className="rounded-full border border-[#d8dde2] bg-[#eef1f3] px-3 py-1 text-[10px] font-semibold uppercase tracking-[0.25em] text-[#4a5560]">
+                  Preview
+                </span>
               </div>
-              <span className="rounded-full border border-[#d8dde2] bg-[#eef1f3] px-3 py-1 text-[10px] font-semibold uppercase tracking-[0.25em] text-[#4a5560]">
-                Preview
-              </span>
-            </div>
 
-            <label className="mt-4 block text-sm text-[#4c4b45]">
-              Text input
-              <textarea
-                value={text}
-                onChange={(event) => setText(event.target.value)}
-                placeholder="Paste a paragraph from your assignment."
-                className="mt-2 min-h-[160px] w-full rounded-2xl border border-[#d8d6cf] bg-white/95 p-4 text-sm text-[#1f1f1c] focus:border-[#8fa3b5] focus:outline-none focus:ring-4 focus:ring-[#d7e1ea]"
-              />
-            </label>
-
-            <div className="mt-4 flex flex-wrap items-center gap-3 text-xs text-[#7a7670]">
-              <span>{`${charCount} characters`}</span>
-              <span>Minimum {MIN_CHARS} characters recommended.</span>
-            </div>
-
-            <div className="mt-4 flex flex-wrap items-center gap-3">
-              <label className="inline-flex cursor-pointer items-center rounded-full border border-[#c9d5de] bg-[#edf2f5] px-4 py-2 text-xs font-semibold uppercase tracking-[0.2em] text-[#2f3e4e] transition hover:border-[#b6c6d2]">
-                Upload document
-                <input
-                  type="file"
-                  accept={FILE_ACCEPT}
-                  className="sr-only"
-                  onChange={handleFileChange}
+              <label className="mt-4 block text-sm text-[#4c4b45]">
+                Text input
+                <textarea
+                  value={text}
+                  onChange={(event) => {
+                    setText(event.target.value);
+                    setPreviewError(null);
+                  }}
+                  placeholder="Paste a paragraph from your assignment."
+                  className="mt-2 min-h-[160px] w-full rounded-2xl border border-[#d8d6cf] bg-white/95 p-4 text-sm text-[#1f1f1c] focus:border-[#8fa3b5] focus:outline-none focus:ring-4 focus:ring-[#d7e1ea]"
                 />
               </label>
-              {isFileLoading && (
-                <span className="inline-flex items-center gap-2 text-xs text-[#4a5560]">
-                  <span className="h-3 w-3 rounded-full border-2 border-[#4a5560]/40 border-t-[#4a5560] animate-spin" />
-                  Loading file
-                </span>
+
+              <div className="mt-4 flex flex-wrap items-center gap-3 text-xs text-[#7a7670]">
+                <span>{`${charCount} characters`}</span>
+                <span>Minimum {MIN_CHARS} characters required.</span>
+              </div>
+
+              <div className="mt-4 flex flex-wrap items-center gap-3">
+                <label className="inline-flex cursor-pointer items-center rounded-full border border-[#c9d5de] bg-[#edf2f5] px-4 py-2 text-xs font-semibold uppercase tracking-[0.2em] text-[#2f3e4e] transition hover:border-[#b6c6d2]">
+                  Upload document
+                  <input
+                    type="file"
+                    accept={FILE_ACCEPT}
+                    className="sr-only"
+                    onChange={handleFileChange}
+                  />
+                </label>
+                {isFileLoading && (
+                  <span className="inline-flex items-center gap-2 text-xs text-[#4a5560]">
+                    <span className="h-3 w-3 rounded-full border-2 border-[#4a5560]/40 border-t-[#4a5560] animate-spin" />
+                    Loading file
+                  </span>
+                )}
+                {fileName && !isFileLoading && (
+                  <span className="text-xs text-[#4a5560]">{fileName}</span>
+                )}
+              </div>
+
+              {fileNote && (
+                <p className="mt-2 text-xs text-[#4a5560]">{fileNote}</p>
               )}
-              {fileName && !isFileLoading && (
-                <span className="text-xs text-[#4a5560]">
-                  {fileName}
-                </span>
+              {fileError && (
+                <p className="mt-2 text-xs text-[#6a4033]">{fileError}</p>
               )}
+
+              {previewError && (
+                <p className="mt-4 text-xs text-[#6a4033]">{previewError}</p>
+              )}
+
+              <div className="mt-6 flex flex-wrap items-center gap-3">
+                <button
+                  type="button"
+                  onClick={handlePreview}
+                  className="inline-flex items-center justify-center rounded-full bg-[#2f3e4e] px-5 py-2 text-xs font-semibold uppercase tracking-[0.3em] text-[#f7f7f4] transition hover:bg-[#3b4d60] disabled:cursor-not-allowed disabled:opacity-60"
+                  disabled={!canPreview || isPreviewing}
+                >
+                  {isPreviewing ? "Running..." : "Run Preview"}
+                </button>
+                <span className="text-xs text-[#7a7670]">
+                  Preview only. Create an account to run the full detector.
+                </span>
+              </div>
             </div>
 
-            {fileNote && (
-              <p className="mt-2 text-xs text-[#4a5560]">{fileNote}</p>
-            )}
-            {fileError && (
-              <p className="mt-2 text-xs text-[#6a4033]">{fileError}</p>
-            )}
-
-            {previewError && (
-              <p className="mt-4 text-xs text-[#6a4033]">{previewError}</p>
-            )}
-
-            <div className="mt-6 flex flex-wrap items-center gap-3">
-              <button
-                type="button"
-                onClick={handlePreview}
-                className="inline-flex items-center justify-center rounded-full bg-[#2f3e4e] px-5 py-2 text-xs font-semibold uppercase tracking-[0.3em] text-[#f7f7f4] transition hover:bg-[#3b4d60]"
-              >
-                Run preview
-              </button>
-              <span className="text-xs text-[#7a7670]">
-                Preview only. Create an account to run the full detector.
-              </span>
-            </div>
-          </div>
-
-          <div className="rounded-3xl border border-[#d8d6cf] bg-white/90 p-6 shadow-[0_18px_60px_rgba(27,24,19,0.08)] backdrop-blur">
-            <p className="text-xs uppercase tracking-[0.3em] text-[#7a7670]">
-              Sample report
-            </p>
-            <p className="mt-3 text-2xl font-semibold text-[#1f1f1c]">
-              Verdict: Unclear
-            </p>
-            <p className="mt-2 text-sm text-[#4c4b45]">
-              The confidence score reflects probability, not certainty.
-            </p>
-            <div className="mt-4 rounded-2xl border border-[#d8d6cf] bg-[#f7f7f4] p-4">
-              <p className="text-xs uppercase tracking-[0.3em] text-[#7a7670]">
-                Detected signals
-              </p>
-              <ul className="mt-3 space-y-2 text-sm text-[#4c4b45]">
-                {PREVIEW_SIGNALS.map((signal) => (
-                  <li key={signal} className="flex gap-3">
-                    <span className="mt-2 h-1.5 w-1.5 rounded-full bg-[#2f3e4e]" />
-                    <span>{signal}</span>
-                  </li>
-                ))}
-              </ul>
-            </div>
-            <div className="mt-4 rounded-2xl border border-[#d8d6cf] bg-[#f7f7f4] p-4">
-              <p className="text-xs uppercase tracking-[0.3em] text-[#7a7670]">
-                Next steps
-              </p>
-              <p className="mt-2 text-sm text-[#4c4b45]">
-                You may want to review sentence variety and add a personal detail.
-              </p>
+            <div className="relative rounded-3xl border border-[#d8d6cf] bg-white/90 p-6 shadow-[0_18px_60px_rgba(27,24,19,0.08)] backdrop-blur">
+              <div className={showPreviewResults ? "blur-sm" : ""}>
+                <p className="text-xs uppercase tracking-[0.3em] text-[#7a7670]">
+                  Sample report
+                </p>
+                <p className="mt-2 text-xs text-[#7a7670]">
+                  Image prompt: AI document checker
+                </p>
+                <p className="mt-3 text-2xl font-semibold text-[#1f1f1c]">
+                  Verdict: Unclear
+                </p>
+                <p className="mt-2 text-sm text-[#4c4b45]">
+                  The confidence score reflects probability, not certainty.
+                </p>
+                <div className="mt-4 rounded-2xl border border-[#d8d6cf] bg-[#f7f7f4] p-4">
+                  <p className="text-xs uppercase tracking-[0.3em] text-[#7a7670]">
+                    Detected signals
+                  </p>
+                  <ul className="mt-3 space-y-2 text-sm text-[#4c4b45]">
+                    {PREVIEW_SIGNALS.map((signal) => (
+                      <li key={signal} className="flex gap-3">
+                        <span className="mt-2 h-1.5 w-1.5 rounded-full bg-[#2f3e4e]" />
+                        <span>{signal}</span>
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+                <div className="mt-4 rounded-2xl border border-[#d8d6cf] bg-[#f7f7f4] p-4">
+                  <p className="text-xs uppercase tracking-[0.3em] text-[#7a7670]">
+                    Next steps
+                  </p>
+                  <p className="mt-2 text-sm text-[#4c4b45]">
+                    You may want to review sentence variety and add a personal detail.
+                  </p>
+                </div>
+              </div>
+              {showPreviewResults && (
+                <div className="absolute inset-0 flex items-center justify-center rounded-3xl bg-white/60 text-center">
+                  <div className="mx-auto max-w-[220px] rounded-2xl border border-[#d8d6cf] bg-white/90 p-4 text-xs uppercase tracking-[0.2em] text-[#4c4b45]">
+                    Create an account to view the full report.
+                  </div>
+                </div>
+              )}
             </div>
           </div>
         </section>
 
-        <section className="mt-12">
+        <section className="mt-16">
           <div className="flex flex-wrap items-center justify-between gap-3">
             <div>
               <p className="text-xs uppercase tracking-[0.3em] text-[#7a7670]">
@@ -338,7 +466,7 @@ export default function HomePage() {
               href="/signup?redirectedFrom=/detector"
               className="rounded-full border border-[#2f3e4e] bg-[#2f3e4e] px-5 py-2 text-xs font-semibold uppercase tracking-[0.3em] text-[#f7f7f4] transition hover:bg-[#27323f]"
             >
-              Start a real check
+              Start a Real Check
             </LoadingLink>
           </div>
           <div className="mt-6 grid gap-4 lg:grid-cols-4">
@@ -356,7 +484,7 @@ export default function HomePage() {
           </div>
         </section>
 
-        <section className="mt-12">
+        <section className="mt-16">
           <p className="text-xs uppercase tracking-[0.3em] text-[#7a7670]">
             Student feedback
           </p>
@@ -367,38 +495,50 @@ export default function HomePage() {
             {TESTIMONIALS.map((item) => (
               <div
                 key={item.name}
-                className="rounded-3xl border border-[#d8d6cf] bg-white/85 p-6 shadow-[0_18px_60px_rgba(27,24,19,0.08)] backdrop-blur"
+                className="rounded-3xl border border-[#d8d6cf] bg-white/85 p-6 shadow-[0_18px_60px_rgba(27,24,19,0.08)] backdrop-blur transition-transform duration-200 hover:-translate-y-1 hover:shadow-[0_22px_70px_rgba(27,24,19,0.16)]"
               >
                 <p className="text-sm text-[#1f1f1c]">"{item.quote}"</p>
-                <p className="mt-4 text-xs uppercase tracking-[0.3em] text-[#7a7670]">
-                  {item.name}
-                </p>
-                <p className="mt-1 text-xs text-[#7a7670]">{item.detail}</p>
+                <div className="mt-4 flex items-center gap-3">
+                  <div className="flex h-10 w-10 items-center justify-center rounded-full border border-[#d8d6cf] bg-[#f3f3ef] text-xs font-semibold uppercase tracking-[0.2em] text-[#4c4b45]">
+                    {getInitials(item.name)}
+                  </div>
+                  <div>
+                    <p className="text-xs uppercase tracking-[0.3em] text-[#7a7670]">
+                      {item.name}
+                    </p>
+                    <p className="mt-1 text-xs text-[#7a7670]">{item.detail}</p>
+                  </div>
+                </div>
               </div>
             ))}
           </div>
         </section>
 
-        <section className="mt-12 rounded-3xl border border-[#d8d6cf] bg-[#f3f3ef] p-8 shadow-[0_18px_60px_rgba(27,24,19,0.08)]">
-          <div className="flex flex-wrap items-center justify-between gap-4">
-            <div>
-              <p className="text-xs uppercase tracking-[0.3em] text-[#7a7670]">
-                Ready for a full check?
-              </p>
-              <h2 className="mt-3 text-2xl font-semibold text-[#1f1f1c]">
-                Run the full detector and save every draft.
-              </h2>
-              <p className="mt-2 text-sm text-[#4c4b45]">
-                Explanations over conclusions. Guidance over punishment.
-              </p>
+        <section className="mt-16 grid items-center gap-10 rounded-3xl border border-[#d8d6cf] bg-[#f3f3ef] p-8 shadow-[0_18px_60px_rgba(27,24,19,0.08)] lg:grid-cols-[1.1fr_0.9fr]">
+          <div>
+            <p className="text-xs uppercase tracking-[0.3em] text-[#7a7670]">
+              Full detection
+            </p>
+            <h2 className="mt-3 text-2xl font-semibold text-[#1f1f1c]">
+              Run the full detector and save every draft.
+            </h2>
+            <p className="mt-2 text-sm text-[#4c4b45]">
+              Explanations over conclusions. Guidance over punishment.
+            </p>
+            <div className="mt-6">
+              <LoadingLink
+                href="/signup?redirectedFrom=/detector"
+                className="rounded-full bg-[#2f3e4e] px-6 py-3 text-xs font-semibold uppercase tracking-[0.3em] text-[#f7f7f4] transition hover:bg-[#3b4d60]"
+              >
+                Create Account
+              </LoadingLink>
             </div>
-            <LoadingLink
-              href="/signup?redirectedFrom=/detector"
-              className="rounded-full bg-[#2f3e4e] px-6 py-3 text-xs font-semibold uppercase tracking-[0.3em] text-[#f7f7f4] transition hover:bg-[#3b4d60]"
-            >
-              Create account
-            </LoadingLink>
           </div>
+          <ImagePromptCard
+            title="CTA visual"
+            prompt="student with paper and AI assistant"
+            className="min-h-[200px] bg-white/70"
+          />
         </section>
       </div>
 
@@ -413,7 +553,7 @@ export default function HomePage() {
             </h3>
             <p className="mt-2 text-sm text-[#4c4b45]">
               We keep your text private and store each run so you can compare
-              revisions. This preview does not analyze content.
+              revisions. We will send you to the full detector after signup.
             </p>
             <div className="mt-5 flex flex-wrap items-center gap-3">
               <LoadingLink

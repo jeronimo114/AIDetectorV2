@@ -54,6 +54,18 @@ const verdictLabelMap: Record<Verdict, string> = {
   "Likely Human": "likely_human"
 };
 
+const DEMO_RESULT: PreferredResponse = {
+  verdict: "Unclear",
+  confidence: 0.66,
+  breakdown: ["Signals suggest a mixed pattern across common detectors."],
+  signals: [
+    "Uniform sentence cadence",
+    "Limited idiomatic variation",
+    "Low burstiness across paragraphs"
+  ],
+  model: "DETECTOR-V1"
+};
+
 const toneStyles: Record<VerdictTone, { pill: string; bar: string; text: string }> =
   {
     positive: {
@@ -143,6 +155,8 @@ export default function Home() {
   const [upgradeIntent, setUpgradeIntent] = useState<null | "edit">(null);
   const [isLoading, setIsLoading] = useState(false);
   const [isFileLoading, setIsFileLoading] = useState(false);
+  const [showAuthGate, setShowAuthGate] = useState(false);
+  const [showLockedResults, setShowLockedResults] = useState(false);
   const [requestError, setRequestError] = useState<string | null>(null);
   const [fileError, setFileError] = useState<string | null>(null);
   const [saveError, setSaveError] = useState<string | null>(null);
@@ -151,6 +165,7 @@ export default function Home() {
   const [tipsEnabled, setTipsEnabled] = useState(true);
   const [timeoutMs, setTimeoutMs] = useState(TIMEOUT_MS);
   const [uploadedFileName, setUploadedFileName] = useState<string | null>(null);
+  const authGateTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   useEffect(() => {
     let isMounted = true;
@@ -193,6 +208,21 @@ export default function Home() {
       document.removeEventListener("visibilitychange", handleVisibility);
     };
   }, [supabase]);
+
+  useEffect(() => {
+    if (user) {
+      setShowAuthGate(false);
+      setShowLockedResults(false);
+    }
+  }, [user]);
+
+  useEffect(() => {
+    return () => {
+      if (authGateTimerRef.current) {
+        clearTimeout(authGateTimerRef.current);
+      }
+    };
+  }, []);
 
   useEffect(() => {
     let isMounted = true;
@@ -295,6 +325,8 @@ export default function Home() {
     setComparisonBase(null);
     setUpgradeIntent(null);
     setUploadedFileName(null);
+    setShowAuthGate(false);
+    setShowLockedResults(false);
   };
 
   const persistRun = async (
@@ -409,13 +441,6 @@ export default function Home() {
       return;
     }
 
-    if (isWebhookMissing) {
-      setRequestError(
-        "Analysis endpoint is not configured. Add NEXT_PUBLIC_N8N_WEBHOOK_URL to enable checks."
-      );
-      return;
-    }
-
     if (exceedsMax) {
       setRequestError(`Please keep the text under ${maxChars} characters.`);
       return;
@@ -423,6 +448,51 @@ export default function Home() {
 
     if (underMin) {
       setRequestError(`Please enter at least ${MIN_CHARS} characters to check.`);
+      return;
+    }
+
+    if (!user) {
+      if (authGateTimerRef.current) {
+        clearTimeout(authGateTimerRef.current);
+      }
+      setIsLoading(true);
+      setRequestError(null);
+      setFileError(null);
+      setSaveError(null);
+      setResult(null);
+      setComparison(null);
+      setComparisonBase(null);
+      setPendingEdit(null);
+      setUpgradeIntent(null);
+      setShowAuthGate(false);
+      setShowLockedResults(false);
+
+      authGateTimerRef.current = setTimeout(() => {
+        const receivedAt = new Date().toISOString();
+        const previewResult = {
+          type: "preferred",
+          data: DEMO_RESULT,
+          receivedAt
+        } as const;
+        setResult(previewResult);
+        setLatestSnapshot({
+          inputText: trimmed,
+          receivedAt,
+          result: previewResult,
+          analysisRunId: null,
+          userId: null
+        });
+        setShowLockedResults(true);
+        setShowAuthGate(true);
+        setIsLoading(false);
+      }, 1600);
+      return;
+    }
+
+    if (isWebhookMissing) {
+      setRequestError(
+        "Analysis endpoint is not configured. Add NEXT_PUBLIC_N8N_WEBHOOK_URL to enable checks."
+      );
       return;
     }
 
@@ -591,6 +661,7 @@ export default function Home() {
 
   const verdictTone =
     result?.type === "preferred" ? verdictToneMap[result.data.verdict] : "neutral";
+  const lockResults = showLockedResults && !user;
 
   return (
     <main className="relative min-h-screen overflow-hidden bg-[#f7f7f4]">
@@ -783,9 +854,10 @@ export default function Home() {
 
         {result?.type === "preferred" && (
           <section
-            className="mt-10 rounded-3xl border border-[#d8d6cf] bg-white/90 p-6 shadow-[0_20px_80px_rgba(24,22,18,0.1)] backdrop-blur opacity-0 animate-fade-up"
+            className="relative mt-10 rounded-3xl border border-[#d8d6cf] bg-white/90 p-6 shadow-[0_20px_80px_rgba(24,22,18,0.1)] backdrop-blur opacity-0 animate-fade-up"
             style={{ animationDelay: "200ms" }}
           >
+            <div className={lockResults ? "pointer-events-none blur-sm" : ""}>
             <div className="grid gap-6 lg:grid-cols-[minmax(0,1fr)_280px] lg:items-start">
               <div>
                 <p className="text-xs uppercase tracking-[0.3em] text-[#7a7670]">
@@ -943,6 +1015,14 @@ export default function Home() {
             {authReady && user && saveError && (
               <p className="mt-4 text-xs text-[#6a4033]">{saveError}</p>
             )}
+            </div>
+            {lockResults && (
+              <div className="absolute inset-0 flex items-center justify-center rounded-3xl bg-white/70 text-center">
+                <div className="mx-auto max-w-[260px] rounded-2xl border border-[#d8d6cf] bg-white/95 p-4 text-xs uppercase tracking-[0.2em] text-[#4c4b45]">
+                  Create an account to view your full report.
+                </div>
+              </div>
+            )}
           </section>
         )}
 
@@ -1045,7 +1125,45 @@ export default function Home() {
           </div>
         )}
 
-        {result && (
+        {showAuthGate && !user && (
+          <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/35 p-6 backdrop-blur-sm">
+            <div className="w-full max-w-lg rounded-3xl border border-[#d8d6cf] bg-white/95 p-6 shadow-[0_22px_70px_rgba(27,24,19,0.2)]">
+              <p className="text-xs uppercase tracking-[0.3em] text-[#7a7670]">
+                Create an account
+              </p>
+              <h3 className="mt-3 text-xl font-semibold text-[#1f1f1c]">
+                View your full report and save every run.
+              </h3>
+              <p className="mt-2 text-sm text-[#4c4b45]">
+                We do not run checks without login. Create an account to unlock
+                the full detector and detailed signals.
+              </p>
+              <div className="mt-5 flex flex-wrap items-center gap-3">
+                <LoadingLink
+                  href="/signup?redirectedFrom=/detector"
+                  className="rounded-full bg-[#2f3e4e] px-5 py-2 text-xs font-semibold uppercase tracking-[0.3em] text-[#f7f7f4] transition hover:bg-[#3b4d60]"
+                >
+                  Create account
+                </LoadingLink>
+                <LoadingLink
+                  href="/login?redirectedFrom=/detector"
+                  className="rounded-full border border-[#c9d5de] bg-[#edf2f5] px-5 py-2 text-xs font-semibold uppercase tracking-[0.3em] text-[#2f3e4e] transition hover:border-[#b6c6d2]"
+                >
+                  Log in
+                </LoadingLink>
+                <button
+                  type="button"
+                  className="text-xs uppercase tracking-[0.3em] text-[#7a7670]"
+                  onClick={() => setShowAuthGate(false)}
+                >
+                  Not now
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {result && !lockResults && (
           <div className="mt-8 flex flex-wrap gap-3">
             <button
               type="button"
