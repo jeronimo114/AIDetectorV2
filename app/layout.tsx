@@ -1,20 +1,14 @@
 import "./globals.css";
-import { IBM_Plex_Mono, IBM_Plex_Sans } from "next/font/google";
+import { Plus_Jakarta_Sans } from "next/font/google";
 import type { Metadata } from "next";
 import SiteHeader from "@/components/SiteHeader";
 import GoogleAnalytics from "@/components/GoogleAnalytics";
 import JsonLd, { organizationSchema, softwareApplicationSchema } from "@/components/JsonLd";
 
-const plexSans = IBM_Plex_Sans({
+const plusJakarta = Plus_Jakarta_Sans({
   subsets: ["latin"],
-  variable: "--font-space",
-  weight: ["400", "500", "600", "700"]
-});
-
-const plexMono = IBM_Plex_Mono({
-  subsets: ["latin"],
-  variable: "--font-plex",
-  weight: ["400", "500"]
+  variable: "--font-plus-jakarta",
+  weight: ["400", "500", "600", "700", "800"]
 });
 
 const siteUrl = "https://veridict.com";
@@ -72,12 +66,22 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="en" className={`${plexSans.variable} ${plexMono.variable}`}>
+    <html lang="en" className={plusJakarta.variable}>
       <head>
         <JsonLd data={organizationSchema} />
         <JsonLd data={softwareApplicationSchema} />
+        <script
+          type="text/javascript"
+          dangerouslySetInnerHTML={{
+            __html: `(function(c,l,a,r,i,t,y){
+    c[a]=c[a]||function(){(c[a].q=c[a].q||[]).push(arguments)};
+    t=l.createElement(r);t.async=1;t.src="https://www.clarity.ms/tag/"+i;
+    y=l.getElementsByTagName(r)[0];y.parentNode.insertBefore(t,y);
+})(window, document, "clarity", "script", "uxrvj4odd1");`
+          }}
+        />
       </head>
-      <body className="font-sans">
+      <body className="font-sans bg-white text-gray-900">
         <GoogleAnalytics />
         <SiteHeader />
         {children}

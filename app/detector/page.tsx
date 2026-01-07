@@ -66,24 +66,26 @@ const DEMO_RESULT: PreferredResponse = {
   model: "DETECTOR-V1"
 };
 
-const toneStyles: Record<VerdictTone, { pill: string; bar: string; text: string }> =
-  {
-    positive: {
-      pill: "bg-[#e5efe7] text-[#2f4b3a] border border-[#cfe0d6]",
-      bar: "bg-[#7fa793]",
-      text: "text-[#2f4b3a]"
-    },
-    neutral: {
-      pill: "bg-[#eef1f3] text-[#4a5560] border border-[#d8dde2]",
-      bar: "bg-[#b7c1c9]",
-      text: "text-[#4a5560]"
-    },
-    caution: {
-      pill: "bg-[#f0e4de] text-[#6a4033] border border-[#e2ccc2]",
-      bar: "bg-[#c98c79]",
-      text: "text-[#6a4033]"
-    }
-  };
+const toneStyles: Record<VerdictTone, { pill: string; bar: string; text: string; glow: string }> = {
+  positive: {
+    pill: "bg-emerald-500/10 text-emerald-400 border border-emerald-500/30",
+    bar: "bg-gradient-to-r from-emerald-500 to-emerald-400",
+    text: "text-emerald-400",
+    glow: "shadow-[0_0_20px_rgba(16,185,129,0.3)]"
+  },
+  neutral: {
+    pill: "bg-amber-500/10 text-amber-400 border border-amber-500/30",
+    bar: "bg-gradient-to-r from-amber-500 to-amber-400",
+    text: "text-amber-400",
+    glow: "shadow-[0_0_20px_rgba(245,158,11,0.3)]"
+  },
+  caution: {
+    pill: "bg-red-500/10 text-red-400 border border-red-500/30",
+    bar: "bg-gradient-to-r from-red-500 to-red-400",
+    text: "text-red-400",
+    glow: "shadow-[0_0_20px_rgba(239,68,68,0.3)]"
+  }
+};
 
 const IMPROVEMENT_TIPS = [
   "Vary sentence length to reduce uniform cadence.",
@@ -664,81 +666,115 @@ export default function Home() {
   const lockResults = showLockedResults && !user;
 
   return (
-    <main className="relative min-h-screen overflow-hidden bg-[#f7f7f4]">
+    <main className="relative min-h-screen overflow-hidden">
+      {/* Loading overlay */}
       {isLoading && (
-        <div className="fixed inset-0 z-[60] flex items-center justify-center bg-[#f7f7f4]/95 backdrop-blur">
-          <div className="w-full max-w-md px-6" role="status" aria-live="polite">
-            <p className="text-xs uppercase tracking-[0.3em] text-[#7a7670]">
+        <div className="fixed inset-0 z-[60] flex items-center justify-center bg-[#050810]/95 backdrop-blur-xl">
+          <div className="w-full max-w-md px-6 text-center" role="status" aria-live="polite">
+            {/* Orbital animation */}
+            <div className="relative mx-auto mb-8 h-24 w-24">
+              <div className="absolute inset-0 rounded-full border border-amber-500/20 animate-pulse" />
+              <div className="absolute inset-2 rounded-full border border-amber-500/30" />
+              <div className="absolute inset-4 rounded-full border border-amber-500/40" />
+              <div className="absolute inset-0 animate-spin" style={{ animationDuration: '3s' }}>
+                <div className="absolute top-0 left-1/2 -ml-1.5 h-3 w-3 rounded-full bg-amber-500 shadow-[0_0_15px_rgba(245,158,11,0.6)]" />
+              </div>
+              <div className="absolute inset-0 flex items-center justify-center">
+                <div className="h-4 w-4 rounded-full bg-amber-500/80 shadow-[0_0_20px_rgba(245,158,11,0.5)]" />
+              </div>
+            </div>
+            <p className="font-mono text-xs uppercase tracking-[0.3em] text-amber-500/80">
               Processing
             </p>
-            <p className="mt-3 text-lg font-semibold text-[#1f1f1c]">
+            <p className="mt-3 font-serif text-2xl font-semibold text-white">
               Analyzing signals...
             </p>
-            <div className="mt-6 h-2 w-full overflow-hidden rounded-full bg-[#d8d6cf]">
-              <div className="h-full w-2/3 rounded-full bg-[#2f3e4e] animate-[loading-bar_2.4s_ease-in-out_infinite]" />
+            <div className="mt-6 h-1 w-full overflow-hidden rounded-full bg-slate-800">
+              <div className="h-full w-1/2 rounded-full bg-gradient-to-r from-amber-500 to-amber-600 animate-[loading-bar_2s_ease-in-out_infinite]" />
             </div>
-            <p className="mt-4 text-xs text-[#7a7670]">
+            <p className="mt-4 text-sm text-slate-500">
               This may take a few seconds.
             </p>
           </div>
         </div>
       )}
-      <div className="pointer-events-none absolute inset-0">
-        <div className="absolute -top-32 left-1/2 h-80 w-80 -translate-x-1/2 rounded-full bg-[#e6ecf1] opacity-70 blur-3xl" />
-        <div className="absolute top-40 right-6 h-56 w-56 rounded-full bg-[#edf2f5] opacity-60 blur-3xl" />
-        <div className="absolute bottom-0 left-10 h-72 w-72 rounded-full bg-[#e9eef2] opacity-50 blur-3xl" />
+
+      {/* Background decorations */}
+      <div className="pointer-events-none absolute inset-0 overflow-hidden">
+        <div className="absolute -top-[30%] left-1/2 h-[600px] w-[600px] -translate-x-1/2 rounded-full bg-amber-500/5 blur-[100px]" />
+        <div className="absolute top-[50%] -right-[15%] h-[400px] w-[400px] rounded-full bg-blue-500/5 blur-[80px]" />
+        <div className="absolute top-[30%] -left-[10%] h-[300px] w-[300px] rounded-full bg-purple-500/5 blur-[60px]" />
+        <div className="absolute inset-0 grid-pattern opacity-20" />
       </div>
 
-      <div className="relative mx-auto flex min-h-screen w-full max-w-[720px] flex-col px-6 pb-16 pt-14">
+      <div className="relative mx-auto flex min-h-screen w-full max-w-[800px] flex-col px-6 pb-16 pt-14">
+        {/* Header */}
         <header className="opacity-0 animate-fade-up">
-          <p className="text-xs uppercase tracking-[0.4em] text-[#7a7670]">
-            Veridict
-          </p>
-          <h1 className="mt-4 text-4xl font-semibold text-[#1f1f1c] sm:text-5xl">
-            Check your work before you submit it.
+          <div className="inline-flex items-center gap-2 rounded-full border border-amber-500/20 bg-amber-500/5 px-4 py-2">
+            <span className="h-2 w-2 rounded-full bg-amber-500 animate-pulse" />
+            <span className="font-mono text-xs uppercase tracking-wider text-amber-400">
+              AI Writing Detector
+            </span>
+          </div>
+          <h1 className="mt-6 font-serif text-4xl font-bold leading-tight text-white sm:text-5xl">
+            Check your work before
+            <span className="block text-gradient">you submit it</span>
           </h1>
-          <p className="mt-4 max-w-xl text-base text-[#4c4b45]">
+          <p className="mt-4 max-w-xl text-lg text-slate-400">
             Understand AI detection signals and avoid surprises when it matters.
-          </p>
-          <p className="mt-3 max-w-xl text-sm text-[#7a7670]">
-            Built for students who want clarity, not accusations.
           </p>
           <div className="mt-6 flex flex-wrap gap-3">
             <button
               type="button"
-              className="inline-flex items-center justify-center rounded-full bg-[#2f3e4e] px-5 py-2 text-xs font-semibold uppercase tracking-[0.3em] text-[#f7f7f4] transition hover:bg-[#3b4d60]"
+              className="inline-flex items-center gap-2 rounded-full bg-gradient-to-r from-amber-500 to-amber-600 px-6 py-3 text-sm font-semibold text-[#050810] shadow-[0_4px_20px_-4px_rgba(245,158,11,0.4)] transition-all hover:shadow-[0_6px_30px_-4px_rgba(245,158,11,0.5)] hover:-translate-y-0.5"
               onClick={focusTextarea}
             >
-              Run a check
+              <svg viewBox="0 0 20 20" fill="none" className="h-4 w-4">
+                <rect x="3" y="3" width="5" height="5" rx="1" stroke="currentColor" strokeWidth="1.5" />
+                <rect x="12" y="3" width="5" height="5" rx="1" stroke="currentColor" strokeWidth="1.5" />
+                <rect x="3" y="12" width="5" height="5" rx="1" stroke="currentColor" strokeWidth="1.5" />
+                <rect x="12" y="12" width="5" height="5" rx="1" stroke="currentColor" strokeWidth="1.5" />
+              </svg>
+              Run Analysis
             </button>
             <a
               href="#how-it-works"
-              className="inline-flex items-center justify-center rounded-full border border-[#c4c1b8] px-5 py-2 text-xs font-semibold uppercase tracking-[0.3em] text-[#4c4b45] transition hover:border-[#9b978f]"
+              className="inline-flex items-center gap-2 rounded-full border border-slate-700 bg-slate-800/50 px-6 py-3 text-sm font-medium text-white transition-all hover:border-slate-600 hover:bg-slate-800"
             >
-              See how it works
+              How it works
             </a>
           </div>
         </header>
 
+        {/* Input Section */}
         <section
-          className="mt-10 rounded-3xl border border-[#d8d6cf] bg-white/85 p-5 shadow-[0_18px_60px_rgba(27,24,19,0.08)] backdrop-blur opacity-0 animate-fade-up"
+          className="mt-10 rounded-2xl glass-card p-6 opacity-0 animate-fade-up"
           style={{ animationDelay: "120ms" }}
         >
-          <div className="flex items-center justify-between text-xs uppercase tracking-[0.3em] text-[#7a7670]">
-            <span>Your text</span>
-            <span className={`font-mono ${exceedsMax ? "text-[#6a4033]" : ""}`}>
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-3">
+              <div className="flex h-10 w-10 items-center justify-center rounded-full bg-amber-500/10">
+                <svg viewBox="0 0 24 24" fill="none" className="h-5 w-5 text-amber-500">
+                  <path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+                  <path d="M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+                </svg>
+              </div>
+              <div>
+                <p className="font-mono text-xs uppercase tracking-wider text-slate-500">Input</p>
+                <p className="text-lg font-semibold text-white">Your Text</p>
+              </div>
+            </div>
+            <span className={`font-mono text-sm ${exceedsMax ? "text-red-400" : "text-slate-500"}`}>
               {charCount}/{maxChars}
             </span>
           </div>
-          <div className="mt-3 flex flex-wrap items-center justify-between gap-3">
-            <div className="flex flex-wrap items-center gap-2 text-xs text-[#7a7670]">
-              <span>Upload a .txt or .md file.</span>
+
+          <div className="mt-4 flex flex-wrap items-center justify-between gap-3">
+            <div className="flex flex-wrap items-center gap-2 text-sm text-slate-500">
+              <span>Upload .txt or .md</span>
               {uploadedFileName && (
-                <span
-                  className="max-w-[220px] truncate text-[#4c4b45]"
-                  title={uploadedFileName}
-                >
-                  Loaded: {uploadedFileName}
+                <span className="max-w-[200px] truncate text-amber-400" title={uploadedFileName}>
+                  {uploadedFileName}
                 </span>
               )}
             </div>
@@ -752,14 +788,14 @@ export default function Home() {
               />
               <button
                 type="button"
-                className="inline-flex items-center justify-center gap-2 rounded-full border border-[#c4c1b8] px-4 py-2 text-xs font-semibold uppercase tracking-[0.2em] text-[#4c4b45] transition hover:border-[#9b978f] disabled:cursor-not-allowed disabled:opacity-50"
+                className="inline-flex items-center gap-2 rounded-lg border border-slate-700 bg-slate-800/50 px-4 py-2 text-sm text-slate-300 transition-colors hover:border-slate-600 hover:bg-slate-800 disabled:opacity-50"
                 onClick={() => fileInputRef.current?.click()}
                 disabled={isLoading || isFileLoading}
                 aria-busy={isFileLoading}
               >
                 <span
                   className={`h-3 w-3 rounded-full border-2 border-current border-t-transparent transition-opacity ${
-                    isFileLoading ? "animate-spin opacity-100" : "opacity-0"
+                    isFileLoading ? "animate-spin opacity-100" : "opacity-0 absolute"
                   }`}
                   aria-hidden="true"
                 />
@@ -767,18 +803,18 @@ export default function Home() {
               </button>
             </div>
           </div>
-          {fileError && (
-            <p className="mt-2 text-xs text-[#6a4033]">{fileError}</p>
-          )}
+
+          {fileError && <p className="mt-2 text-sm text-red-400">{fileError}</p>}
           {pendingEdit && (
-            <p className="mt-3 text-xs uppercase tracking-[0.25em] text-[#7a7670]">
+            <p className="mt-3 font-mono text-xs uppercase tracking-wider text-amber-500/80">
               Editing previous run from {new Date(pendingEdit.receivedAt).toLocaleString()}
             </p>
           )}
+
           <textarea
             ref={textareaRef}
-            className="mt-4 min-h-[260px] w-full resize-none rounded-2xl border border-[#d8d6cf] bg-white/90 p-4 text-base leading-relaxed text-[#1f1f1c] shadow-sm transition focus:border-[#8fa3b5] focus:outline-none focus:ring-4 focus:ring-[#d7e1ea] disabled:opacity-70"
-            placeholder="Paste or type your draft here."
+            className="mt-4 min-h-[260px] w-full resize-none rounded-xl input-field p-4 text-base leading-relaxed placeholder:text-slate-600 disabled:opacity-70"
+            placeholder="Paste or type your draft here..."
             value={text}
             onChange={(event) => {
               setText(event.target.value);
@@ -786,33 +822,32 @@ export default function Home() {
             }}
             disabled={isLoading}
           />
+
           <div className="mt-4 flex flex-wrap items-center justify-between gap-4">
-            <p
-              className={`text-sm ${exceedsMax ? "text-[#6a4033]" : "text-[#4c4b45]"}`}
-            >
+            <p className={`text-sm ${exceedsMax ? "text-red-400" : "text-slate-500"}`}>
               {exceedsMax
                 ? `Maximum ${maxChars} characters exceeded.`
-                : `Minimum ${MIN_CHARS} characters to check.`}
+                : `Minimum ${MIN_CHARS} characters to analyze.`}
             </p>
             <div className="flex flex-wrap items-center gap-3">
               <button
                 type="button"
-                className="inline-flex items-center justify-center gap-2 rounded-full bg-[#2f3e4e] px-6 py-3 text-xs font-semibold uppercase tracking-[0.3em] text-[#f7f7f4] transition hover:bg-[#3b4d60] disabled:cursor-not-allowed disabled:opacity-50"
+                className="inline-flex items-center gap-2 rounded-full bg-gradient-to-r from-amber-500 to-amber-600 px-6 py-3 text-sm font-semibold text-[#050810] shadow-[0_4px_20px_-4px_rgba(245,158,11,0.4)] transition-all hover:shadow-[0_6px_30px_-4px_rgba(245,158,11,0.5)] disabled:opacity-50 disabled:cursor-not-allowed"
                 onClick={handleAnalyze}
                 disabled={!canAnalyze}
               >
                 {isLoading ? (
                   <>
-                    <span className="h-4 w-4 animate-spin rounded-full border-2 border-[#f7f7f4]/40 border-t-[#f7f7f4]" />
-                    Checking...
+                    <span className="h-4 w-4 animate-spin rounded-full border-2 border-[#050810]/40 border-t-[#050810]" />
+                    Analyzing...
                   </>
                 ) : (
-                  "Run a check"
+                  "Run Analysis"
                 )}
               </button>
               <button
                 type="button"
-                className="inline-flex items-center justify-center rounded-full border border-[#c4c1b8] px-5 py-3 text-xs font-semibold uppercase tracking-[0.3em] text-[#4c4b45] transition hover:border-[#9b978f] disabled:cursor-not-allowed disabled:opacity-50"
+                className="inline-flex items-center rounded-lg border border-slate-700 bg-slate-800/50 px-5 py-3 text-sm font-medium text-slate-300 transition-all hover:border-slate-600 hover:bg-slate-800 disabled:opacity-50"
                 onClick={handleClear}
                 disabled={isLoading || isFileLoading || text.length === 0}
               >
@@ -823,26 +858,26 @@ export default function Home() {
           <TipRotator isActive={isLoading && tipsEnabled} />
         </section>
 
+        {/* Error Messages */}
         {isWebhookMissing && (
           <div
-            className="mt-6 rounded-2xl border border-[#e2ccc2] bg-[#f0e4de] p-4 text-sm text-[#6a4033] opacity-0 animate-fade-in"
+            className="mt-6 rounded-xl border border-red-500/30 bg-red-500/10 p-4 text-sm text-red-400 opacity-0 animate-fade-in"
             style={{ animationDelay: "160ms" }}
           >
-            Analysis endpoint is not configured. Add NEXT_PUBLIC_N8N_WEBHOOK_URL to
-            enable checks.
+            Analysis endpoint is not configured. Add NEXT_PUBLIC_N8N_WEBHOOK_URL to enable checks.
           </div>
         )}
 
         {requestError && !isWebhookMissing && (
           <div
-            className="mt-6 rounded-2xl border border-[#e2ccc2] bg-[#f0e4de] p-4 text-sm text-[#6a4033] opacity-0 animate-fade-in"
+            className="mt-6 rounded-xl border border-red-500/30 bg-red-500/10 p-4 text-sm text-red-400 opacity-0 animate-fade-in"
             style={{ animationDelay: "160ms" }}
           >
             <div className="flex flex-wrap items-center justify-between gap-3">
               <span>{requestError}</span>
               <button
                 type="button"
-                className="rounded-full border border-[#c7b1a7] px-4 py-1 text-xs font-semibold uppercase tracking-[0.2em] text-[#6a4033]"
+                className="rounded-lg border border-red-500/30 px-4 py-1.5 text-sm font-medium text-red-400 transition-colors hover:bg-red-500/10"
                 onClick={handleAnalyze}
                 disabled={isLoading}
               >
@@ -852,236 +887,224 @@ export default function Home() {
           </div>
         )}
 
+        {/* Results Section */}
         {result?.type === "preferred" && (
           <section
-            className="relative mt-10 rounded-3xl border border-[#d8d6cf] bg-white/90 p-6 shadow-[0_20px_80px_rgba(24,22,18,0.1)] backdrop-blur opacity-0 animate-fade-up"
+            className="relative mt-10 rounded-2xl glass-card p-6 opacity-0 animate-fade-up"
             style={{ animationDelay: "200ms" }}
           >
             <div className={lockResults ? "pointer-events-none blur-sm" : ""}>
-            <div className="grid gap-6 lg:grid-cols-[minmax(0,1fr)_280px] lg:items-start">
-              <div>
-                <p className="text-xs uppercase tracking-[0.3em] text-[#7a7670]">
-                  Verdict summary
-                </p>
-                <div
-                  className={`mt-3 inline-flex items-center rounded-full px-4 py-1 text-sm font-semibold ${
-                    toneStyles[verdictTone].pill
-                  }`}
-                >
-                  {result.data.verdict}
+              {/* Verdict & Confidence */}
+              <div className="grid gap-6 lg:grid-cols-[1fr_280px] lg:items-start">
+                <div>
+                  <p className="font-mono text-xs uppercase tracking-wider text-slate-500">
+                    Verdict Summary
+                  </p>
+                  <div className={`mt-3 inline-flex items-center rounded-full px-4 py-2 text-sm font-semibold ${toneStyles[verdictTone].pill}`}>
+                    <span className={`mr-2 h-2 w-2 rounded-full ${verdictTone === 'positive' ? 'bg-emerald-500' : verdictTone === 'caution' ? 'bg-red-500' : 'bg-amber-500'}`} />
+                    {result.data.verdict}
+                  </div>
+                  <p className="mt-3 text-sm text-slate-400">{summaryLine}</p>
                 </div>
-                <p className="mt-3 text-sm text-[#4c4b45]">{summaryLine}</p>
+                <div className="rounded-xl border border-slate-800 bg-slate-900/50 p-4">
+                  <div className="flex items-center justify-between text-xs">
+                    <span className="font-mono uppercase tracking-wider text-slate-500">Confidence</span>
+                    <span
+                      className="inline-flex h-5 w-5 items-center justify-center rounded-full border border-slate-700 text-[10px] text-slate-400"
+                      title="The confidence score reflects probability, not certainty."
+                    >
+                      ?
+                    </span>
+                  </div>
+                  <p className={`mt-3 font-mono text-4xl font-bold ${toneStyles[verdictTone].text}`}>
+                    {confidencePercent}%
+                  </p>
+                  <p className="mt-1 text-xs text-slate-500">
+                    Probability, not certainty.
+                  </p>
+                  {result.data.model && (
+                    <p className="mt-2 font-mono text-xs text-slate-600">
+                      Model: {result.data.model}
+                    </p>
+                  )}
+                </div>
               </div>
-              <div className="rounded-2xl border border-[#d8d6cf] bg-[#f7f7f4] p-4">
-                <div className="flex items-center justify-between gap-2 text-xs uppercase tracking-[0.3em] text-[#7a7670]">
-                  <span>Confidence</span>
+
+              {/* Confidence Bar */}
+              <div className="mt-6 h-2 w-full rounded-full bg-slate-800">
+                <div
+                  className={`h-2 rounded-full transition-all ${toneStyles[verdictTone].bar} ${toneStyles[verdictTone].glow}`}
+                  style={{ width: `${confidencePercent}%` }}
+                />
+              </div>
+
+              {/* Detected Signals */}
+              <div className="mt-8">
+                <div className="flex items-center justify-between">
+                  <span className="font-mono text-xs uppercase tracking-wider text-slate-500">
+                    Detected Signals
+                  </span>
                   <span
-                    className="inline-flex h-5 w-5 items-center justify-center rounded-full border border-[#c4c1b8] text-[10px] text-[#4c4b45]"
-                    title="The confidence score reflects probability, not certainty."
+                    className="inline-flex h-5 w-5 items-center justify-center rounded-full border border-slate-700 text-[10px] text-slate-400"
+                    title="Each signal includes what it means, why it matters, and how it affects the score."
                   >
-                    i
+                    ?
                   </span>
                 </div>
-                <p className="mt-3 text-3xl font-semibold text-[#1f1f1c]">
-                  {confidencePercent}%
-                </p>
-                <p className="mt-1 text-xs text-[#7a7670]">
-                  The confidence score reflects probability, not certainty.
-                </p>
-                {result.data.model && (
-                  <p className="mt-2 text-xs uppercase tracking-[0.2em] text-[#7a7670]">
-                    Model: {result.data.model}
-                  </p>
-                )}
-                <p className="mt-2 text-xs text-[#7a7670]">
-                  Generated at {new Date(result.receivedAt).toLocaleTimeString()}.
-                </p>
-              </div>
-            </div>
-
-            <div className="mt-6 h-2 w-full rounded-full bg-[#e3e1db]">
-              <div
-                className={`h-2 rounded-full transition-all ${
-                  toneStyles[verdictTone].bar
-                }`}
-                style={{ width: `${confidencePercent}%` }}
-              />
-            </div>
-
-            <div className="mt-8">
-              <div className="flex items-center justify-between">
-                <span className="text-xs uppercase tracking-[0.3em] text-[#7a7670]">
-                  Detected signals
-                </span>
-                <span
-                  className="inline-flex h-5 w-5 items-center justify-center rounded-full border border-[#c4c1b8] text-[10px] text-[#4c4b45]"
-                  title="Each signal includes what it means, why it matters, and how it affects the score."
-                >
-                  i
-                </span>
-              </div>
-              {detectedSignals.length > 0 ? (
-                <ul className="mt-4 space-y-3">
-                  {detectedSignals.map((signal, index) => {
-                    const details = buildSignalDetails(signal, usesBreakdownSignals);
-                    return (
-                      <li
-                        key={`${signal}-${index}`}
-                        className="rounded-2xl border border-[#d8d6cf] bg-white/95 p-4"
-                      >
-                        <details className="group">
-                          <summary className="flex cursor-pointer list-none items-start justify-between gap-3">
-                            <div className="flex items-start gap-3">
-                              <span className="mt-2 h-1.5 w-1.5 rounded-full bg-[#2f3e4e]" />
-                              <span className="text-sm text-[#1f1f1c]">{signal}</span>
+                {detectedSignals.length > 0 ? (
+                  <ul className="mt-4 space-y-3">
+                    {detectedSignals.map((signal, index) => {
+                      const details = buildSignalDetails(signal, usesBreakdownSignals);
+                      return (
+                        <li
+                          key={`${signal}-${index}`}
+                          className="rounded-xl border border-slate-800 bg-slate-900/50 overflow-hidden"
+                        >
+                          <details className="group">
+                            <summary className="flex cursor-pointer items-start justify-between gap-3 p-4 [&::-webkit-details-marker]:hidden">
+                              <div className="flex items-start gap-3">
+                                <span className="mt-1.5 h-2 w-2 rounded-full bg-amber-500" />
+                                <span className="text-sm text-white">{signal}</span>
+                              </div>
+                              <span className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full border border-slate-700 text-slate-400 transition-all group-open:border-amber-500/50 group-open:bg-amber-500/10 group-open:text-amber-500">
+                                <svg viewBox="0 0 16 16" fill="none" className="h-3 w-3 transition-transform group-open:rotate-180">
+                                  <path d="M4 6l4 4 4-4" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+                                </svg>
+                              </span>
+                            </summary>
+                            <div className="border-t border-slate-800 px-4 py-4 space-y-2 text-sm text-slate-400">
+                              <p>
+                                <span className="font-medium text-white">What it means:</span>{" "}
+                                {details.meaning}
+                              </p>
+                              <p>
+                                <span className="font-medium text-white">Why it matters:</span>{" "}
+                                {details.why}
+                              </p>
+                              <p>
+                                <span className="font-medium text-white">How it affects the score:</span>{" "}
+                                {details.impact}
+                              </p>
                             </div>
-                            <span className="text-xs uppercase tracking-[0.2em] text-[#7a7670]">
-                              Details
-                            </span>
-                          </summary>
-                          <div className="mt-3 space-y-2 text-sm text-[#4c4b45]">
-                            <p>
-                              <span className="font-semibold text-[#1f1f1c]">
-                                What it means:
-                              </span>{" "}
-                              {details.meaning}
-                            </p>
-                            <p>
-                              <span className="font-semibold text-[#1f1f1c]">
-                                Why it matters:
-                              </span>{" "}
-                              {details.why}
-                            </p>
-                            <p>
-                              <span className="font-semibold text-[#1f1f1c]">
-                                How it affects the score:
-                              </span>{" "}
-                              {details.impact}
-                            </p>
-                          </div>
-                        </details>
-                      </li>
-                    );
-                  })}
+                          </details>
+                        </li>
+                      );
+                    })}
+                  </ul>
+                ) : (
+                  <div className="mt-4 rounded-xl border border-slate-800 bg-slate-900/50 p-4 text-sm text-slate-400">
+                    No signal list was returned. Review the verdict summary.
+                  </div>
+                )}
+              </div>
+
+              {/* Improvement Tips */}
+              <div className="mt-8 rounded-xl border border-slate-800 bg-slate-900/50 p-4">
+                <p className="font-mono text-xs uppercase tracking-wider text-slate-500">
+                  Suggestions
+                </p>
+                <ul className="mt-3 space-y-2">
+                  {IMPROVEMENT_TIPS.map((tip) => (
+                    <li key={tip} className="flex items-start gap-3">
+                      <span className="mt-1.5 h-1.5 w-1.5 rounded-full bg-amber-500" />
+                      <span className="text-sm text-slate-300">{tip}</span>
+                    </li>
+                  ))}
                 </ul>
-              ) : (
-                <div className="mt-4 rounded-2xl border border-[#d8d6cf] bg-[#f3f3ef] p-4 text-sm text-[#4c4b45]">
-                  No signal list was returned. Review the verdict summary and consider another run.
+              </div>
+
+              {/* Actions */}
+              <div className="mt-6 flex flex-wrap items-center gap-3">
+                <button
+                  type="button"
+                  className="inline-flex items-center gap-2 rounded-full bg-gradient-to-r from-amber-500 to-amber-600 px-5 py-2.5 text-sm font-semibold text-[#050810] shadow-[0_4px_20px_-4px_rgba(245,158,11,0.4)] transition-all hover:shadow-[0_6px_30px_-4px_rgba(245,158,11,0.5)]"
+                  onClick={() => startEditFromSnapshot(latestSnapshot)}
+                >
+                  Edit and recheck
+                </button>
+                {!canEdit && (
+                  <span className="inline-flex items-center rounded-full border border-slate-700 bg-slate-800/50 px-3 py-1.5 text-xs font-medium text-slate-400">
+                    Free plan
+                  </span>
+                )}
+              </div>
+
+              {authReady && !user && (
+                <div className="mt-6 rounded-xl border border-slate-800 bg-slate-900/50 px-4 py-3 text-sm text-slate-400">
+                  <Link href="/login" className="font-semibold text-amber-400 hover:text-amber-300">
+                    Log in
+                  </Link>{" "}
+                  to save your history.
                 </div>
               )}
-            </div>
 
-            <div className="mt-8 rounded-2xl border border-[#d8d6cf] bg-[#f3f3ef] p-4">
-              <p className="text-xs uppercase tracking-[0.3em] text-[#7a7670]">
-                What you can improve
-              </p>
-              <p className="mt-2 text-sm text-[#4c4b45]">
-                You may want to review the following.
-              </p>
-              <ul className="mt-3 space-y-2 text-sm text-[#4c4b45]">
-                {IMPROVEMENT_TIPS.map((tip) => (
-                  <li key={tip} className="flex gap-3">
-                    <span className="mt-2 h-1.5 w-1.5 rounded-full bg-[#2f3e4e]" />
-                    <span>{tip}</span>
-                  </li>
-                ))}
-              </ul>
-            </div>
-
-            <div className="mt-6 flex flex-wrap gap-3">
-              <button
-                type="button"
-                className="inline-flex items-center justify-center rounded-full bg-[#2f3e4e] px-5 py-2 text-xs font-semibold uppercase tracking-[0.3em] text-[#f7f7f4]"
-                onClick={() => startEditFromSnapshot(latestSnapshot)}
-              >
-                Edit and recheck
-              </button>
-              {!canEdit && (
-                <span className="inline-flex items-center rounded-full border border-[#d8dde2] bg-[#eef1f3] px-3 py-1 text-xs uppercase tracking-[0.2em] text-[#4a5560]">
-                  Free plan
-                </span>
+              {authReady && user && saveError && (
+                <p className="mt-4 text-sm text-red-400">{saveError}</p>
               )}
             </div>
 
-            {authReady && !user && (
-              <div className="mt-6 rounded-2xl border border-[#d8d6cf] bg-[#f7f7f4] px-4 py-3 text-sm text-[#4c4b45]">
-                <Link href="/login" className="font-semibold text-[#1f1f1c]">
-                  Log in
-                </Link>{" "}
-                to save your history.
-              </div>
-            )}
-
-            {authReady && user && saveError && (
-              <p className="mt-4 text-xs text-[#6a4033]">{saveError}</p>
-            )}
-            </div>
+            {/* Lock overlay */}
             {lockResults && (
-              <div className="absolute inset-0 flex items-center justify-center rounded-3xl bg-white/70 text-center">
-                <div className="mx-auto max-w-[260px] rounded-2xl border border-[#d8d6cf] bg-white/95 p-4 text-xs uppercase tracking-[0.2em] text-[#4c4b45]">
-                  Create an account to view your full report.
+              <div className="absolute inset-0 flex items-center justify-center rounded-2xl bg-[#050810]/80 backdrop-blur-sm">
+                <div className="mx-auto max-w-[280px] rounded-xl glass-card p-6 text-center">
+                  <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-full bg-amber-500/10">
+                    <svg viewBox="0 0 24 24" fill="none" className="h-6 w-6 text-amber-500">
+                      <rect x="3" y="11" width="18" height="11" rx="2" stroke="currentColor" strokeWidth="2" />
+                      <path d="M7 11V7a5 5 0 0110 0v4" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
+                    </svg>
+                  </div>
+                  <p className="mt-3 font-medium text-white">Create an account</p>
+                  <p className="mt-1 text-sm text-slate-400">to view your full report</p>
                 </div>
               </div>
             )}
           </section>
         )}
 
+        {/* Raw result fallback */}
         {result?.type === "raw" && (
           <section
-            className="mt-10 rounded-3xl border border-[#d8d6cf] bg-white/90 p-6 shadow-[0_20px_80px_rgba(24,22,18,0.1)] backdrop-blur opacity-0 animate-fade-up"
+            className="mt-10 rounded-2xl glass-card p-6 opacity-0 animate-fade-up"
             style={{ animationDelay: "200ms" }}
           >
             <div className="flex flex-wrap items-center justify-between gap-4">
               <div>
-                <p className="text-xs uppercase tracking-[0.3em] text-[#7a7670]">
-                  Response
-                </p>
-                <p className="mt-3 text-lg font-semibold text-[#1f1f1c]">
-                  Analysis received
-                </p>
-                <p className="mt-1 text-sm text-[#4c4b45]">
+                <p className="font-mono text-xs uppercase tracking-wider text-slate-500">Response</p>
+                <p className="mt-2 text-lg font-semibold text-white">Analysis received</p>
+                <p className="mt-1 text-sm text-slate-400">
                   The response did not match the expected schema.
                 </p>
               </div>
-              <p className="text-xs uppercase tracking-[0.3em] text-[#7a7670]">
+              <p className="font-mono text-xs text-slate-500">
                 {new Date(result.receivedAt).toLocaleTimeString()}
               </p>
             </div>
-            <details className="mt-4 rounded-2xl border border-[#d8d6cf] bg-[#f7f7f4]/80 p-4">
-              <summary className="cursor-pointer text-sm font-semibold text-[#4c4b45]">
-                Raw output
+            <details className="mt-4 rounded-xl border border-slate-800 bg-slate-900/50 overflow-hidden">
+              <summary className="cursor-pointer p-4 text-sm font-medium text-slate-300 [&::-webkit-details-marker]:hidden">
+                View raw output
               </summary>
-              <pre className="mt-3 max-h-80 overflow-auto rounded-xl bg-[#f1f1ec] p-3 text-xs text-[#2a2924]">
-{JSON.stringify(result.data, null, 2)}
+              <pre className="border-t border-slate-800 p-4 max-h-80 overflow-auto font-mono text-xs text-slate-400">
+                {JSON.stringify(result.data, null, 2)}
               </pre>
             </details>
 
             <div className="mt-6 flex flex-wrap gap-3">
               <button
                 type="button"
-                className="inline-flex items-center justify-center rounded-full bg-[#2f3e4e] px-5 py-2 text-xs font-semibold uppercase tracking-[0.3em] text-[#f7f7f4]"
+                className="inline-flex items-center gap-2 rounded-full bg-gradient-to-r from-amber-500 to-amber-600 px-5 py-2.5 text-sm font-semibold text-[#050810]"
                 onClick={() => startEditFromSnapshot(latestSnapshot)}
               >
                 Edit and recheck
               </button>
-              {!canEdit && (
-                <span className="inline-flex items-center rounded-full border border-[#d8dde2] bg-[#eef1f3] px-3 py-1 text-xs uppercase tracking-[0.2em] text-[#4a5560]">
-                  Free plan
-                </span>
-              )}
             </div>
 
             {authReady && !user && (
-              <div className="mt-6 rounded-2xl border border-[#d8d6cf] bg-[#f7f7f4] px-4 py-3 text-sm text-[#4c4b45]">
-                <Link href="/login" className="font-semibold text-[#1f1f1c]">
+              <div className="mt-6 rounded-xl border border-slate-800 bg-slate-900/50 px-4 py-3 text-sm text-slate-400">
+                <Link href="/login" className="font-semibold text-amber-400">
                   Log in
                 </Link>{" "}
                 to save your history.
               </div>
-            )}
-
-            {authReady && user && saveError && (
-              <p className="mt-4 text-xs text-[#6a4033]">{saveError}</p>
             )}
           </section>
         )}
@@ -1093,30 +1116,33 @@ export default function Home() {
           />
         )}
 
+        {/* Upgrade Modal */}
         {!canEdit && upgradeIntent && (
-          <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/35 p-6 backdrop-blur-sm transition-opacity duration-200 animate-fade-in">
-            <div className="w-full max-w-2xl rounded-3xl border border-[#d8d6cf] bg-[#f3f3ef] p-6 shadow-[0_22px_70px_rgba(27,24,19,0.2)] transition-all duration-200 ease-out animate-fade-up">
+          <div className="fixed inset-0 z-50 flex items-center justify-center bg-[#050810]/80 p-6 backdrop-blur-xl animate-fade-in">
+            <div className="w-full max-w-lg rounded-2xl glass-card p-6 animate-scale-in">
               <div className="flex items-start justify-between gap-4">
                 <div>
-                  <p className="text-sm font-semibold text-[#1f1f1c]">
+                  <p className="text-lg font-semibold text-white">
                     Edit feedback helps you understand why a result changed.
                   </p>
-                  <p className="mt-1 text-xs uppercase tracking-[0.2em] text-[#7a7670]">
+                  <p className="mt-1 font-mono text-xs uppercase tracking-wider text-slate-500">
                     Edit recheck and change tracking
                   </p>
                 </div>
                 <button
                   type="button"
-                  className="rounded-full border border-[#c4c1b8] px-3 py-1 text-xs font-semibold uppercase tracking-[0.2em] text-[#4c4b45] transition hover:border-[#9b978f]"
+                  className="rounded-lg border border-slate-700 p-2 text-slate-400 transition-colors hover:bg-slate-800 hover:text-white"
                   onClick={() => setUpgradeIntent(null)}
                 >
-                  Close
+                  <svg viewBox="0 0 20 20" fill="none" className="h-4 w-4">
+                    <path d="M6 6l8 8M6 14l8-8" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
+                  </svg>
                 </button>
               </div>
-              <div className="mt-4 flex flex-wrap items-center gap-3">
+              <div className="mt-6">
                 <LoadingLink
                   href="/pricing"
-                  className="rounded-full bg-[#2f3e4e] px-5 py-2 text-xs font-semibold uppercase tracking-[0.3em] text-[#f7f7f4] transition hover:bg-[#3b4d60]"
+                  className="inline-flex items-center gap-2 rounded-full bg-gradient-to-r from-amber-500 to-amber-600 px-6 py-3 text-sm font-semibold text-[#050810] shadow-[0_4px_20px_-4px_rgba(245,158,11,0.4)]"
                 >
                   Upgrade to Starter
                 </LoadingLink>
@@ -1125,49 +1151,52 @@ export default function Home() {
           </div>
         )}
 
+        {/* Auth Gate Modal */}
         {showAuthGate && !user && (
-          <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/35 p-6 backdrop-blur-sm">
-            <div className="w-full max-w-lg rounded-3xl border border-[#d8d6cf] bg-white/95 p-6 shadow-[0_22px_70px_rgba(27,24,19,0.2)]">
-              <p className="text-xs uppercase tracking-[0.3em] text-[#7a7670]">
-                Create an account
-              </p>
-              <h3 className="mt-3 text-xl font-semibold text-[#1f1f1c]">
-                View your full report and save every run.
+          <div className="fixed inset-0 z-50 flex items-center justify-center bg-[#050810]/80 p-6 backdrop-blur-xl">
+            <div className="w-full max-w-lg rounded-2xl glass-card p-8">
+              <div className="flex h-12 w-12 items-center justify-center rounded-full bg-amber-500/10">
+                <svg viewBox="0 0 24 24" fill="none" className="h-6 w-6 text-amber-500">
+                  <path d="M12 15v2m0-8v4m0 8c4.97 0 9-4.03 9-9s-4.03-9-9-9-9 4.03-9 9 4.03 9 9 9z" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
+                </svg>
+              </div>
+              <h3 className="mt-4 font-serif text-2xl font-bold text-white">
+                View your full report
               </h3>
-              <p className="mt-2 text-sm text-[#4c4b45]">
-                We do not run checks without login. Create an account to unlock
-                the full detector and detailed signals.
+              <p className="mt-2 text-slate-400">
+                Create an account to unlock detailed signals, save your history, and track revisions over time.
               </p>
-              <div className="mt-5 flex flex-wrap items-center gap-3">
+              <div className="mt-6 space-y-3">
                 <LoadingLink
                   href="/signup?redirectedFrom=/detector"
-                  className="rounded-full bg-[#2f3e4e] px-5 py-2 text-xs font-semibold uppercase tracking-[0.3em] text-[#f7f7f4] transition hover:bg-[#3b4d60]"
+                  className="block w-full rounded-xl bg-gradient-to-r from-amber-500 to-amber-600 py-3 text-center text-sm font-semibold text-[#050810] shadow-[0_4px_20px_-4px_rgba(245,158,11,0.4)]"
                 >
-                  Create account
+                  Create Free Account
                 </LoadingLink>
                 <LoadingLink
                   href="/login?redirectedFrom=/detector"
-                  className="rounded-full border border-[#c9d5de] bg-[#edf2f5] px-5 py-2 text-xs font-semibold uppercase tracking-[0.3em] text-[#2f3e4e] transition hover:border-[#b6c6d2]"
+                  className="block w-full rounded-xl border border-slate-700 bg-slate-800/50 py-3 text-center text-sm font-medium text-white transition-all hover:border-slate-600 hover:bg-slate-800"
                 >
-                  Log in
+                  Already have an account? Log in
                 </LoadingLink>
-                <button
-                  type="button"
-                  className="text-xs uppercase tracking-[0.3em] text-[#7a7670]"
-                  onClick={() => setShowAuthGate(false)}
-                >
-                  Not now
-                </button>
               </div>
+              <button
+                type="button"
+                className="mt-4 w-full text-center text-sm text-slate-500 hover:text-slate-400 transition-colors"
+                onClick={() => setShowAuthGate(false)}
+              >
+                Maybe later
+              </button>
             </div>
           </div>
         )}
 
+        {/* Another check button */}
         {result && !lockResults && (
           <div className="mt-8 flex flex-wrap gap-3">
             <button
               type="button"
-              className="rounded-full border border-[#c4c1b8] px-4 py-2 text-xs font-semibold uppercase tracking-[0.2em] text-[#4c4b45]"
+              className="rounded-lg border border-slate-700 bg-slate-800/50 px-4 py-2 text-sm font-medium text-slate-300 transition-all hover:border-slate-600 hover:bg-slate-800"
               onClick={() => startEditFromSnapshot(latestSnapshot)}
             >
               Check another edit
@@ -1175,26 +1204,38 @@ export default function Home() {
           </div>
         )}
 
+        {/* How it works section */}
         <section
           id="how-it-works"
-          className="mt-12 rounded-3xl border border-[#d8d6cf] bg-white/85 p-6 shadow-[0_18px_60px_rgba(27,24,19,0.08)] backdrop-blur opacity-0 animate-fade-up"
+          className="mt-12 rounded-2xl glass-card p-6 opacity-0 animate-fade-up"
           style={{ animationDelay: "220ms" }}
         >
-          <p className="text-xs uppercase tracking-[0.3em] text-[#7a7670]">
+          <p className="font-mono text-xs uppercase tracking-wider text-amber-500">
             How it works
           </p>
-          <div className="mt-4 space-y-2 text-sm text-[#4c4b45]">
-            <p>Paste your draft.</p>
-            <p>Review signals and probability.</p>
-            <p>Decide what to adjust before submission.</p>
+          <div className="mt-4 grid gap-4 md:grid-cols-3">
+            {[
+              { step: "01", title: "Paste your draft", desc: "Enter or upload your text" },
+              { step: "02", title: "Review signals", desc: "See what patterns are detected" },
+              { step: "03", title: "Revise & recheck", desc: "Improve and verify your changes" }
+            ].map((item) => (
+              <div key={item.step} className="flex gap-4">
+                <span className="font-mono text-2xl font-bold text-amber-500/30">{item.step}</span>
+                <div>
+                  <p className="font-medium text-white">{item.title}</p>
+                  <p className="mt-1 text-sm text-slate-500">{item.desc}</p>
+                </div>
+              </div>
+            ))}
           </div>
         </section>
 
+        {/* Footer */}
         <footer
-          className="mt-auto pt-12 text-xs uppercase tracking-[0.3em] text-[#7a7670] opacity-0 animate-fade-in"
+          className="mt-auto pt-12 text-center font-mono text-xs uppercase tracking-wider text-slate-600 opacity-0 animate-fade-in"
           style={{ animationDelay: "240ms" }}
         >
-          You control where your text is analyzed.
+          Signals over accusations · Probability over certainty
         </footer>
       </div>
     </main>
