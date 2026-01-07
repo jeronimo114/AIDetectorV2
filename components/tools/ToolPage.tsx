@@ -13,9 +13,21 @@ import { DetectionResult, TransformationResult } from "@/components/tools/ToolRe
 import type { ToolConfig, DetectionResponse, TransformationResponse, ToolResponse } from "@/lib/tools/types";
 import { getRelatedTools } from "@/lib/tools/config";
 import { getSupabaseBrowserClient } from "@/lib/supabase/client";
+import { formatNumber } from "@/lib/format";
 
 const TIMEOUT_MS = 20000;
 const FILE_ACCEPT = ".txt,.md,text/plain,text/markdown";
+
+// Next.js requires literal strings for env vars at build time
+function getWebhookUrl(envKey: string): string {
+  if (envKey === "NEXT_PUBLIC_N8N_WEBHOOK_URL") {
+    return process.env.NEXT_PUBLIC_N8N_WEBHOOK_URL ?? "";
+  }
+  if (envKey === "NEXT_PUBLIC_N8N_HUMANIZER_WEBHOOK_URL") {
+    return process.env.NEXT_PUBLIC_N8N_HUMANIZER_WEBHOOK_URL ?? "";
+  }
+  return "";
+}
 
 const DEMO_DETECTION: DetectionResponse = {
   verdict: "Unclear",
@@ -73,7 +85,7 @@ export default function ToolPage({ config }: ToolPageProps) {
   const authGateTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   const relatedTools = getRelatedTools(config.slug);
-  const webhookUrl = process.env[config.webhookEnvKey] ?? "";
+  const webhookUrl = getWebhookUrl(config.webhookEnvKey);
   const isWebhookMissing = webhookUrl.length === 0;
 
   useEffect(() => {
@@ -360,7 +372,7 @@ export default function ToolPage({ config }: ToolPageProps) {
               </div>
             </div>
             <span className={`text-sm font-medium ${exceedsMax ? "text-red-500" : "text-gray-400"}`}>
-              {charCount.toLocaleString()}/{config.ui.maxChars.toLocaleString()}
+              {formatNumber(charCount)}/{formatNumber(config.ui.maxChars)}
             </span>
           </div>
 
@@ -424,7 +436,7 @@ export default function ToolPage({ config }: ToolPageProps) {
           <div className="mt-4 flex flex-wrap items-center justify-between gap-4">
             <p className={`text-sm ${exceedsMax ? "text-red-500" : "text-gray-500"}`}>
               {exceedsMax
-                ? `Maximum ${config.ui.maxChars.toLocaleString()} characters exceeded.`
+                ? `Maximum ${formatNumber(config.ui.maxChars)} characters exceeded.`
                 : `Minimum ${config.ui.minChars} characters to analyze.`}
             </p>
             <div className="flex flex-wrap items-center gap-3">
