@@ -48,6 +48,14 @@ export const metadata: Metadata = {
     description:
       "Check if your essay looks AI-generated before submitting. Get actionable signals to reduce false positives."
   },
+  icons: {
+    icon: [
+      { url: "/favicon-16.png", sizes: "16x16", type: "image/png" },
+      { url: "/favicon-32.png", sizes: "32x32", type: "image/png" },
+      { url: "/favicon.svg", type: "image/svg+xml" }
+    ],
+    shortcut: ["/favicon-32.png"]
+  },
   robots: {
     index: true,
     follow: true,
