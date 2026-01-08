@@ -392,7 +392,7 @@ export default function HomePage() {
           <div className="grid items-center gap-12 lg:grid-cols-2">
             {/* Image */}
             <div className="scroll-slide-right relative">
-              <div className="aspect-[4/3] overflow-hidden rounded-2xl bg-gray-100">
+              <div className="relative aspect-[4/3] overflow-hidden rounded-2xl bg-gray-100">
                 <Image
                   src="/images/expert-solutions.jpg"
                   alt="Person working on a laptop outdoors with a clear sky and beach backdrop."
