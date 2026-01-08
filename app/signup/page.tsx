@@ -12,12 +12,18 @@ function SignupForm() {
   const redirectedFrom = searchParams.get("redirectedFrom");
   const supabase = getSupabaseBrowserClient();
 
+  // Check if returning from OAuth (has code or access_token in URL hash/params)
+  const hasAuthCode = searchParams.get("code") !== null;
+  const hasHashToken = typeof window !== "undefined" && window.location.hash.includes("access_token");
+  const isReturningFromOAuth = hasAuthCode || hasHashToken;
+
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState<string | null>(null);
   const [notice, setNotice] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const [isOAuthLoading, setIsOAuthLoading] = useState(false);
+  const [isProcessingOAuth, setIsProcessingOAuth] = useState(isReturningFromOAuth);
 
   const safeRedirect =
     redirectedFrom && redirectedFrom.startsWith("/") && !redirectedFrom.startsWith("//")
@@ -33,6 +39,17 @@ function SignupForm() {
       if ((event === "SIGNED_IN" || event === "INITIAL_SESSION") && session) {
         router.push(safeRedirect);
         router.refresh();
+      }
+    });
+
+    // Check for existing session on mount
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      if (session) {
+        router.push(safeRedirect);
+        router.refresh();
+      } else {
+        // No session and not returning from OAuth, show the form
+        setIsProcessingOAuth(false);
       }
     });
 
@@ -69,6 +86,27 @@ function SignupForm() {
     );
     setIsLoading(false);
   };
+
+  // Show loading screen while processing OAuth callback
+  if (isProcessingOAuth) {
+    return (
+      <main className="relative min-h-screen bg-gray-50">
+        <div className="mx-auto flex min-h-screen w-full max-w-[480px] flex-col items-center justify-center px-6">
+          <div className="rounded-2xl border border-gray-200 bg-white p-8 shadow-sm text-center">
+            <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-xl bg-orange-50">
+              <span className="h-6 w-6 animate-spin rounded-full border-2 border-orange-200 border-t-orange-500" />
+            </div>
+            <h1 className="mt-4 text-xl font-bold text-gray-900">
+              Creating your account...
+            </h1>
+            <p className="mt-2 text-gray-600">
+              Please wait while we set up your account.
+            </p>
+          </div>
+        </div>
+      </main>
+    );
+  }
 
   return (
     <main className="relative min-h-screen bg-gray-50">
