@@ -121,7 +121,8 @@ function SignupForm() {
                 setNotice(null);
                 setIsOAuthLoading(true);
 
-                const redirectUrl = new URL("/signup", window.location.origin);
+                const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || window.location.origin;
+                const redirectUrl = new URL("/signup", siteUrl);
                 redirectUrl.searchParams.set("redirectedFrom", safeRedirect);
 
                 const { error: oauthError } = await supabase.auth.signInWithOAuth({

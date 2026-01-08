@@ -63,7 +63,8 @@ export default function LoginForm() {
     setError(null);
     setIsOAuthLoading(true);
 
-    const redirectUrl = new URL("/login", window.location.origin);
+    const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || window.location.origin;
+    const redirectUrl = new URL("/login", siteUrl);
     redirectUrl.searchParams.set("redirectedFrom", safeRedirect);
 
     const { error: oauthError } = await supabase.auth.signInWithOAuth({
