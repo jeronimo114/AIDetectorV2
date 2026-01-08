@@ -1,5 +1,6 @@
 "use client";
 
+import Image from "next/image";
 import { useEffect, useRef, useState, type ChangeEvent } from "react";
 
 import LoadingLink from "@/components/LoadingLink";
@@ -389,16 +390,16 @@ export default function HomePage() {
       <section className="bg-gray-50 py-20">
         <div className="mx-auto max-w-[1200px] px-6">
           <div className="grid items-center gap-12 lg:grid-cols-2">
-            {/* Image placeholder */}
+            {/* Image */}
             <div className="scroll-slide-right relative">
-              <div className="aspect-[4/3] overflow-hidden rounded-2xl bg-gradient-to-br from-gray-200 to-gray-300">
-                <div className="flex h-full items-center justify-center text-gray-400">
-                  <svg viewBox="0 0 24 24" fill="none" className="h-16 w-16">
-                    <rect x="3" y="3" width="18" height="18" rx="2" stroke="currentColor" strokeWidth="2" />
-                    <circle cx="8.5" cy="8.5" r="1.5" fill="currentColor" />
-                    <path d="M21 15l-5-5L5 21" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
-                  </svg>
-                </div>
+              <div className="aspect-[4/3] overflow-hidden rounded-2xl bg-gray-100">
+                <Image
+                  src="/images/expert-solutions.jpg"
+                  alt="Person working on a laptop outdoors with a clear sky and beach backdrop."
+                  fill
+                  sizes="(max-width: 1024px) 100vw, 50vw"
+                  className="object-cover"
+                />
               </div>
               {/* Floating trust badge */}
               <div className="absolute -bottom-6 left-6 rounded-xl border border-gray-100 bg-white p-4 shadow-lg animate-float-slow">
