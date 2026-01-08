@@ -28,7 +28,7 @@ const tiers = [
     period: "/month",
     description: "Submit assignments with confidence and peace of mind.",
     cta: "Get Starter",
-    ctaHref: "/checkout?plan=starter",
+    ctaHref: "/signup?redirectedFrom=%2Fcheckout%3Fplan%3Dstarter",
     popular: true,
     highlights: [
       "100 analyses per month",
@@ -45,7 +45,7 @@ const tiers = [
     period: "/month",
     description: "For higher volume and exports.",
     cta: "Get Pro",
-    ctaHref: "/checkout?plan=pro",
+    ctaHref: "/signup?redirectedFrom=%2Fcheckout%3Fplan%3Dpro",
     popular: false,
     highlights: [
       "500 analyses per month",
@@ -254,7 +254,7 @@ export default function PricingPage() {
 
           <div className="mt-8 text-center">
             <LoadingLink
-              href="/checkout?plan=starter"
+              href="/signup?redirectedFrom=%2Fcheckout%3Fplan%3Dstarter"
               className="inline-flex items-center gap-2 rounded-full bg-orange-500 px-8 py-4 text-sm font-semibold text-white shadow-md transition-all hover:bg-orange-600 hover:shadow-lg"
             >
               Start with Starter — Most Popular

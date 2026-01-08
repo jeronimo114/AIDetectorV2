@@ -3,7 +3,8 @@ import type { PlanId, Subscription, Payment, TransactionStatus, PLANS } from "./
 import {
   createPaymentSource,
   createTransaction,
-  generateReference
+  generateReference,
+  generateIntegritySignature
 } from "./client";
 
 // Use service role client for server-side operations
@@ -59,6 +60,13 @@ export async function createSubscription(params: {
   // Generate reference for first payment
   const reference = generateReference(params.userId, params.planId);
 
+  // Generate integrity signature
+  const integritySignature = generateIntegritySignature(
+    reference,
+    params.amountCents,
+    params.currency
+  );
+
   // Create first transaction
   const transactionResponse = await createTransaction({
     amount_in_cents: params.amountCents,
@@ -66,7 +74,9 @@ export async function createSubscription(params: {
     customer_email: params.customerEmail,
     reference,
     payment_source_id: paymentSourceId,
-    recurrent: true
+    payment_method: { installments: 1 },
+    recurrent: true,
+    signature: integritySignature
   });
 
   const transaction = transactionResponse.data;
@@ -155,6 +165,13 @@ export async function processRecurringPayment(
 
   const reference = generateReference(subscription.user_id, subscription.plan_id);
 
+  // Generate integrity signature
+  const integritySignature = generateIntegritySignature(
+    reference,
+    subscription.amount_cents,
+    subscription.currency
+  );
+
   // Create transaction
   const transactionResponse = await createTransaction({
     amount_in_cents: subscription.amount_cents,
@@ -162,7 +179,9 @@ export async function processRecurringPayment(
     customer_email: subscription.customer_email,
     reference,
     payment_source_id: subscription.payment_source_id,
-    recurrent: true
+    payment_method: { installments: 1 },
+    recurrent: true,
+    signature: integritySignature
   });
 
   const transaction = transactionResponse.data;

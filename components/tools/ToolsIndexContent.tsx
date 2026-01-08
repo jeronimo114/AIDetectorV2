@@ -10,6 +10,8 @@ export default function ToolsIndexContent() {
 
   const detectorTools = tools.filter((t) => t.category === "detector");
   const humanizerTools = tools.filter((t) => t.category === "humanizer");
+  const generatorTools = tools.filter((t) => t.category === "generator");
+  const utilityTools = tools.filter((t) => t.category === "utility");
 
   return (
     <main className="min-h-screen bg-gray-50">
@@ -127,6 +129,106 @@ export default function ToolsIndexContent() {
             ))}
           </div>
         </section>
+
+        {/* Generator Tools */}
+        {generatorTools.length > 0 && (
+          <section className="scroll-fade-up mt-16">
+            <div className="flex items-center gap-3 mb-6">
+              <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-violet-50">
+                <svg viewBox="0 0 24 24" fill="none" className="h-5 w-5 text-violet-500">
+                  <path d="M13 10V3L4 14h7v7l9-11h-7z" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+                </svg>
+              </div>
+              <h2 className="text-2xl font-bold text-gray-900">Content Generators</h2>
+            </div>
+            <p className="text-gray-600 mb-8">
+              Generate essay outlines, thesis statements, and other academic content.
+            </p>
+            <div className="stagger-children grid gap-4 sm:grid-cols-2">
+              {generatorTools.map((tool) => (
+                <Link
+                  key={tool.slug}
+                  href={`/tools/${tool.slug}`}
+                  className="group rounded-2xl border border-gray-200 bg-white p-6 shadow-sm transition-all hover:border-violet-200 hover:shadow-md hover-lift"
+                >
+                  <div className="flex items-start justify-between">
+                    <div>
+                      <h3 className="text-lg font-semibold text-gray-900 group-hover:text-violet-600 transition-colors">
+                        {tool.name}
+                      </h3>
+                      <p className="mt-2 text-sm text-gray-600 line-clamp-2">
+                        {tool.seo.description}
+                      </p>
+                    </div>
+                    <div className="flex h-8 w-8 items-center justify-center rounded-full bg-violet-50 text-violet-500 group-hover:bg-violet-100 transition-colors">
+                      <svg viewBox="0 0 16 16" fill="none" className="h-4 w-4">
+                        <path d="M6 12l4-4-4-4" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+                      </svg>
+                    </div>
+                  </div>
+                  <div className="mt-4 flex flex-wrap gap-2">
+                    {tool.seo.keywords.slice(0, 3).map((keyword) => (
+                      <span
+                        key={keyword}
+                        className="rounded-full bg-gray-100 px-3 py-1 text-xs text-gray-600"
+                      >
+                        {keyword}
+                      </span>
+                    ))}
+                  </div>
+                </Link>
+              ))}
+            </div>
+          </section>
+        )}
+
+        {/* Utility Tools */}
+        {utilityTools.length > 0 && (
+          <section className="scroll-fade-up mt-16">
+            <div className="flex items-center gap-3 mb-6">
+              <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-blue-50">
+                <svg viewBox="0 0 24 24" fill="none" className="h-5 w-5 text-blue-500">
+                  <path d="M9 7h6M9 12h6M9 17h4" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
+                  <rect x="4" y="3" width="16" height="18" rx="2" stroke="currentColor" strokeWidth="2" />
+                </svg>
+              </div>
+              <h2 className="text-2xl font-bold text-gray-900">Writing Utilities</h2>
+            </div>
+            <p className="text-gray-600 mb-8">
+              Free tools to count words, characters, and analyze your text. No signup required.
+            </p>
+            <div className="stagger-children grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+              {utilityTools.map((tool) => (
+                <Link
+                  key={tool.slug}
+                  href={`/tools/${tool.slug}`}
+                  className="group rounded-2xl border border-gray-200 bg-white p-6 shadow-sm transition-all hover:border-blue-200 hover:shadow-md hover-lift"
+                >
+                  <div className="flex items-start justify-between">
+                    <div>
+                      <h3 className="text-lg font-semibold text-gray-900 group-hover:text-blue-600 transition-colors">
+                        {tool.name}
+                      </h3>
+                      <p className="mt-2 text-sm text-gray-600 line-clamp-2">
+                        {tool.seo.description}
+                      </p>
+                    </div>
+                    <div className="flex h-8 w-8 items-center justify-center rounded-full bg-blue-50 text-blue-500 group-hover:bg-blue-100 transition-colors">
+                      <svg viewBox="0 0 16 16" fill="none" className="h-4 w-4">
+                        <path d="M6 12l4-4-4-4" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+                      </svg>
+                    </div>
+                  </div>
+                  <div className="mt-4">
+                    <span className="inline-flex items-center rounded-full bg-blue-50 px-3 py-1 text-xs font-medium text-blue-700">
+                      Free · No signup
+                    </span>
+                  </div>
+                </Link>
+              ))}
+            </div>
+          </section>
+        )}
 
         {/* CTA Section */}
         <section className="scroll-fade-up mt-16 rounded-2xl border border-gray-200 bg-gradient-to-br from-orange-50 to-white p-8 shadow-sm">

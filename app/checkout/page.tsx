@@ -146,7 +146,9 @@ function CheckoutContent() {
       const { data: { user } } = await supabase.auth.getUser();
 
       if (!user) {
-        router.push(`/login?redirectedFrom=/checkout?plan=${planId}`);
+        // Redirect to signup (not login) - new customers coming from pricing
+        const redirectUrl = encodeURIComponent(`/checkout?plan=${planId}`);
+        router.push(`/signup?redirectedFrom=${redirectUrl}`);
         return;
       }
 

@@ -16,6 +16,10 @@ export default function LoginForm() {
       : "/dashboard";
   const supabase = getSupabaseBrowserClient();
 
+  // Check if user is coming from checkout (paid plan flow)
+  const isCheckoutFlow = redirectedFrom?.includes("/checkout");
+  const planFromUrl = redirectedFrom?.match(/plan=(\w+)/)?.[1];
+
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState<string | null>(null);
@@ -94,9 +98,20 @@ export default function LoginForm() {
             </p>
           </div>
 
-          {redirectedFrom && (
-            <div className="mt-6 rounded-xl border border-blue-200 bg-blue-50 px-4 py-3 text-sm text-blue-700">
-              Please log in to access {redirectedFrom}.
+          {/* Plan indicator for checkout flow */}
+          {isCheckoutFlow && planFromUrl && (
+            <div className="mt-4 rounded-xl border border-orange-200 bg-orange-50 p-4">
+              <div className="flex items-center gap-3">
+                <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-orange-100">
+                  <svg viewBox="0 0 20 20" fill="currentColor" className="h-5 w-5 text-orange-600">
+                    <path fillRule="evenodd" d="M10.868 2.884c-.321-.772-1.415-.772-1.736 0l-1.83 4.401-4.753.381c-.833.067-1.171 1.107-.536 1.651l3.62 3.102-1.106 4.637c-.194.813.691 1.456 1.405 1.02L10 15.591l4.069 2.485c.713.436 1.598-.207 1.404-1.02l-1.106-4.637 3.62-3.102c.635-.544.297-1.584-.536-1.65l-4.752-.382-1.831-4.401z" clipRule="evenodd" />
+                  </svg>
+                </div>
+                <div>
+                  <p className="text-sm font-medium text-gray-900 capitalize">{planFromUrl} Plan Selected</p>
+                  <p className="text-xs text-gray-600">Log in to complete your purchase</p>
+                </div>
+              </div>
             </div>
           )}
 
@@ -181,7 +196,10 @@ export default function LoginForm() {
 
           <p className="mt-6 text-center text-sm text-gray-600">
             New here?{" "}
-            <Link href="/signup" className="font-semibold text-orange-600 hover:text-orange-500">
+            <Link
+              href={redirectedFrom ? `/signup?redirectedFrom=${encodeURIComponent(redirectedFrom)}` : "/signup"}
+              className="font-semibold text-orange-600 hover:text-orange-500"
+            >
               Create an account
             </Link>
           </p>

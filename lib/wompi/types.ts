@@ -115,7 +115,11 @@ export interface CreateTransactionRequest {
   customer_email: string;
   reference: string;
   payment_source_id: number;
+  payment_method?: {
+    installments: number;
+  };
   recurrent?: boolean;
+  signature?: string;
 }
 
 export type TransactionStatus =

@@ -1,6 +1,6 @@
 "use client";
 
-import type { DetectionResponse, TransformationResponse } from "@/lib/tools/types";
+import type { DetectionResponse, TransformationResponse, CountResponse, GenerationResponse } from "@/lib/tools/types";
 
 type VerdictTone = "positive" | "neutral" | "caution";
 
@@ -255,6 +255,178 @@ export function TransformationResult({ result, locked }: TransformationResultPro
               </li>
             ))}
           </ul>
+        </div>
+      )}
+    </div>
+  );
+}
+
+interface CountResultProps {
+  result: CountResponse;
+  locked?: boolean;
+}
+
+export function CountResult({ result, locked }: CountResultProps) {
+  const formatNumber = (num: number) => num.toLocaleString();
+
+  const stats = [
+    { label: "Words", value: formatNumber(result.words), icon: (
+      <svg viewBox="0 0 24 24" fill="none" className="h-5 w-5">
+        <path d="M4 7h16M4 12h16M4 17h10" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
+      </svg>
+    )},
+    { label: "Characters", value: formatNumber(result.characters), icon: (
+      <svg viewBox="0 0 24 24" fill="none" className="h-5 w-5">
+        <path d="M4 7V4h16v3M9 20h6M12 4v16" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+      </svg>
+    )},
+    { label: "Characters (no spaces)", value: formatNumber(result.charactersNoSpaces), icon: (
+      <svg viewBox="0 0 24 24" fill="none" className="h-5 w-5">
+        <path d="M4 7V4h16v3M9 20h6M12 4v16" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+      </svg>
+    )},
+    { label: "Sentences", value: formatNumber(result.sentences), icon: (
+      <svg viewBox="0 0 24 24" fill="none" className="h-5 w-5">
+        <circle cx="12" cy="18" r="2" stroke="currentColor" strokeWidth="2" />
+        <path d="M12 4v10" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
+      </svg>
+    )},
+    { label: "Paragraphs", value: formatNumber(result.paragraphs), icon: (
+      <svg viewBox="0 0 24 24" fill="none" className="h-5 w-5">
+        <path d="M6 4h12M6 8h8M6 12h10M6 16h6M6 20h12" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
+      </svg>
+    )}
+  ];
+
+  const timeStats = [
+    { label: "Reading Time", value: result.readingTime, desc: "Average reading speed (~200 wpm)" },
+    { label: "Speaking Time", value: result.speakingTime, desc: "Average speaking speed (~150 wpm)" }
+  ];
+
+  return (
+    <div className={locked ? "pointer-events-none blur-sm" : ""}>
+      <div className="flex items-center gap-3 mb-6">
+        <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-orange-50">
+          <svg viewBox="0 0 24 24" fill="none" className="h-5 w-5 text-orange-500">
+            <path d="M9 7h6M9 12h6M9 17h4" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
+            <rect x="4" y="3" width="16" height="18" rx="2" stroke="currentColor" strokeWidth="2" />
+          </svg>
+        </div>
+        <div>
+          <p className="text-xs font-medium uppercase tracking-wider text-gray-400">Results</p>
+          <p className="text-lg font-semibold text-gray-900">Text Statistics</p>
+        </div>
+      </div>
+
+      {/* Main stats grid */}
+      <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-5">
+        {stats.map((stat) => (
+          <div key={stat.label} className="rounded-xl border border-gray-200 bg-white p-4 text-center">
+            <div className="mx-auto flex h-10 w-10 items-center justify-center rounded-lg bg-orange-50 text-orange-500 mb-3">
+              {stat.icon}
+            </div>
+            <p className="text-2xl font-bold text-gray-900">{stat.value}</p>
+            <p className="mt-1 text-xs text-gray-500">{stat.label}</p>
+          </div>
+        ))}
+      </div>
+
+      {/* Time estimates */}
+      <div className="mt-6 grid gap-4 sm:grid-cols-2">
+        {timeStats.map((stat) => (
+          <div key={stat.label} className="rounded-xl border border-orange-100 bg-orange-50 p-4">
+            <div className="flex items-center justify-between">
+              <span className="text-sm font-medium text-orange-700">{stat.label}</span>
+              <span className="text-xl font-bold text-orange-600">{stat.value}</span>
+            </div>
+            <p className="mt-1 text-xs text-orange-600/70">{stat.desc}</p>
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+}
+
+interface GenerationResultProps {
+  result: GenerationResponse;
+  locked?: boolean;
+}
+
+export function GenerationResult({ result, locked }: GenerationResultProps) {
+  const copyToClipboard = async () => {
+    try {
+      await navigator.clipboard.writeText(result.output);
+    } catch {
+      const textArea = document.createElement("textarea");
+      textArea.value = result.output;
+      document.body.appendChild(textArea);
+      textArea.select();
+      document.execCommand("copy");
+      document.body.removeChild(textArea);
+    }
+  };
+
+  return (
+    <div className={locked ? "pointer-events-none blur-sm" : ""}>
+      <div className="flex items-center justify-between mb-4">
+        <div className="flex items-center gap-3">
+          <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-emerald-50">
+            <svg viewBox="0 0 24 24" fill="none" className="h-5 w-5 text-emerald-500">
+              <path d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+            </svg>
+          </div>
+          <div>
+            <p className="text-xs font-medium uppercase tracking-wider text-gray-400">Generated</p>
+            <p className="text-lg font-semibold text-gray-900">Result</p>
+          </div>
+        </div>
+        <button
+          type="button"
+          onClick={copyToClipboard}
+          className="inline-flex items-center gap-2 rounded-lg border border-gray-200 bg-white px-4 py-2 text-sm font-medium text-gray-700 transition-colors hover:bg-gray-50"
+        >
+          <svg viewBox="0 0 20 20" fill="none" className="h-4 w-4">
+            <path d="M8 3H5a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-3M8 3v4a2 2 0 002 2h4M8 3l6 6" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+          </svg>
+          Copy
+        </button>
+      </div>
+
+      <div className="rounded-xl border border-emerald-200 bg-emerald-50 p-4 mb-4">
+        <div className="flex items-start gap-3">
+          <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-emerald-100 text-emerald-600 flex-shrink-0">
+            <svg viewBox="0 0 20 20" fill="none" className="h-5 w-5">
+              <path d="M10 18a8 8 0 100-16 8 8 0 000 16z" stroke="currentColor" strokeWidth="1.5" />
+              <path d="M7 10l2 2 4-4" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+            </svg>
+          </div>
+          <div className="flex-1">
+            <p className="text-sm font-medium text-emerald-700">Generation Complete</p>
+            <p className="mt-1 text-xs text-emerald-600">Your content has been generated</p>
+          </div>
+        </div>
+      </div>
+
+      <div className="rounded-xl border border-gray-200 bg-gray-50 p-5">
+        <div className="prose prose-sm prose-gray max-w-none">
+          <div className="whitespace-pre-wrap text-sm text-gray-700 leading-relaxed">
+            {result.output}
+          </div>
+        </div>
+      </div>
+
+      {result.sections && result.sections.length > 0 && (
+        <div className="mt-6">
+          <p className="text-xs font-medium uppercase tracking-wider text-gray-400 mb-3">
+            Sections Included
+          </p>
+          <div className="flex flex-wrap gap-2">
+            {result.sections.map((section, index) => (
+              <span key={index} className="inline-flex items-center rounded-full bg-orange-50 px-3 py-1 text-sm font-medium text-orange-700">
+                {section}
+              </span>
+            ))}
+          </div>
         </div>
       )}
     </div>

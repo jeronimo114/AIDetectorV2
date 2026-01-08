@@ -1,4 +1,4 @@
-export type ToolCategory = "detector" | "humanizer";
+export type ToolCategory = "detector" | "humanizer" | "utility" | "generator";
 
 export type ToolConfig = {
   slug: string;
@@ -21,7 +21,7 @@ export type ToolConfig = {
     maxChars: number;
   };
   result: {
-    type: "detection" | "transformation";
+    type: "detection" | "transformation" | "count" | "generation";
   };
   relatedTools: string[];
 };
@@ -46,4 +46,19 @@ export type TransformationResponse = {
   changes?: string[];
 };
 
-export type ToolResponse = DetectionResponse | TransformationResponse;
+export type CountResponse = {
+  words: number;
+  characters: number;
+  charactersNoSpaces: number;
+  sentences: number;
+  paragraphs: number;
+  readingTime: string;
+  speakingTime: string;
+};
+
+export type GenerationResponse = {
+  output: string;
+  sections?: string[];
+};
+
+export type ToolResponse = DetectionResponse | TransformationResponse | CountResponse | GenerationResponse;

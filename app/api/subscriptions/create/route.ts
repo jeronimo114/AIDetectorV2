@@ -55,9 +55,10 @@ export async function POST(request: NextRequest) {
 
     // Determine currency based on environment
     // Wompi sandbox only supports COP, production can use USD
+    // Note: amount_in_cents means centavos for COP (multiply by 100)
     const isProduction = process.env.NEXT_PUBLIC_WOMPI_ENV === "production";
     const currency = isProduction ? "USD" : "COP";
-    const amountCents = isProduction ? plan.priceUSD * 100 : plan.priceCOP;
+    const amountCents = isProduction ? plan.priceUSD * 100 : plan.priceCOP * 100;
 
     // Create subscription
     const result = await createSubscription({

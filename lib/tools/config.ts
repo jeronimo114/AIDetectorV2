@@ -163,6 +163,123 @@ export const tools: ToolConfig[] = [
     },
     result: { type: "transformation" },
     relatedTools: ["ai-humanizer", "essay-humanizer"]
+  },
+  // Generator Tools
+  {
+    slug: "essay-outline-generator",
+    name: "Essay Outline Generator",
+    category: "generator",
+    webhookEnvKey: "NEXT_PUBLIC_N8N_OUTLINE_WEBHOOK_URL",
+    seo: {
+      title: "Free Essay Outline Generator - Create Essay Outlines Instantly",
+      description: "Free essay outline generator to create structured outlines for your essays. Generate professional essay outlines with thesis, body paragraphs, and conclusions.",
+      keywords: ["essay outline generator", "essay outline maker", "outline maker for essays", "outline essay generator", "essay outline builder"],
+      h1: "Essay Outline Generator",
+      subheading: "Create professional essay outlines instantly. Enter your topic and get a structured outline with thesis, arguments, and conclusions."
+    },
+    ui: {
+      badge: "Essay Outline",
+      placeholder: "Enter your essay topic or thesis statement...",
+      buttonText: "Generate Outline",
+      buttonLoadingText: "Generating...",
+      minChars: 10,
+      maxChars: 500
+    },
+    result: { type: "generation" },
+    relatedTools: ["ai-thesis-generator", "essay-ai-detector"]
+  },
+  {
+    slug: "ai-thesis-generator",
+    name: "AI Thesis Generator",
+    category: "generator",
+    webhookEnvKey: "NEXT_PUBLIC_N8N_THESIS_WEBHOOK_URL",
+    seo: {
+      title: "Free AI Thesis Generator - Create Strong Thesis Statements",
+      description: "Free AI thesis generator to create compelling thesis statements for your essays. Generate clear, arguable thesis statements instantly.",
+      keywords: ["ai thesis", "thesis ai", "ai thesis generator", "thesis statement generator", "thesis maker"],
+      h1: "AI Thesis Generator",
+      subheading: "Generate strong, arguable thesis statements for your essays. Enter your topic and get a professional thesis instantly."
+    },
+    ui: {
+      badge: "Thesis Generator",
+      placeholder: "Enter your essay topic or main argument...",
+      buttonText: "Generate Thesis",
+      buttonLoadingText: "Generating...",
+      minChars: 10,
+      maxChars: 300
+    },
+    result: { type: "generation" },
+    relatedTools: ["essay-outline-generator", "essay-ai-detector"]
+  },
+  // Utility Tools
+  {
+    slug: "word-counter",
+    name: "Word Counter",
+    category: "utility",
+    webhookEnvKey: "",
+    seo: {
+      title: "Free Word Counter - Count Words, Characters & Sentences Online",
+      description: "Free online word counter tool. Count words, characters, sentences, and paragraphs instantly. Check reading time and get detailed text statistics.",
+      keywords: ["word count", "word counter", "word count counter", "count words online", "word counter online", "word counter tool", "word count checker", "check number of words", "count my words online", "count number of words online"],
+      h1: "Word Counter",
+      subheading: "Count words, characters, sentences, and paragraphs instantly. Free online tool with reading time estimates."
+    },
+    ui: {
+      badge: "Word Counter",
+      placeholder: "Paste or type your text here to count words, characters, and more...",
+      buttonText: "Count Words",
+      buttonLoadingText: "Counting...",
+      minChars: 1,
+      maxChars: 100000
+    },
+    result: { type: "count" },
+    relatedTools: ["character-counter", "google-docs-word-counter"]
+  },
+  {
+    slug: "character-counter",
+    name: "Character Counter",
+    category: "utility",
+    webhookEnvKey: "",
+    seo: {
+      title: "Free Character Counter - Count Characters & Letters Online",
+      description: "Free online character counter tool. Count characters, letters, spaces, and words instantly. Perfect for social media posts and text limits.",
+      keywords: ["character counter", "count the letter", "letter counter", "character count", "count characters online"],
+      h1: "Character Counter",
+      subheading: "Count characters, letters, and spaces instantly. Perfect for Twitter, Instagram, and text with character limits."
+    },
+    ui: {
+      badge: "Character Counter",
+      placeholder: "Type or paste your text here to count characters...",
+      buttonText: "Count Characters",
+      buttonLoadingText: "Counting...",
+      minChars: 1,
+      maxChars: 100000
+    },
+    result: { type: "count" },
+    relatedTools: ["word-counter", "google-docs-word-counter"]
+  },
+  {
+    slug: "google-docs-word-counter",
+    name: "Google Docs Word Counter",
+    category: "utility",
+    webhookEnvKey: "",
+    seo: {
+      title: "Free Word Counter for Google Docs - Count Words Online",
+      description: "Free word counter for Google Docs content. Copy your text from Google Docs and count words, characters, and sentences instantly online.",
+      keywords: ["word count on google docs", "google docs word counter", "word counter for google docs", "google doc count words", "count words google docs", "google docs count words", "counting words in google docs", "word count for google docs", "google docs number of words"],
+      h1: "Google Docs Word Counter",
+      subheading: "Copy your Google Docs text and count words instantly. Get accurate word counts, character counts, and reading time estimates."
+    },
+    ui: {
+      badge: "Google Docs",
+      placeholder: "Paste your Google Docs text here to count words...",
+      buttonText: "Count Words",
+      buttonLoadingText: "Counting...",
+      minChars: 1,
+      maxChars: 100000
+    },
+    result: { type: "count" },
+    relatedTools: ["word-counter", "character-counter"]
   }
 ];
 

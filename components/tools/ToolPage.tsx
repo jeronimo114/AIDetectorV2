@@ -9,8 +9,8 @@ import TipRotator from "@/components/TipRotator";
 import ToolHeader from "@/components/tools/ToolHeader";
 import ToolCTA from "@/components/tools/ToolCTA";
 import RelatedTools from "@/components/tools/RelatedTools";
-import { DetectionResult, TransformationResult } from "@/components/tools/ToolResult";
-import type { ToolConfig, DetectionResponse, TransformationResponse, ToolResponse } from "@/lib/tools/types";
+import { DetectionResult, TransformationResult, CountResult, GenerationResult } from "@/components/tools/ToolResult";
+import type { ToolConfig, DetectionResponse, TransformationResponse, CountResponse, GenerationResponse, ToolResponse } from "@/lib/tools/types";
 import { getRelatedTools } from "@/lib/tools/config";
 import { getSupabaseBrowserClient } from "@/lib/supabase/client";
 import { formatNumber } from "@/lib/format";
@@ -27,7 +27,50 @@ function getWebhookUrl(envKey: string): string {
   if (envKey === "NEXT_PUBLIC_N8N_HUMANIZER_WEBHOOK_URL") {
     return process.env.NEXT_PUBLIC_N8N_HUMANIZER_WEBHOOK_URL ?? "";
   }
+  if (envKey === "NEXT_PUBLIC_N8N_OUTLINE_WEBHOOK_URL") {
+    return process.env.NEXT_PUBLIC_N8N_OUTLINE_WEBHOOK_URL ?? "";
+  }
+  if (envKey === "NEXT_PUBLIC_N8N_THESIS_WEBHOOK_URL") {
+    return process.env.NEXT_PUBLIC_N8N_THESIS_WEBHOOK_URL ?? "";
+  }
+  // Empty string for utility tools (word counter, etc.) - they compute locally
   return "";
+}
+
+// Calculate text statistics for count tools
+function calculateTextStats(text: string): CountResponse {
+  const trimmed = text.trim();
+
+  // Word count
+  const words = trimmed.length === 0 ? 0 : trimmed.split(/\s+/).filter(Boolean).length;
+
+  // Character counts
+  const characters = text.length;
+  const charactersNoSpaces = text.replace(/\s/g, "").length;
+
+  // Sentence count (split by .!? followed by space or end)
+  const sentences = trimmed.length === 0 ? 0 : (trimmed.match(/[.!?]+(?:\s|$)/g) || []).length || (trimmed.length > 0 ? 1 : 0);
+
+  // Paragraph count (split by double newlines or single newlines)
+  const paragraphs = trimmed.length === 0 ? 0 : trimmed.split(/\n\s*\n|\n/).filter(p => p.trim().length > 0).length;
+
+  // Reading time (average 200 wpm)
+  const readingMinutes = Math.ceil(words / 200);
+  const readingTime = readingMinutes < 1 ? "< 1 min" : `${readingMinutes} min`;
+
+  // Speaking time (average 150 wpm)
+  const speakingMinutes = Math.ceil(words / 150);
+  const speakingTime = speakingMinutes < 1 ? "< 1 min" : `${speakingMinutes} min`;
+
+  return {
+    words,
+    characters,
+    charactersNoSpaces,
+    sentences,
+    paragraphs,
+    readingTime,
+    speakingTime
+  };
 }
 
 const DEMO_DETECTION: DetectionResponse = {
@@ -48,6 +91,11 @@ const DEMO_TRANSFORMATION: TransformationResponse = {
   changes: ["Varied sentence structure", "Added natural transitions", "Reduced repetitive patterns"]
 };
 
+const DEMO_GENERATION: GenerationResponse = {
+  output: "Your generated content will appear here. Sign up to unlock full generation capabilities and save your results.",
+  sections: ["Introduction", "Body", "Conclusion"]
+};
+
 interface ToolPageProps {
   config: ToolConfig;
 }
@@ -65,6 +113,18 @@ function isTransformationResponse(value: unknown): value is TransformationRespon
   if (!value || typeof value !== "object") return false;
   const data = value as TransformationResponse;
   return typeof data.transformedText === "string";
+}
+
+function isCountResponse(value: unknown): value is CountResponse {
+  if (!value || typeof value !== "object") return false;
+  const data = value as CountResponse;
+  return typeof data.words === "number" && typeof data.characters === "number";
+}
+
+function isGenerationResponse(value: unknown): value is GenerationResponse {
+  if (!value || typeof value !== "object") return false;
+  const data = value as GenerationResponse;
+  return typeof data.output === "string";
 }
 
 export default function ToolPage({ config }: ToolPageProps) {
@@ -89,7 +149,9 @@ export default function ToolPage({ config }: ToolPageProps) {
 
   const relatedTools = getRelatedTools(config.slug);
   const webhookUrl = getWebhookUrl(config.webhookEnvKey);
-  const isWebhookMissing = webhookUrl.length === 0;
+  // Count tools don't need webhooks - they compute locally
+  const isCountTool = config.result.type === "count";
+  const isWebhookMissing = !isCountTool && webhookUrl.length === 0;
 
   useEffect(() => {
     let isMounted = true;
@@ -193,6 +255,22 @@ export default function ToolPage({ config }: ToolPageProps) {
       return;
     }
 
+    // Count tools compute locally - no auth needed, no API call
+    if (isCountTool) {
+      setIsLoading(true);
+      setRequestError(null);
+      setFileError(null);
+      setResult(null);
+
+      // Small delay for UX
+      setTimeout(() => {
+        const countResult = calculateTextStats(text);
+        setResult(countResult);
+        setIsLoading(false);
+      }, 300);
+      return;
+    }
+
     if (!user) {
       if (authGateTimerRef.current) {
         clearTimeout(authGateTimerRef.current);
@@ -205,9 +283,14 @@ export default function ToolPage({ config }: ToolPageProps) {
       setShowLockedResults(false);
 
       authGateTimerRef.current = setTimeout(() => {
-        const demoResult = config.result.type === "detection"
-          ? DEMO_DETECTION
-          : { ...DEMO_TRANSFORMATION, originalText: trimmed };
+        let demoResult: ToolResponse;
+        if (config.result.type === "detection") {
+          demoResult = DEMO_DETECTION;
+        } else if (config.result.type === "generation") {
+          demoResult = DEMO_GENERATION;
+        } else {
+          demoResult = { ...DEMO_TRANSFORMATION, originalText: trimmed };
+        }
         setResult(demoResult);
         setShowLockedResults(true);
         setShowAuthGate(true);
@@ -253,6 +336,8 @@ export default function ToolPage({ config }: ToolPageProps) {
         setResult(data);
       } else if (config.result.type === "transformation" && isTransformationResponse(data)) {
         setResult({ ...data, originalText: trimmed });
+      } else if (config.result.type === "generation" && isGenerationResponse(data)) {
+        setResult(data);
       } else {
         setRequestError("Unexpected response format. Please try again.");
       }
@@ -296,7 +381,8 @@ export default function ToolPage({ config }: ToolPageProps) {
     }
   };
 
-  const lockResults = showLockedResults && !user;
+  // Count tools are free - no locking
+  const lockResults = showLockedResults && !user && !isCountTool;
 
   return (
     <main className="relative min-h-screen bg-gray-50">
@@ -506,6 +592,12 @@ export default function ToolPage({ config }: ToolPageProps) {
             {config.result.type === "transformation" && isTransformationResponse(result) && (
               <TransformationResult result={result} locked={lockResults} />
             )}
+            {config.result.type === "count" && isCountResponse(result) && (
+              <CountResult result={result} locked={lockResults} />
+            )}
+            {config.result.type === "generation" && isGenerationResponse(result) && (
+              <GenerationResult result={result} locked={lockResults} />
+            )}
 
             {/* Lock overlay */}
             {lockResults && (
@@ -594,12 +686,30 @@ export default function ToolPage({ config }: ToolPageProps) {
                   <path d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
                 </svg>
               )},
-              { step: "02", title: config.result.type === "detection" ? "Review signals" : "Get results", desc: config.result.type === "detection" ? "See what patterns are detected" : "Receive your humanized text", icon: (
+              { step: "02", title:
+                config.result.type === "detection" ? "Review signals" :
+                config.result.type === "count" ? "See statistics" :
+                config.result.type === "generation" ? "Generate content" :
+                "Get results",
+                desc:
+                config.result.type === "detection" ? "See what patterns are detected" :
+                config.result.type === "count" ? "View word count, characters & more" :
+                config.result.type === "generation" ? "AI creates your content instantly" :
+                "Receive your humanized text",
+                icon: (
                 <svg viewBox="0 0 24 24" fill="none" className="h-6 w-6">
                   <path d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
                 </svg>
               )},
-              { step: "03", title: config.result.type === "detection" ? "Revise & recheck" : "Copy & use", desc: config.result.type === "detection" ? "Improve and verify your changes" : "Use your improved text", icon: (
+              { step: "03", title:
+                config.result.type === "detection" ? "Revise & recheck" :
+                config.result.type === "count" ? "Use anywhere" :
+                "Copy & use",
+                desc:
+                config.result.type === "detection" ? "Improve and verify your changes" :
+                config.result.type === "count" ? "Free to use, no signup required" :
+                "Use your improved text",
+                icon: (
                 <svg viewBox="0 0 24 24" fill="none" className="h-6 w-6">
                   <path d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
                 </svg>
