@@ -6,7 +6,7 @@ export function toolPageSchema(tool: ToolConfig) {
     "@type": "WebApplication",
     name: tool.name,
     description: tool.seo.description,
-    url: `https://veridict.com/tools/${tool.slug}`,
+    url: `https://veridict.xyz/tools/${tool.slug}`,
     applicationCategory: "UtilityApplication",
     operatingSystem: "Web",
     offers: {
@@ -17,7 +17,7 @@ export function toolPageSchema(tool: ToolConfig) {
     provider: {
       "@type": "Organization",
       name: "Veridict",
-      url: "https://veridict.com"
+      url: "https://veridict.xyz"
     }
   };
 }
@@ -31,19 +31,19 @@ export function toolBreadcrumbSchema(tool: ToolConfig) {
         "@type": "ListItem",
         position: 1,
         name: "Home",
-        item: "https://veridict.com"
+        item: "https://veridict.xyz"
       },
       {
         "@type": "ListItem",
         position: 2,
         name: "Tools",
-        item: "https://veridict.com/tools"
+        item: "https://veridict.xyz/tools"
       },
       {
         "@type": "ListItem",
         position: 3,
         name: tool.name,
-        item: `https://veridict.com/tools/${tool.slug}`
+        item: `https://veridict.xyz/tools/${tool.slug}`
       }
     ]
   };

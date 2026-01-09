@@ -9,12 +9,12 @@ export const metadata: Metadata = {
   openGraph: {
     title: "Free AI Writing Tools | Veridict",
     description: "Free AI writing tools including AI detectors, essay checkers, and humanizers.",
-    url: "https://veridict.com/tools",
+    url: "https://veridict.xyz/tools",
     siteName: "Veridict",
     type: "website"
   },
   alternates: {
-    canonical: "https://veridict.com/tools"
+    canonical: "https://veridict.xyz/tools"
   }
 };
 

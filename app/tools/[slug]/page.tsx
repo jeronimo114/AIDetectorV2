@@ -31,7 +31,7 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
     openGraph: {
       title: tool.seo.title,
       description: tool.seo.description,
-      url: `https://veridict.com/tools/${tool.slug}`,
+      url: `https://veridict.xyz/tools/${tool.slug}`,
       siteName: "Veridict",
       type: "website"
     },
@@ -41,7 +41,7 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
       description: tool.seo.description
     },
     alternates: {
-      canonical: `https://veridict.com/tools/${tool.slug}`
+      canonical: `https://veridict.xyz/tools/${tool.slug}`
     }
   };
 }

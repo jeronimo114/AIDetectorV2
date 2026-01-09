@@ -15,8 +15,8 @@ export const organizationSchema = {
   "@context": "https://schema.org",
   "@type": "Organization",
   name: "Veridict",
-  url: "https://veridict.com",
-  logo: "https://veridict.com/logo.png",
+  url: "https://veridict.xyz",
+  logo: "https://veridict.xyz/logo.png",
   description:
     "AI writing detector for students. Check your essays before submitting to understand AI detection signals.",
   sameAs: []

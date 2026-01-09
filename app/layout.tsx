@@ -12,7 +12,7 @@ const plusJakarta = Plus_Jakarta_Sans({
   weight: ["400", "500", "600", "700", "800"]
 });
 
-const siteUrl = "https://veridict.com";
+const siteUrl = "https://veridict.xyz";
 
 export const metadata: Metadata = {
   title: {

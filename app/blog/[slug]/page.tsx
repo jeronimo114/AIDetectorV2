@@ -128,7 +128,7 @@ export default function BlogPostPage({ params }: Props) {
     publisher: {
       "@type": "Organization",
       name: "Veridict",
-      url: "https://veridict.com"
+      url: "https://veridict.xyz"
     }
   };
 
