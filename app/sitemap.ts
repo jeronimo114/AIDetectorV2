@@ -7,7 +7,7 @@ import { getAllToolSlugs } from "@/lib/tools/config";
 
 type StaticRouteMeta = Pick<MetadataRoute.Sitemap[number], "changeFrequency" | "priority">;
 
-const baseUrl = "https://veridict.com";
+const baseUrl = "https://veridict.xyz";
 const appDir = path.join(process.cwd(), "app");
 const postsDir = path.join(process.cwd(), "content/posts");
 const toolsConfigPath = path.join(process.cwd(), "lib/tools/config.ts");
