@@ -5,6 +5,9 @@ import type { MetadataRoute } from "next";
 import { getAllPosts } from "@/lib/blog";
 import { getAllToolSlugs } from "@/lib/tools/config";
 
+export const runtime = "nodejs";
+export const dynamic = "force-static";
+
 type StaticRouteMeta = Pick<MetadataRoute.Sitemap[number], "changeFrequency" | "priority">;
 
 const baseUrl = "https://veridict.xyz";
@@ -41,6 +44,14 @@ const DEFAULT_STATIC_META: StaticRouteMeta = {
 };
 
 type StaticRoute = { route: string; lastModified: Date };
+
+const getFallbackStaticRoutes = (): StaticRoute[] => {
+  const fallbackDate = new Date();
+  return Object.keys(STATIC_ROUTE_OVERRIDES).map((route) => ({
+    route,
+    lastModified: fallbackDate
+  }));
+};
 
 const isRouteGroup = (segment: string): boolean =>
   segment.startsWith("(") && segment.endsWith(")");
@@ -89,7 +100,17 @@ const collectStaticRoutes = (dir: string, baseRoute: string): StaticRoute[] => {
 };
 
 const getStaticRoutes = (): StaticRoute[] => {
-  const collected = collectStaticRoutes(appDir, "");
+  if (!fs.existsSync(appDir)) {
+    return getFallbackStaticRoutes();
+  }
+
+  let collected: StaticRoute[];
+
+  try {
+    collected = collectStaticRoutes(appDir, "");
+  } catch {
+    return getFallbackStaticRoutes();
+  }
   const deduped = new Map<string, Date>();
 
   for (const route of collected) {
