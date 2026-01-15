@@ -195,7 +195,7 @@ export default function ToolsIndexContent() {
               <h2 className="text-2xl font-bold text-gray-900">Writing Utilities</h2>
             </div>
             <p className="text-gray-600 mb-8">
-              Free tools to count words, characters, and analyze your text. No signup required.
+              Free tools to count words, characters, and convert documents. No signup required.
             </p>
             <div className="stagger-children grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
               {utilityTools.map((tool) => (

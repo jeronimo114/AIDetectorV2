@@ -213,6 +213,29 @@ export const tools: ToolConfig[] = [
   },
   // Utility Tools
   {
+    slug: "pdf-to-md",
+    name: "PDF to Markdown",
+    category: "utility",
+    webhookEnvKey: "",
+    seo: {
+      title: "Free PDF to Markdown Converter - Convert PDF to MD",
+      description: "Convert PDF files to clean Markdown online. Extract text and structure from your PDF into Markdown instantly.",
+      keywords: ["pdf to md", "pdf to markdown", "convert pdf to md", "pdf markdown converter", "pdf to markdown online"],
+      h1: "PDF to Markdown Converter",
+      subheading: "Convert PDF documents into clean Markdown in seconds. No signup required."
+    },
+    ui: {
+      badge: "PDF to Markdown",
+      placeholder: "Upload a PDF to convert it to Markdown.",
+      buttonText: "Convert PDF",
+      buttonLoadingText: "Converting...",
+      minChars: 1,
+      maxChars: 100000
+    },
+    result: { type: "conversion" },
+    relatedTools: ["word-counter", "character-counter"]
+  },
+  {
     slug: "word-counter",
     name: "Word Counter",
     category: "utility",

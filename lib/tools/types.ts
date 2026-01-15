@@ -21,7 +21,7 @@ export type ToolConfig = {
     maxChars: number;
   };
   result: {
-    type: "detection" | "transformation" | "count" | "generation";
+    type: "detection" | "transformation" | "count" | "generation" | "conversion";
   };
   relatedTools: string[];
 };
@@ -61,4 +61,12 @@ export type GenerationResponse = {
   sections?: string[];
 };
 
-export type ToolResponse = DetectionResponse | TransformationResponse | CountResponse | GenerationResponse;
+export type ConversionResponse = {
+  markdown: string;
+  pages: number;
+  words: number;
+  characters: number;
+  sourceName?: string;
+};
+
+export type ToolResponse = DetectionResponse | TransformationResponse | CountResponse | GenerationResponse | ConversionResponse;

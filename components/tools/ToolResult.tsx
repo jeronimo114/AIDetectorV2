@@ -1,6 +1,6 @@
 "use client";
 
-import type { DetectionResponse, TransformationResponse, CountResponse, GenerationResponse } from "@/lib/tools/types";
+import type { DetectionResponse, TransformationResponse, CountResponse, GenerationResponse, ConversionResponse } from "@/lib/tools/types";
 
 type VerdictTone = "positive" | "neutral" | "caution";
 
@@ -429,6 +429,108 @@ export function GenerationResult({ result, locked }: GenerationResultProps) {
           </div>
         </div>
       )}
+    </div>
+  );
+}
+
+interface ConversionResultProps {
+  result: ConversionResponse;
+  locked?: boolean;
+}
+
+export function ConversionResult({ result, locked }: ConversionResultProps) {
+  const copyToClipboard = async () => {
+    try {
+      await navigator.clipboard.writeText(result.markdown);
+    } catch {
+      const textArea = document.createElement("textarea");
+      textArea.value = result.markdown;
+      document.body.appendChild(textArea);
+      textArea.select();
+      document.execCommand("copy");
+      document.body.removeChild(textArea);
+    }
+  };
+
+  const downloadMarkdown = () => {
+    const fileName = result.sourceName
+      ? result.sourceName.replace(/\.pdf$/i, ".md")
+      : "converted.md";
+    const blob = new Blob([result.markdown], { type: "text/markdown;charset=utf-8" });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement("a");
+    link.href = url;
+    link.download = fileName;
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    URL.revokeObjectURL(url);
+  };
+
+  const stats = [
+    { label: "Pages", value: result.pages.toLocaleString() },
+    { label: "Words", value: result.words.toLocaleString() },
+    { label: "Characters", value: result.characters.toLocaleString() }
+  ];
+
+  return (
+    <div className={locked ? "pointer-events-none blur-sm" : ""}>
+      <div className="flex flex-wrap items-center justify-between gap-3 mb-4">
+        <div className="flex items-center gap-3">
+          <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-blue-50">
+            <svg viewBox="0 0 24 24" fill="none" className="h-5 w-5 text-blue-600">
+              <path d="M7 3h7l5 5v13a1 1 0 01-1 1H7a1 1 0 01-1-1V4a1 1 0 011-1z" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" />
+              <path d="M14 3v5h5" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" />
+              <path d="M8 12h8M8 16h8" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" />
+            </svg>
+          </div>
+          <div>
+            <p className="text-xs font-medium uppercase tracking-wider text-gray-400">Converted</p>
+            <p className="text-lg font-semibold text-gray-900">Markdown Output</p>
+          </div>
+        </div>
+        <div className="flex flex-wrap items-center gap-2">
+          <button
+            type="button"
+            onClick={copyToClipboard}
+            className="inline-flex items-center gap-2 rounded-lg border border-gray-200 bg-white px-4 py-2 text-sm font-medium text-gray-700 transition-colors hover:bg-gray-50"
+          >
+            <svg viewBox="0 0 20 20" fill="none" className="h-4 w-4">
+              <path d="M8 3H5a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-3M8 3v4a2 2 0 002 2h4M8 3l6 6" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+            </svg>
+            Copy
+          </button>
+          <button
+            type="button"
+            onClick={downloadMarkdown}
+            className="inline-flex items-center gap-2 rounded-lg border border-gray-200 bg-white px-4 py-2 text-sm font-medium text-gray-700 transition-colors hover:bg-gray-50"
+          >
+            <svg viewBox="0 0 20 20" fill="none" className="h-4 w-4">
+              <path d="M3 16v1a2 2 0 002 2h10a2 2 0 002-2v-1M14 6l-4-4m0 0L6 6m4-4v12" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+            </svg>
+            Download .md
+          </button>
+        </div>
+      </div>
+
+      {result.sourceName && (
+        <p className="mb-4 text-xs text-gray-400">Source: {result.sourceName}</p>
+      )}
+
+      <div className="grid gap-4 sm:grid-cols-3">
+        {stats.map((stat) => (
+          <div key={stat.label} className="rounded-xl border border-gray-200 bg-white p-4 text-center">
+            <p className="text-2xl font-bold text-gray-900">{stat.value}</p>
+            <p className="mt-1 text-xs text-gray-500">{stat.label}</p>
+          </div>
+        ))}
+      </div>
+
+      <div className="mt-6 rounded-xl border border-gray-200 bg-gray-50 p-5">
+        <div className="whitespace-pre-wrap font-mono text-sm text-gray-700 leading-relaxed">
+          {result.markdown || "No extractable text was found in this PDF."}
+        </div>
+      </div>
     </div>
   );
 }

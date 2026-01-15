@@ -9,15 +9,18 @@ import TipRotator from "@/components/TipRotator";
 import ToolHeader from "@/components/tools/ToolHeader";
 import ToolCTA from "@/components/tools/ToolCTA";
 import RelatedTools from "@/components/tools/RelatedTools";
-import { DetectionResult, TransformationResult, CountResult, GenerationResult } from "@/components/tools/ToolResult";
-import type { ToolConfig, DetectionResponse, TransformationResponse, CountResponse, GenerationResponse, ToolResponse } from "@/lib/tools/types";
+import { DetectionResult, TransformationResult, CountResult, GenerationResult, ConversionResult } from "@/components/tools/ToolResult";
+import type { ToolConfig, DetectionResponse, TransformationResponse, CountResponse, GenerationResponse, ConversionResponse, ToolResponse } from "@/lib/tools/types";
 import { getRelatedTools } from "@/lib/tools/config";
+import { convertPdfToMarkdown } from "@/lib/tools/pdf";
 import { getSupabaseBrowserClient } from "@/lib/supabase/client";
 import { formatNumber } from "@/lib/format";
 import { useScrollAnimation } from "@/hooks/useScrollAnimation";
 
 const TIMEOUT_MS = 20000;
-const FILE_ACCEPT = ".txt,.md,text/plain,text/markdown";
+const TEXT_FILE_ACCEPT = ".txt,.md,text/plain,text/markdown";
+const PDF_FILE_ACCEPT = ".pdf,application/pdf";
+const MAX_PDF_BYTES = 10 * 1024 * 1024;
 
 // Next.js requires literal strings for env vars at build time
 function getWebhookUrl(envKey: string): string {
@@ -73,6 +76,14 @@ function calculateTextStats(text: string): CountResponse {
   };
 }
 
+const formatFileSize = (bytes: number) => {
+  if (bytes < 1024) return `${bytes} B`;
+  const kb = bytes / 1024;
+  if (kb < 1024) return `${kb.toFixed(1)} KB`;
+  const mb = kb / 1024;
+  return `${mb.toFixed(1)} MB`;
+};
+
 const DEMO_DETECTION: DetectionResponse = {
   verdict: "Unclear",
   confidence: 0.66,
@@ -127,6 +138,12 @@ function isGenerationResponse(value: unknown): value is GenerationResponse {
   return typeof data.output === "string";
 }
 
+function isConversionResponse(value: unknown): value is ConversionResponse {
+  if (!value || typeof value !== "object") return false;
+  const data = value as ConversionResponse;
+  return typeof data.markdown === "string" && typeof data.pages === "number";
+}
+
 export default function ToolPage({ config }: ToolPageProps) {
   useScrollAnimation();
 
@@ -145,13 +162,15 @@ export default function ToolPage({ config }: ToolPageProps) {
   const [authReady, setAuthReady] = useState(false);
   const [tipsEnabled, setTipsEnabled] = useState(true);
   const [uploadedFileName, setUploadedFileName] = useState<string | null>(null);
+  const [uploadedFile, setUploadedFile] = useState<File | null>(null);
   const authGateTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   const relatedTools = getRelatedTools(config.slug);
   const webhookUrl = getWebhookUrl(config.webhookEnvKey);
-  // Count tools don't need webhooks - they compute locally
   const isCountTool = config.result.type === "count";
-  const isWebhookMissing = !isCountTool && webhookUrl.length === 0;
+  const isConversionTool = config.result.type === "conversion";
+  const isLocalTool = isCountTool || isConversionTool;
+  const isWebhookMissing = !isLocalTool && webhookUrl.length === 0;
 
   useEffect(() => {
     let isMounted = true;
@@ -222,10 +241,31 @@ export default function ToolPage({ config }: ToolPageProps) {
 
   const trimmed = text.trim();
   const charCount = text.length;
-  const underMin = trimmed.length < config.ui.minChars;
-  const exceedsMax = charCount > config.ui.maxChars;
+  const pdfTooLarge = isConversionTool && uploadedFile !== null && uploadedFile.size > MAX_PDF_BYTES;
+  const underMin = isConversionTool ? !uploadedFile : trimmed.length < config.ui.minChars;
+  const exceedsMax = isConversionTool ? pdfTooLarge : charCount > config.ui.maxChars;
 
-  const canAnalyze = !isLoading && !isFileLoading && !exceedsMax && !underMin && !isWebhookMissing;
+  const canAnalyze = isConversionTool
+    ? !isLoading && !isFileLoading && !!uploadedFile && !pdfTooLarge
+    : !isLoading && !isFileLoading && !exceedsMax && !underMin && !isWebhookMissing;
+
+  const fileAccept = isConversionTool ? PDF_FILE_ACCEPT : TEXT_FILE_ACCEPT;
+  const fileHint = isConversionTool ? "Upload .pdf" : "Upload .txt or .md";
+  const inputTitle = isConversionTool ? "Your PDF" : "Your Text";
+  const headerStat = isConversionTool
+    ? uploadedFile
+      ? `${formatFileSize(uploadedFile.size)} / ${formatFileSize(MAX_PDF_BYTES)}`
+      : `Max ${formatFileSize(MAX_PDF_BYTES)}`
+    : `${formatNumber(charCount)}/${formatNumber(config.ui.maxChars)}`;
+  const helperText = isConversionTool
+    ? pdfTooLarge
+      ? `File is too large. Max ${formatFileSize(MAX_PDF_BYTES)}.`
+      : uploadedFile
+        ? "Ready to convert."
+        : `Upload a PDF (max ${formatFileSize(MAX_PDF_BYTES)}).`
+    : exceedsMax
+      ? `Maximum ${formatNumber(config.ui.maxChars)} characters exceeded.`
+      : `Minimum ${config.ui.minChars} characters to analyze.`;
 
   const handleClear = () => {
     setText("");
@@ -233,17 +273,53 @@ export default function ToolPage({ config }: ToolPageProps) {
     setRequestError(null);
     setFileError(null);
     setUploadedFileName(null);
+    setUploadedFile(null);
     setShowAuthGate(false);
     setShowLockedResults(false);
   };
 
   const focusTextarea = () => {
+    if (isConversionTool) {
+      fileInputRef.current?.click();
+      return;
+    }
     textareaRef.current?.focus();
     textareaRef.current?.scrollIntoView({ behavior: "smooth", block: "center" });
   };
 
   const handleAnalyze = async () => {
     if (isLoading || isFileLoading) return;
+
+    if (isConversionTool) {
+      if (!uploadedFile) {
+        setRequestError("Please upload a PDF to convert.");
+        return;
+      }
+
+      if (pdfTooLarge) {
+        setRequestError(`Please upload a PDF under ${formatFileSize(MAX_PDF_BYTES)}.`);
+        return;
+      }
+
+      setIsLoading(true);
+      setRequestError(null);
+      setFileError(null);
+      setResult(null);
+
+      try {
+        const conversion = await convertPdfToMarkdown(uploadedFile);
+        setResult(conversion);
+      } catch (error) {
+        if (error instanceof Error) {
+          setRequestError(error.message || "We could not convert that PDF.");
+        } else {
+          setRequestError("We could not convert that PDF.");
+        }
+      } finally {
+        setIsLoading(false);
+      }
+      return;
+    }
 
     if (exceedsMax) {
       setRequestError(`Please keep the text under ${config.ui.maxChars} characters.`);
@@ -362,6 +438,28 @@ export default function ToolPage({ config }: ToolPageProps) {
     setFileError(null);
 
     try {
+      if (isConversionTool) {
+        const isPdf = file.type === "application/pdf" || file.name.toLowerCase().endsWith(".pdf");
+        if (!isPdf) {
+          setUploadedFileName(null);
+          setUploadedFile(null);
+          setFileError("Please upload a PDF file.");
+          return;
+        }
+        if (file.size > MAX_PDF_BYTES) {
+          setUploadedFileName(null);
+          setUploadedFile(null);
+          setFileError(`PDF exceeds ${formatFileSize(MAX_PDF_BYTES)}.`);
+          return;
+        }
+        setUploadedFile(file);
+        setUploadedFileName(file.name);
+        setRequestError(null);
+        setResult(null);
+        setText("");
+        return;
+      }
+
       const content = await file.text();
       if (content.length > config.ui.maxChars) {
         setUploadedFileName(null);
@@ -381,8 +479,8 @@ export default function ToolPage({ config }: ToolPageProps) {
     }
   };
 
-  // Count tools are free - no locking
-  const lockResults = showLockedResults && !user && !isCountTool;
+  // Local tools are free - no locking
+  const lockResults = showLockedResults && !user && !isLocalTool;
 
   return (
     <main className="relative min-h-screen bg-gray-50">
@@ -457,17 +555,17 @@ export default function ToolPage({ config }: ToolPageProps) {
               </div>
               <div>
                 <p className="text-xs font-medium uppercase tracking-wider text-gray-400">Input</p>
-                <p className="text-lg font-semibold text-gray-900">Your Text</p>
+                <p className="text-lg font-semibold text-gray-900">{inputTitle}</p>
               </div>
             </div>
             <span className={`text-sm font-medium ${exceedsMax ? "text-red-500" : "text-gray-400"}`}>
-              {formatNumber(charCount)}/{formatNumber(config.ui.maxChars)}
+              {headerStat}
             </span>
           </div>
 
           <div className="mt-4 flex flex-wrap items-center justify-between gap-3">
             <div className="flex flex-wrap items-center gap-2 text-sm text-gray-500">
-              <span>Upload .txt or .md</span>
+              <span>{fileHint}</span>
               {uploadedFileName && (
                 <span className="max-w-[200px] truncate rounded-full bg-orange-50 px-3 py-1 text-orange-700" title={uploadedFileName}>
                   {uploadedFileName}
@@ -478,7 +576,7 @@ export default function ToolPage({ config }: ToolPageProps) {
               <input
                 ref={fileInputRef}
                 type="file"
-                accept={FILE_ACCEPT}
+                accept={fileAccept}
                 className="hidden"
                 onChange={handleFileUpload}
               />
@@ -510,23 +608,28 @@ export default function ToolPage({ config }: ToolPageProps) {
             <p className="mt-3 rounded-lg bg-red-50 px-3 py-2 text-sm text-red-600">{fileError}</p>
           )}
 
-          <textarea
-            ref={textareaRef}
-            className="mt-4 min-h-[260px] w-full resize-none rounded-xl border border-gray-200 bg-gray-50 p-4 text-base leading-relaxed text-gray-900 placeholder:text-gray-400 focus:border-orange-300 focus:bg-white focus:outline-none focus:ring-2 focus:ring-orange-100 disabled:opacity-70 transition-all"
-            placeholder={config.ui.placeholder}
-            value={text}
-            onChange={(event) => {
-              setText(event.target.value);
-              setFileError(null);
-            }}
-            disabled={isLoading}
-          />
+          {isConversionTool ? (
+            <div className="mt-4 rounded-xl border border-dashed border-gray-200 bg-gray-50 p-6 text-center text-sm text-gray-600">
+              <p>Upload a PDF and convert it to clean Markdown in your browser.</p>
+              <p className="mt-2 text-xs text-gray-500">The conversion runs locally and does not upload your file.</p>
+            </div>
+          ) : (
+            <textarea
+              ref={textareaRef}
+              className="mt-4 min-h-[260px] w-full resize-none rounded-xl border border-gray-200 bg-gray-50 p-4 text-base leading-relaxed text-gray-900 placeholder:text-gray-400 focus:border-orange-300 focus:bg-white focus:outline-none focus:ring-2 focus:ring-orange-100 disabled:opacity-70 transition-all"
+              placeholder={config.ui.placeholder}
+              value={text}
+              onChange={(event) => {
+                setText(event.target.value);
+                setFileError(null);
+              }}
+              disabled={isLoading}
+            />
+          )}
 
           <div className="mt-4 flex flex-wrap items-center justify-between gap-4">
             <p className={`text-sm ${exceedsMax ? "text-red-500" : "text-gray-500"}`}>
-              {exceedsMax
-                ? `Maximum ${formatNumber(config.ui.maxChars)} characters exceeded.`
-                : `Minimum ${config.ui.minChars} characters to analyze.`}
+              {helperText}
             </p>
             <div className="flex flex-wrap items-center gap-3">
               <button
@@ -548,7 +651,7 @@ export default function ToolPage({ config }: ToolPageProps) {
                 type="button"
                 className="inline-flex items-center rounded-lg border border-gray-200 bg-white px-5 py-3 text-sm font-medium text-gray-700 transition-all hover:bg-gray-50 disabled:opacity-50"
                 onClick={handleClear}
-                disabled={isLoading || isFileLoading || text.length === 0}
+                disabled={isLoading || isFileLoading || (isConversionTool ? !uploadedFile : text.length === 0)}
               >
                 Clear
               </button>
@@ -597,6 +700,9 @@ export default function ToolPage({ config }: ToolPageProps) {
             )}
             {config.result.type === "generation" && isGenerationResponse(result) && (
               <GenerationResult result={result} locked={lockResults} />
+            )}
+            {config.result.type === "conversion" && isConversionResponse(result) && (
+              <ConversionResult result={result} locked={lockResults} />
             )}
 
             {/* Lock overlay */}
@@ -690,11 +796,13 @@ export default function ToolPage({ config }: ToolPageProps) {
                 config.result.type === "detection" ? "Review signals" :
                 config.result.type === "count" ? "See statistics" :
                 config.result.type === "generation" ? "Generate content" :
+                config.result.type === "conversion" ? "Convert to Markdown" :
                 "Get results",
                 desc:
                 config.result.type === "detection" ? "See what patterns are detected" :
                 config.result.type === "count" ? "View word count, characters & more" :
                 config.result.type === "generation" ? "AI creates your content instantly" :
+                config.result.type === "conversion" ? "Extract text and structure it as Markdown" :
                 "Receive your humanized text",
                 icon: (
                 <svg viewBox="0 0 24 24" fill="none" className="h-6 w-6">
@@ -704,10 +812,12 @@ export default function ToolPage({ config }: ToolPageProps) {
               { step: "03", title:
                 config.result.type === "detection" ? "Revise & recheck" :
                 config.result.type === "count" ? "Use anywhere" :
+                config.result.type === "conversion" ? "Download Markdown" :
                 "Copy & use",
                 desc:
                 config.result.type === "detection" ? "Improve and verify your changes" :
                 config.result.type === "count" ? "Free to use, no signup required" :
+                config.result.type === "conversion" ? "Copy or download the .md file" :
                 "Use your improved text",
                 icon: (
                 <svg viewBox="0 0 24 24" fill="none" className="h-6 w-6">
