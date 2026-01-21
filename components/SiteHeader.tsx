@@ -8,6 +8,8 @@ import type { User } from "@supabase/supabase-js";
 import LoadingLink from "@/components/LoadingLink";
 import { getSupabaseBrowserClient } from "@/lib/supabase/client";
 
+const HEADERLESS_ROUTES = ["/validacion-2da-hipotesis"];
+
 export default function SiteHeader() {
   const [user, setUser] = useState<User | null>(null);
   const [isReady, setIsReady] = useState(false);
@@ -16,6 +18,7 @@ export default function SiteHeader() {
   const pathname = usePathname();
   const router = useRouter();
   const supabase = getSupabaseBrowserClient();
+  const isHeaderless = HEADERLESS_ROUTES.some((route) => pathname?.startsWith(route));
 
   useEffect(() => {
     let isMounted = true;
@@ -94,6 +97,10 @@ export default function SiteHeader() {
       : normalizedPlan === "starter"
         ? "bg-blue-50 text-blue-600 border-blue-200"
         : "bg-gray-100 text-gray-600 border-gray-200";
+
+  if (isHeaderless) {
+    return null;
+  }
 
   return (
     <header className="sticky top-0 z-50 border-b border-gray-100 bg-white/95 backdrop-blur-sm">

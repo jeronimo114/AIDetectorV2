@@ -1,4 +1,7 @@
+"use client";
+
 import Link from "next/link";
+import { usePathname } from "next/navigation";
 
 const legalLinks = [
   { href: "/privacy-policy", label: "Privacy Policy" },
@@ -7,8 +10,15 @@ const legalLinks = [
   { href: "/disclaimer", label: "Disclaimer" }
 ];
 
+const FOOTERLESS_ROUTES = ["/validacion-2da-hipotesis"];
+
 export default function SiteFooter() {
+  const pathname = usePathname();
   const year = new Date().getFullYear();
+
+  if (FOOTERLESS_ROUTES.some((route) => pathname?.startsWith(route))) {
+    return null;
+  }
 
   return (
     <footer className="border-t border-gray-100 bg-white">
