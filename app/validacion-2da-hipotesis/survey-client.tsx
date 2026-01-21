@@ -61,12 +61,6 @@ export default function SurveyClient() {
 
     const payload = serializeForm(formRef.current);
 
-    if (!ENDPOINT_URL || ENDPOINT_URL === "YOUR_ENDPOINT_URL") {
-      downloadJSON(payload);
-      setStatus("No hay endpoint configurado. Se descargó el JSON localmente.");
-      return;
-    }
-
     try {
       const response = await fetch(ENDPOINT_URL, {
         method: "POST",
