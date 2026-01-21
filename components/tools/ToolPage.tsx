@@ -13,6 +13,7 @@ import { DetectionResult, TransformationResult, CountResult, GenerationResult, C
 import type { ToolConfig, DetectionResponse, TransformationResponse, CountResponse, GenerationResponse, ConversionResponse, ToolResponse } from "@/lib/tools/types";
 import { getRelatedTools } from "@/lib/tools/config";
 import { convertPdfToMarkdown } from "@/lib/tools/pdf";
+import { convertDocxToMarkdown } from "@/lib/tools/docx";
 import { getSupabaseBrowserClient } from "@/lib/supabase/client";
 import { formatNumber } from "@/lib/format";
 import { useScrollAnimation } from "@/hooks/useScrollAnimation";
@@ -20,7 +21,9 @@ import { useScrollAnimation } from "@/hooks/useScrollAnimation";
 const TIMEOUT_MS = 20000;
 const TEXT_FILE_ACCEPT = ".txt,.md,text/plain,text/markdown";
 const PDF_FILE_ACCEPT = ".pdf,application/pdf";
+const DOCX_FILE_ACCEPT = ".docx,application/vnd.openxmlformats-officedocument.wordprocessingml.document";
 const MAX_PDF_BYTES = 10 * 1024 * 1024;
+const MAX_DOCX_BYTES = 10 * 1024 * 1024;
 
 // Next.js requires literal strings for env vars at build time
 function getWebhookUrl(envKey: string): string {
@@ -169,8 +172,11 @@ export default function ToolPage({ config }: ToolPageProps) {
   const webhookUrl = getWebhookUrl(config.webhookEnvKey);
   const isCountTool = config.result.type === "count";
   const isConversionTool = config.result.type === "conversion";
+  const isPdfTool = config.slug === "pdf-to-md";
+  const isDocxTool = config.slug === "docx-to-md";
   const isLocalTool = isCountTool || isConversionTool;
   const isWebhookMissing = !isLocalTool && webhookUrl.length === 0;
+  const maxFileBytes = isPdfTool ? MAX_PDF_BYTES : MAX_DOCX_BYTES;
 
   useEffect(() => {
     let isMounted = true;
@@ -241,28 +247,29 @@ export default function ToolPage({ config }: ToolPageProps) {
 
   const trimmed = text.trim();
   const charCount = text.length;
-  const pdfTooLarge = isConversionTool && uploadedFile !== null && uploadedFile.size > MAX_PDF_BYTES;
+  const fileTooLarge = isConversionTool && uploadedFile !== null && uploadedFile.size > maxFileBytes;
   const underMin = isConversionTool ? !uploadedFile : trimmed.length < config.ui.minChars;
-  const exceedsMax = isConversionTool ? pdfTooLarge : charCount > config.ui.maxChars;
+  const exceedsMax = isConversionTool ? fileTooLarge : charCount > config.ui.maxChars;
 
   const canAnalyze = isConversionTool
-    ? !isLoading && !isFileLoading && !!uploadedFile && !pdfTooLarge
+    ? !isLoading && !isFileLoading && !!uploadedFile && !fileTooLarge
     : !isLoading && !isFileLoading && !exceedsMax && !underMin && !isWebhookMissing;
 
-  const fileAccept = isConversionTool ? PDF_FILE_ACCEPT : TEXT_FILE_ACCEPT;
-  const fileHint = isConversionTool ? "Upload .pdf" : "Upload .txt or .md";
-  const inputTitle = isConversionTool ? "Your PDF" : "Your Text";
+  const fileAccept = isPdfTool ? PDF_FILE_ACCEPT : isDocxTool ? DOCX_FILE_ACCEPT : TEXT_FILE_ACCEPT;
+  const fileHint = isPdfTool ? "Upload .pdf" : isDocxTool ? "Upload .docx" : "Upload .txt or .md";
+  const inputTitle = isPdfTool ? "Your PDF" : isDocxTool ? "Your DOCX" : "Your Text";
   const headerStat = isConversionTool
     ? uploadedFile
-      ? `${formatFileSize(uploadedFile.size)} / ${formatFileSize(MAX_PDF_BYTES)}`
-      : `Max ${formatFileSize(MAX_PDF_BYTES)}`
+      ? `${formatFileSize(uploadedFile.size)} / ${formatFileSize(maxFileBytes)}`
+      : `Max ${formatFileSize(maxFileBytes)}`
     : `${formatNumber(charCount)}/${formatNumber(config.ui.maxChars)}`;
+  const fileTypeLabel = isPdfTool ? "PDF" : "DOCX";
   const helperText = isConversionTool
-    ? pdfTooLarge
-      ? `File is too large. Max ${formatFileSize(MAX_PDF_BYTES)}.`
+    ? fileTooLarge
+      ? `File is too large. Max ${formatFileSize(maxFileBytes)}.`
       : uploadedFile
         ? "Ready to convert."
-        : `Upload a PDF (max ${formatFileSize(MAX_PDF_BYTES)}).`
+        : `Upload a ${fileTypeLabel} (max ${formatFileSize(maxFileBytes)}).`
     : exceedsMax
       ? `Maximum ${formatNumber(config.ui.maxChars)} characters exceeded.`
       : `Minimum ${config.ui.minChars} characters to analyze.`;
@@ -292,12 +299,12 @@ export default function ToolPage({ config }: ToolPageProps) {
 
     if (isConversionTool) {
       if (!uploadedFile) {
-        setRequestError("Please upload a PDF to convert.");
+        setRequestError(`Please upload a ${fileTypeLabel} to convert.`);
         return;
       }
 
-      if (pdfTooLarge) {
-        setRequestError(`Please upload a PDF under ${formatFileSize(MAX_PDF_BYTES)}.`);
+      if (fileTooLarge) {
+        setRequestError(`Please upload a ${fileTypeLabel} under ${formatFileSize(maxFileBytes)}.`);
         return;
       }
 
@@ -307,13 +314,16 @@ export default function ToolPage({ config }: ToolPageProps) {
       setResult(null);
 
       try {
-        const conversion = await convertPdfToMarkdown(uploadedFile);
+        const conversion = isPdfTool
+          ? await convertPdfToMarkdown(uploadedFile)
+          : await convertDocxToMarkdown(uploadedFile);
         setResult(conversion);
       } catch (error) {
+        const errorMsg = `We could not convert that ${fileTypeLabel}.`;
         if (error instanceof Error) {
-          setRequestError(error.message || "We could not convert that PDF.");
+          setRequestError(error.message || errorMsg);
         } else {
-          setRequestError("We could not convert that PDF.");
+          setRequestError(errorMsg);
         }
       } finally {
         setIsLoading(false);
@@ -440,16 +450,18 @@ export default function ToolPage({ config }: ToolPageProps) {
     try {
       if (isConversionTool) {
         const isPdf = file.type === "application/pdf" || file.name.toLowerCase().endsWith(".pdf");
-        if (!isPdf) {
+        const isDocx = file.type === "application/vnd.openxmlformats-officedocument.wordprocessingml.document" || file.name.toLowerCase().endsWith(".docx");
+        const isValidFile = isPdfTool ? isPdf : isDocxTool ? isDocx : false;
+        if (!isValidFile) {
           setUploadedFileName(null);
           setUploadedFile(null);
-          setFileError("Please upload a PDF file.");
+          setFileError(`Please upload a ${fileTypeLabel} file.`);
           return;
         }
-        if (file.size > MAX_PDF_BYTES) {
+        if (file.size > maxFileBytes) {
           setUploadedFileName(null);
           setUploadedFile(null);
-          setFileError(`PDF exceeds ${formatFileSize(MAX_PDF_BYTES)}.`);
+          setFileError(`${fileTypeLabel} exceeds ${formatFileSize(maxFileBytes)}.`);
           return;
         }
         setUploadedFile(file);
@@ -610,7 +622,7 @@ export default function ToolPage({ config }: ToolPageProps) {
 
           {isConversionTool ? (
             <div className="mt-4 rounded-xl border border-dashed border-gray-200 bg-gray-50 p-6 text-center text-sm text-gray-600">
-              <p>Upload a PDF and convert it to clean Markdown in your browser.</p>
+              <p>Upload a {fileTypeLabel} and convert it to clean Markdown in your browser.</p>
               <p className="mt-2 text-xs text-gray-500">The conversion runs locally and does not upload your file.</p>
             </div>
           ) : (

@@ -233,7 +233,30 @@ export const tools: ToolConfig[] = [
       maxChars: 100000
     },
     result: { type: "conversion" },
-    relatedTools: ["word-counter", "character-counter"]
+    relatedTools: ["docx-to-md", "word-counter", "character-counter"]
+  },
+  {
+    slug: "docx-to-md",
+    name: "DOCX to Markdown",
+    category: "utility",
+    webhookEnvKey: "",
+    seo: {
+      title: "Free DOCX to Markdown Converter - Convert Word to MD",
+      description: "Convert Word documents to clean Markdown online. Extract text and formatting from your DOCX files into Markdown instantly.",
+      keywords: ["docx to md", "docx to markdown", "word to markdown", "convert docx to md", "docx markdown converter", "word to md"],
+      h1: "DOCX to Markdown Converter",
+      subheading: "Convert Word documents into clean Markdown in seconds. No signup required."
+    },
+    ui: {
+      badge: "DOCX to Markdown",
+      placeholder: "Upload a DOCX file to convert it to Markdown.",
+      buttonText: "Convert DOCX",
+      buttonLoadingText: "Converting...",
+      minChars: 1,
+      maxChars: 100000
+    },
+    result: { type: "conversion" },
+    relatedTools: ["pdf-to-md", "word-counter", "character-counter"]
   },
   {
     slug: "word-counter",
