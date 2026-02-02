@@ -1,0 +1,776 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Más que Impresos - Oportunidades de Transformación Digital</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+    <style>
+        /*
+         * APPLE KEYNOTE STYLE SYSTEM V2 IMPLEMENTATION
+         * "Mas aire, menos cajas, tipografia protagonista"
+         */
+
+        :root {
+            /* Palette: Apple Neutral */
+            --ink: #0B0B0F;
+            --secondary: #5B5F6A;
+            --hairline: #E6E7EB;
+            --fog: #F5F5F7;
+            --white: #FFFFFF;
+
+            /* Accent (Max 5% usage) */
+            --accent: #0071E3;
+
+            /* Spacing (Safe Area) */
+            --margin-x: 96px;
+            --margin-y: 72px;
+
+            /* Typography Scale (Keynote Reference) */
+            --fs-hero: 96px;
+            --fs-h1: 80px;
+            --fs-h2: 64px;
+            --fs-body: 32px;
+            --fs-small: 24px;
+            --fs-caption: 22px;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            -webkit-font-smoothing: antialiased;
+        }
+
+        body {
+            background-color: #000;
+            font-family: 'SF Pro Display', 'SF Pro Text', 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            overflow: hidden;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            color: var(--ink);
+        }
+
+        /* Presentation Container - 16:9 Fixed */
+        #deck-container {
+            width: 1920px;
+            height: 1080px;
+            background-color: var(--white);
+            position: relative;
+            overflow: hidden;
+            transform-origin: center center;
+            box-shadow: 0 0 100px rgba(0, 0, 0, 0.5);
+        }
+
+        /* Slide Base */
+        .slide {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            padding: var(--margin-y) var(--margin-x);
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.8s cubic-bezier(0.2, 0.8, 0.2, 1);
+            background: var(--white);
+        }
+
+        .slide.fog {
+            background: var(--fog);
+        }
+
+        .slide.dark {
+            background: var(--ink);
+            color: var(--white);
+        }
+
+        .slide.dark .secondary,
+        .slide.dark p {
+            color: rgba(255, 255, 255, 0.6);
+        }
+
+        .slide.dark .eyebrow {
+            color: rgba(255, 255, 255, 0.5);
+        }
+
+        .slide.active {
+            opacity: 1;
+            pointer-events: auto;
+            z-index: 10;
+        }
+
+        /* Typography */
+        h1 {
+            font-size: var(--fs-h1);
+            font-weight: 600;
+            letter-spacing: -2px;
+            line-height: 1.1;
+            color: var(--ink);
+            margin-bottom: 48px;
+        }
+
+        .slide.dark h1 {
+            color: var(--white);
+        }
+
+        .slide-cover h1 {
+            font-size: var(--fs-hero);
+            margin-bottom: 24px;
+        }
+
+        h2 {
+            font-size: var(--fs-h2);
+            font-weight: 600;
+            letter-spacing: -1.5px;
+            color: var(--ink);
+            margin-bottom: 24px;
+        }
+
+        .slide.dark h2 {
+            color: var(--white);
+        }
+
+        h3 {
+            font-size: 48px;
+            font-weight: 600;
+            letter-spacing: -1px;
+            color: var(--ink);
+        }
+
+        .slide.dark h3 {
+            color: var(--white);
+        }
+
+        h4 {
+            font-size: 36px;
+            font-weight: 600;
+            letter-spacing: -0.5px;
+            color: var(--ink);
+            margin-bottom: 16px;
+        }
+
+        .slide.dark h4 {
+            color: var(--white);
+        }
+
+        p,
+        li {
+            font-size: var(--fs-body);
+            color: var(--secondary);
+            line-height: 1.4;
+            letter-spacing: -0.01em;
+        }
+
+        .small {
+            font-size: var(--fs-small);
+        }
+
+        .caption {
+            font-size: var(--fs-caption);
+            color: var(--secondary);
+        }
+
+        .keyword {
+            color: var(--ink);
+            font-weight: 600;
+        }
+
+        .slide.dark .keyword {
+            color: var(--white);
+        }
+
+        .accent {
+            color: var(--accent);
+            font-weight: 600;
+        }
+
+        .eyebrow {
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            font-size: var(--fs-caption);
+            color: var(--secondary);
+            margin-bottom: 16px;
+        }
+
+        /* Layout Helpers */
+        .layout-left {
+            justify-content: center;
+            align-items: flex-start;
+            text-align: left;
+        }
+
+        .layout-center {
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+        }
+
+        .layout-title-top {
+            justify-content: flex-start;
+            padding-top: var(--margin-y);
+        }
+
+        /* Clean list */
+        ul {
+            list-style: none;
+            display: flex;
+            flex-direction: column;
+            gap: 32px;
+        }
+
+        li {
+            display: flex;
+            align-items: baseline;
+            gap: 16px;
+        }
+
+        /* Two column layout */
+        .two-column {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 64px;
+            align-items: center;
+            width: 100%;
+            margin-top: 32px;
+        }
+
+        .three-column {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 48px;
+            margin-top: 48px;
+        }
+
+        /* Feature list */
+        .feature-list {
+            gap: 20px;
+            margin-top: 24px;
+        }
+
+        .feature-list li {
+            font-size: 28px;
+            display: block;
+            padding: 20px 0;
+            border-bottom: 1px solid var(--hairline);
+        }
+
+        .feature-list li:last-child {
+            border-bottom: none;
+        }
+
+        .feature-list .desc {
+            color: var(--secondary);
+            margin-left: 12px;
+        }
+
+        /* Card minimal */
+        .card-minimal {
+            text-align: center;
+            padding: 32px;
+        }
+
+        .card-minimal .number {
+            font-size: 72px;
+            font-weight: 600;
+            color: var(--accent);
+            margin-bottom: 16px;
+            letter-spacing: -2px;
+        }
+
+        .card-minimal h3 {
+            font-size: 28px;
+            margin-bottom: 12px;
+        }
+
+        .card-minimal p {
+            font-size: 20px;
+            color: var(--secondary);
+        }
+
+        /* Problem list */
+        .problem-list {
+            gap: 16px;
+        }
+
+        .problem-list li {
+            display: flex;
+            align-items: flex-start;
+            gap: 16px;
+            font-size: 26px;
+            padding: 16px 0;
+            border-bottom: 1px solid var(--hairline);
+        }
+
+        .problem-list li::before {
+            content: "";
+            width: 8px;
+            height: 8px;
+            background: var(--accent);
+            border-radius: 50%;
+            margin-top: 12px;
+            flex-shrink: 0;
+        }
+
+        /* Opportunity grid */
+        .opportunity-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 32px;
+            margin-top: 48px;
+        }
+
+        .opportunity-item {
+            padding: 32px;
+            background: var(--white);
+            border-radius: 24px;
+        }
+
+        .opportunity-item .icon {
+            font-size: 48px;
+            font-weight: 600;
+            color: var(--accent);
+            margin-bottom: 16px;
+        }
+
+        .opportunity-item h4 {
+            font-size: 28px;
+            margin-bottom: 12px;
+        }
+
+        .opportunity-item p {
+            font-size: 22px;
+            color: var(--secondary);
+            line-height: 1.5;
+        }
+
+        /* Screenshot container */
+        .screenshot-container {
+            border-radius: 18px;
+            overflow: hidden;
+            border: 1px solid var(--hairline);
+            background: var(--white);
+        }
+
+        .screenshot-container img {
+            width: 100%;
+            height: auto;
+            display: block;
+        }
+
+        /* Case flow */
+        .case-flow {
+            display: flex;
+            align-items: center;
+            gap: 24px;
+            margin-top: 48px;
+        }
+
+        .case-step {
+            flex: 1;
+            text-align: center;
+        }
+
+        .case-step .step-number {
+            width: 56px;
+            height: 56px;
+            background: var(--accent);
+            color: var(--white);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 600;
+            font-size: 24px;
+            margin: 0 auto 16px;
+        }
+
+        .case-step h4 {
+            font-size: 22px;
+            margin-bottom: 8px;
+        }
+
+        .case-step p {
+            font-size: 18px;
+            color: var(--secondary);
+        }
+
+        .flow-arrow {
+            font-size: 32px;
+            color: var(--hairline);
+        }
+
+        /* Tag */
+        .tag {
+            display: inline-block;
+            padding: 8px 20px;
+            background: var(--accent);
+            color: var(--white);
+            font-size: 18px;
+            font-weight: 500;
+            border-radius: 24px;
+            margin-bottom: 24px;
+        }
+
+        /* Timeline */
+        .timeline {
+            display: flex;
+            flex-direction: column;
+            gap: 28px;
+            margin-top: 48px;
+            max-width: 1200px;
+        }
+
+        .timeline-item {
+            display: grid;
+            grid-template-columns: 180px 1fr;
+            gap: 32px;
+            align-items: baseline;
+            padding-bottom: 24px;
+            border-bottom: 1px solid var(--hairline);
+        }
+
+        .timeline-item:last-child {
+            border-bottom: none;
+        }
+
+        .timeline-item .phase {
+            font-size: 26px;
+            color: var(--accent);
+            font-weight: 600;
+        }
+
+        .timeline-item .content h4 {
+            font-size: 28px;
+            margin-bottom: 8px;
+        }
+
+        .timeline-item .content p {
+            font-size: 22px;
+            color: var(--secondary);
+        }
+
+        /* Animations */
+        .animate {
+            opacity: 0;
+            transform: translateY(18px);
+            animation: appleFadeIn 0.8s cubic-bezier(0.2, 0.8, 0.2, 1) forwards;
+        }
+
+        .d-1 {
+            animation-delay: 0.1s;
+        }
+
+        .d-2 {
+            animation-delay: 0.2s;
+        }
+
+        .d-3 {
+            animation-delay: 0.3s;
+        }
+
+        .d-4 {
+            animation-delay: 0.4s;
+        }
+
+        @keyframes appleFadeIn {
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* Navigation */
+        .nav-controls {
+            position: absolute;
+            bottom: 32px;
+            right: 32px;
+            display: flex;
+            gap: 16px;
+            opacity: 0;
+            transition: opacity 0.3s;
+            z-index: 100;
+        }
+
+        body:hover .nav-controls {
+            opacity: 1;
+        }
+
+        .nav-btn {
+            background: rgba(0, 0, 0, 0.05);
+            border: none;
+            color: var(--ink);
+            width: 48px;
+            height: 48px;
+            border-radius: 50%;
+            cursor: pointer;
+            font-size: 20px;
+            transition: background 0.2s;
+        }
+
+        .nav-btn:hover {
+            background: rgba(0, 0, 0, 0.1);
+        }
+
+        .slide.dark .nav-btn {
+            background: rgba(255, 255, 255, 0.1);
+            color: var(--white);
+        }
+
+        .slide.dark .nav-btn:hover {
+            background: rgba(255, 255, 255, 0.2);
+        }
+    </style>
+</head>
+
+<body>
+    <div id="deck-container">
+
+        <!-- SLIDE 1: La Empresa -->
+        <section class="slide layout-left active">
+            <p class="eyebrow animate">La Empresa</p>
+            <h1 class="animate d-1">Más que Impresos <span class="accent">S.A.S</span></h1>
+            <p class="animate d-2 small">Desarrollo creativo especializado en publicidad industrial y espacios comerciales en Colombia.</p>
+            <div class="two-column animate d-3">
+                <ul class="feature-list">
+                    <li><span class="keyword">Publicidad Industrial</span><span class="desc">Litografía y branding</span></li>
+                    <li><span class="keyword">Espacios Comerciales</span><span class="desc">Stands, estructuras metálicas</span></li>
+                    <li><span class="keyword">Mobiliario</span><span class="desc">Diseño de oficinas</span></li>
+                    <li><span class="keyword">Paquetes Completos</span><span class="desc">Soluciones integrales</span></li>
+                </ul>
+                <div class="screenshot-container">
+                    <img src="assets/screenshot-home.png" alt="Página principal Más que Impresos">
+                </div>
+            </div>
+        </section>
+
+        <!-- SLIDE 2: Modelo de Negocio Actual -->
+        <section class="slide fog layout-center">
+            <p class="eyebrow animate">Modelo Actual</p>
+            <h1 class="animate d-1">Servicios por <span class="accent">proyecto</span></h1>
+            <p class="animate d-2 small">Clientes diversos: startups, supermercados, grandes corporaciones y franquicias.</p>
+            <div class="three-column animate d-3">
+                <div class="card-minimal">
+                    <p class="number">790K</p>
+                    <h3>Paquete Emprendedor</h3>
+                    <p>Aviso con lona, tarjetas de presentación y material básico de branding.</p>
+                </div>
+                <div class="card-minimal">
+                    <p class="number">2.4M</p>
+                    <h3>Paquete Crecimiento</h3>
+                    <p>Solución intermedia para negocios en expansión.</p>
+                </div>
+                <div class="card-minimal">
+                    <p class="number">4.78M</p>
+                    <h3>Premium Plan</h3>
+                    <p>Paquete completo para empresas establecidas.</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- SLIDE 3: Problemas Identificados -->
+        <section class="slide layout-left">
+            <p class="eyebrow animate">Diagnóstico</p>
+            <h1 class="animate d-1">Problemas <span class="accent">identificados</span></h1>
+            <div class="two-column" style="margin-top: 24px;">
+                <ul class="problem-list animate d-2">
+                    <li>Cotizaciones manuales que consumen tiempo del equipo comercial</li>
+                    <li>Seguimiento de proyectos en hojas de cálculo sin trazabilidad</li>
+                    <li>Comunicación con clientes fragmentada (WhatsApp, email, llamadas)</li>
+                    <li>Sin visibilidad de métricas de conversión web</li>
+                </ul>
+                <ul class="problem-list animate d-3">
+                    <li>Proceso de aprobación de diseños no estandarizado</li>
+                    <li>Inventario de materiales sin sistema de alertas</li>
+                    <li>Facturación y cobranza manual</li>
+                    <li>Pérdida de leads por falta de seguimiento automatizado</li>
+                </ul>
+            </div>
+        </section>
+
+        <!-- SLIDE 4: Oportunidades Automatización -->
+        <section class="slide fog layout-left">
+            <p class="eyebrow animate">Automatización</p>
+            <h1 class="animate d-1">Procesos <span class="accent">automatizables</span></h1>
+            <div class="opportunity-grid animate d-2">
+                <div class="opportunity-item">
+                    <div class="icon">1</div>
+                    <h4>Cotizador Automático</h4>
+                    <p>Sistema web que calcula precios en tiempo real según especificaciones. Integración con CRM para seguimiento automático de leads.</p>
+                </div>
+                <div class="opportunity-item">
+                    <div class="icon">2</div>
+                    <h4>Workflow de Aprobaciones</h4>
+                    <p>Plataforma de revisión de diseños con comentarios, versiones y aprobación digital. Notificaciones automáticas a clientes.</p>
+                </div>
+                <div class="opportunity-item">
+                    <div class="icon">3</div>
+                    <h4>Gestión de Proyectos</h4>
+                    <p>Tablero Kanban con estados de producción, asignación de tareas y alertas de vencimiento. Visibilidad en tiempo real.</p>
+                </div>
+                <div class="opportunity-item">
+                    <div class="icon">4</div>
+                    <h4>Facturación Automática</h4>
+                    <p>Generación de facturas al completar hitos. Integración con pasarelas de pago y recordatorios de cobranza.</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- SLIDE 5: Caso Delta Energía -->
+        <section class="slide layout-left">
+            <span class="tag animate">Caso Real</span>
+            <h1 class="animate d-1">Delta Energía: <span class="accent">Cotización Automática</span></h1>
+            <p class="animate d-2 small">Ejemplo de flujo automatizado: cotización, cálculo y guardado de lead desde el sitio web.</p>
+            <div class="two-column animate d-3">
+                <div class="screenshot-container">
+                    <img src="assets/delta-form.png" alt="Formulario de cotización Delta Energía">
+                </div>
+                <div class="screenshot-container">
+                    <img src="assets/delta-email.png" alt="Email automático con cotización Delta Energía">
+                </div>
+            </div>
+            <div class="case-flow animate d-4">
+                <div class="case-step">
+                    <div class="step-number">1</div>
+                    <h4>Formulario Web</h4>
+                    <p>Cliente ingresa datos y consumo</p>
+                </div>
+                <div class="flow-arrow">→</div>
+                <div class="case-step">
+                    <div class="step-number">2</div>
+                    <h4>Cálculo Automático</h4>
+                    <p>Sistema genera propuesta personalizada</p>
+                </div>
+                <div class="flow-arrow">→</div>
+                <div class="case-step">
+                    <div class="step-number">3</div>
+                    <h4>Email + PDF</h4>
+                    <p>Cotización enviada instantáneamente</p>
+                </div>
+                <div class="flow-arrow">→</div>
+                <div class="case-step">
+                    <div class="step-number">4</div>
+                    <h4>Lead en CRM</h4>
+                    <p>Datos guardados para seguimiento</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- SLIDE 6: Oportunidades IA -->
+        <section class="slide dark layout-center">
+            <p class="eyebrow animate">Inteligencia Artificial</p>
+            <h1 class="animate d-1">IA aplicada al <span class="accent">negocio</span></h1>
+            <div class="three-column animate d-2">
+                <div style="text-align: center;">
+                    <p style="font-size: 64px; margin-bottom: 24px; font-weight: 600;">01</p>
+                    <h4 style="font-size: 28px; margin-bottom: 16px;">Chatbot de Atención</h4>
+                    <p style="font-size: 20px;">Respuestas 24/7 a consultas frecuentes, captura de leads y agendamiento de citas con el equipo comercial.</p>
+                </div>
+                <div style="text-align: center;">
+                    <p style="font-size: 64px; margin-bottom: 24px; font-weight: 600;">02</p>
+                    <h4 style="font-size: 28px; margin-bottom: 16px;">Generación de Propuestas</h4>
+                    <p style="font-size: 20px;">Creación automática de documentos comerciales personalizados con base en templates y datos del cliente.</p>
+                </div>
+                <div style="text-align: center;">
+                    <p style="font-size: 64px; margin-bottom: 24px; font-weight: 600;">03</p>
+                    <h4 style="font-size: 28px; margin-bottom: 16px;">Predicción de Demanda</h4>
+                    <p style="font-size: 20px;">Análisis de patrones estacionales para optimizar inventario de materiales y planificar capacidad.</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- SLIDE 7: Roadmap -->
+        <section class="slide layout-center">
+            <p class="eyebrow animate">Implementación</p>
+            <h1 class="animate d-1">Roadmap de <span class="accent">transformación</span></h1>
+            <div class="timeline animate d-2">
+                <div class="timeline-item">
+                    <div class="phase">Fase 1</div>
+                    <div class="content">
+                        <h4>Cotizador Automático</h4>
+                        <p>Sistema web de cotización con cálculo en tiempo real y captura de leads</p>
+                    </div>
+                </div>
+                <div class="timeline-item">
+                    <div class="phase">Fase 2</div>
+                    <div class="content">
+                        <h4>Automatización Operativa</h4>
+                        <p>Gestión de proyectos, workflow de aprobaciones y facturación automática</p>
+                    </div>
+                </div>
+                <div class="timeline-item">
+                    <div class="phase">Fase 3</div>
+                    <div class="content">
+                        <h4>Inteligencia Artificial</h4>
+                        <p>Chatbot de atención, generación de propuestas y predicción de demanda</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Navigation Controls -->
+        <div class="nav-controls">
+            <button class="nav-btn" onclick="prevSlide()">&#8592;</button>
+            <button class="nav-btn" onclick="nextSlide()">&#8594;</button>
+        </div>
+
+    </div>
+
+    <script>
+        let currentSlide = 0;
+        const slides = document.querySelectorAll('.slide');
+        const container = document.getElementById('deck-container');
+
+        function resize() {
+            const scaleX = window.innerWidth / 1920;
+            const scaleY = window.innerHeight / 1080;
+            const scale = Math.min(scaleX, scaleY);
+            container.style.transform = `scale(${scale})`;
+        }
+
+        function showSlide(index) {
+            slides.forEach(s => s.classList.remove('active'));
+            slides[index].classList.add('active');
+
+            const current = slides[index];
+            const animatedElements = current.querySelectorAll('.animate');
+            animatedElements.forEach(el => {
+                el.style.animation = 'none';
+                el.offsetHeight;
+                el.style.animation = null;
+            });
+        }
+
+        function nextSlide() {
+            if (currentSlide < slides.length - 1) {
+                currentSlide++;
+                showSlide(currentSlide);
+            }
+        }
+
+        function prevSlide() {
+            if (currentSlide > 0) {
+                currentSlide--;
+                showSlide(currentSlide);
+            }
+        }
+
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'ArrowRight' || e.key === ' ') nextSlide();
+            if (e.key === 'ArrowLeft') prevSlide();
+        });
+
+        window.addEventListener('resize', resize);
+        resize();
+    </script>
+</body>
+
+</html>
