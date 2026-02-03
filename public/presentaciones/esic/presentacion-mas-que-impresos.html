@@ -529,6 +529,43 @@
             background: rgba(255, 255, 255, 0.2);
         }
 
+        /* Objective cards */
+        .objective-card {
+            background: var(--white);
+            border-radius: 24px;
+            padding: 40px;
+            text-align: left;
+        }
+
+        .objective-card h3 {
+            font-size: 36px;
+            margin-bottom: 24px;
+        }
+
+        .objective-icon {
+            font-size: 48px;
+            margin-bottom: 20px;
+        }
+
+        .objective-list {
+            gap: 16px;
+        }
+
+        .objective-list li {
+            display: block;
+            font-size: 22px;
+            color: var(--secondary);
+            padding-left: 20px;
+            position: relative;
+        }
+
+        .objective-list li::before {
+            content: "→";
+            position: absolute;
+            left: 0;
+            color: var(--accent);
+        }
+
         /* Link button */
         .link-btn {
             display: inline-flex;
@@ -719,7 +756,45 @@
             </div>
         </section>
 
-        <!-- SLIDE 7: Roadmap -->
+        <!-- SLIDE 7: Objetivos Estratégicos -->
+        <section class="slide fog layout-center">
+            <p class="eyebrow animate">Objetivos Estratégicos</p>
+            <h1 class="animate d-1">Supervivencia, Crecimiento y <span class="accent">Rentabilidad</span></h1>
+            <div class="three-column animate d-2">
+                <div class="objective-card">
+                    <div class="objective-icon">🛡️</div>
+                    <h3>Supervivencia</h3>
+                    <ul class="objective-list">
+                        <li>Reducir tiempos de cotización</li>
+                        <li>Evitar pérdida de leads</li>
+                        <li>Mantener competitividad digital</li>
+                        <li>Control de inventario y costos</li>
+                    </ul>
+                </div>
+                <div class="objective-card">
+                    <div class="objective-icon">📈</div>
+                    <h3>Crecimiento</h3>
+                    <ul class="objective-list">
+                        <li>Captar más clientes vía web</li>
+                        <li>Escalar operaciones sin más personal</li>
+                        <li>Expandir cartera de servicios</li>
+                        <li>Atención 24/7 con chatbot</li>
+                    </ul>
+                </div>
+                <div class="objective-card">
+                    <div class="objective-icon">💰</div>
+                    <h3>Rentabilidad</h3>
+                    <ul class="objective-list">
+                        <li>Reducir costos operativos</li>
+                        <li>Automatizar facturación y cobranza</li>
+                        <li>Optimizar inventario con IA</li>
+                        <li>Menos tiempo en tareas manuales</li>
+                    </ul>
+                </div>
+            </div>
+        </section>
+
+        <!-- SLIDE 8: Roadmap -->
         <section class="slide layout-center">
             <p class="eyebrow animate">Implementación</p>
             <h1 class="animate d-1">Roadmap de <span class="accent">transformación</span></h1>
