@@ -543,8 +543,13 @@
         }
 
         .objective-icon {
-            font-size: 48px;
             margin-bottom: 20px;
+            color: var(--accent);
+        }
+
+        .objective-icon svg {
+            width: 48px;
+            height: 48px;
         }
 
         .objective-list {
@@ -564,6 +569,72 @@
             position: absolute;
             left: 0;
             color: var(--accent);
+        }
+
+        /* Strategy list */
+        .strategy-list {
+            gap: 28px;
+        }
+
+        .strategy-list li {
+            display: flex;
+            align-items: flex-start;
+            gap: 20px;
+        }
+
+        .strategy-list .keyword {
+            display: block;
+            font-size: 28px;
+            margin-bottom: 8px;
+        }
+
+        .strategy-list .desc {
+            display: block;
+            font-size: 22px;
+            color: var(--secondary);
+        }
+
+        .strategy-icon {
+            color: var(--accent);
+            flex-shrink: 0;
+            margin-top: 4px;
+        }
+
+        /* Strategy highlight */
+        .strategy-highlight {
+            background: var(--ink);
+            color: var(--white);
+            border-radius: 24px;
+            padding: 48px;
+            text-align: center;
+        }
+
+        .highlight-number {
+            font-size: 96px;
+            font-weight: 600;
+            color: var(--accent);
+            letter-spacing: -4px;
+            line-height: 1;
+        }
+
+        .highlight-label {
+            font-size: 28px;
+            color: var(--white);
+            margin-top: 16px;
+            font-weight: 500;
+        }
+
+        .highlight-divider {
+            width: 60px;
+            height: 2px;
+            background: var(--accent);
+            margin: 32px auto;
+        }
+
+        .highlight-desc {
+            font-size: 20px;
+            color: rgba(255, 255, 255, 0.6);
+            line-height: 1.5;
         }
 
         /* Link button */
@@ -740,9 +811,39 @@
                 margin-bottom: 16px;
             }
 
-            .objective-icon {
-                font-size: 36px;
-                margin-bottom: 12px;
+            .objective-icon svg {
+                width: 36px;
+                height: 36px;
+            }
+
+            .strategy-list .keyword {
+                font-size: 22px;
+            }
+
+            .strategy-list .desc {
+                font-size: 18px;
+            }
+
+            .strategy-icon svg {
+                width: 28px;
+                height: 28px;
+            }
+
+            .strategy-highlight {
+                padding: 32px;
+                margin-top: 32px;
+            }
+
+            .highlight-number {
+                font-size: 64px;
+            }
+
+            .highlight-label {
+                font-size: 22px;
+            }
+
+            .highlight-desc {
+                font-size: 16px;
             }
 
             .objective-list li {
@@ -899,7 +1000,64 @@
             </div>
         </section>
 
-        <!-- SLIDE 3: Problemas Identificados -->
+        <!-- SLIDE 3: Estrategia de la Empresa -->
+        <section class="slide layout-left">
+            <p class="eyebrow animate">Estrategia</p>
+            <h1 class="animate d-1">Enfoque en <span class="accent">Crecimiento</span></h1>
+            <div class="two-column animate d-2">
+                <div>
+                    <p class="small" style="margin-bottom: 32px;">La empresa busca escalar sus operaciones y captar más clientes sin aumentar proporcionalmente su estructura de costos.</p>
+                    <ul class="strategy-list">
+                        <li>
+                            <div class="strategy-icon">
+                                <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+                                    <circle cx="12" cy="12" r="10"/>
+                                    <line x1="2" y1="12" x2="22" y2="12"/>
+                                    <path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/>
+                                </svg>
+                            </div>
+                            <div>
+                                <span class="keyword">Expansión de mercado</span>
+                                <span class="desc">Llegar a más clientes a través de canales digitales</span>
+                            </div>
+                        </li>
+                        <li>
+                            <div class="strategy-icon">
+                                <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+                                    <path d="M12 20V10"/>
+                                    <path d="M18 20V4"/>
+                                    <path d="M6 20v-4"/>
+                                </svg>
+                            </div>
+                            <div>
+                                <span class="keyword">Escalabilidad operativa</span>
+                                <span class="desc">Automatizar procesos para crecer sin contratar</span>
+                            </div>
+                        </li>
+                        <li>
+                            <div class="strategy-icon">
+                                <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+                                    <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/>
+                                    <polyline points="22 4 12 14.01 9 11.01"/>
+                                </svg>
+                            </div>
+                            <div>
+                                <span class="keyword">Eficiencia comercial</span>
+                                <span class="desc">Convertir más leads con menos esfuerzo manual</span>
+                            </div>
+                        </li>
+                    </ul>
+                </div>
+                <div class="strategy-highlight">
+                    <div class="highlight-number">40%</div>
+                    <p class="highlight-label">Meta de crecimiento en leads en 6 meses</p>
+                    <div class="highlight-divider"></div>
+                    <p class="highlight-desc">A través de automatización, presencia digital optimizada y seguimiento sistemático de oportunidades.</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- SLIDE 4: Problemas Identificados -->
         <section class="slide layout-left">
             <p class="eyebrow animate">Diagnóstico</p>
             <h1 class="animate d-1">Problemas <span class="accent">identificados</span></h1>
@@ -1022,7 +1180,12 @@
             <h1 class="animate d-1">Supervivencia, Crecimiento y <span class="accent">Rentabilidad</span></h1>
             <div class="three-column animate d-2">
                 <div class="objective-card">
-                    <div class="objective-icon">🛡️</div>
+                    <div class="objective-icon">
+                        <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
+                            <polyline points="9 12 11 14 15 10"/>
+                        </svg>
+                    </div>
                     <h3>Supervivencia</h3>
                     <ul class="objective-list">
                         <li>Reducir tiempo de cotización de 24h a 5 minutos</li>
@@ -1030,7 +1193,14 @@
                     </ul>
                 </div>
                 <div class="objective-card">
-                    <div class="objective-icon">📈</div>
+                    <div class="objective-icon">
+                        <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+                            <line x1="12" y1="20" x2="12" y2="10"/>
+                            <line x1="18" y1="20" x2="18" y2="4"/>
+                            <line x1="6" y1="20" x2="6" y2="16"/>
+                            <polyline points="18 4 22 8 18 8"/>
+                        </svg>
+                    </div>
                     <h3>Crecimiento</h3>
                     <ul class="objective-list">
                         <li>Aumentar leads web un 40% en 6 meses</li>
@@ -1038,7 +1208,13 @@
                     </ul>
                 </div>
                 <div class="objective-card">
-                    <div class="objective-icon">💰</div>
+                    <div class="objective-icon">
+                        <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+                            <circle cx="12" cy="12" r="10"/>
+                            <path d="M16 8h-6a2 2 0 1 0 0 4h4a2 2 0 1 1 0 4H8"/>
+                            <path d="M12 18V6"/>
+                        </svg>
+                    </div>
                     <h3>Rentabilidad</h3>
                     <ul class="objective-list">
                         <li>Reducir 15h/semana en tareas manuales</li>
