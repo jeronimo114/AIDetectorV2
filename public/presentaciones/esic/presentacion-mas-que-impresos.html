@@ -591,6 +591,266 @@
             width: 20px;
             height: 20px;
         }
+
+        /* ========== RESPONSIVE ========== */
+        @media (max-width: 1024px) {
+            :root {
+                --margin-x: 48px;
+                --margin-y: 48px;
+                --fs-hero: 56px;
+                --fs-h1: 48px;
+                --fs-h2: 40px;
+                --fs-body: 20px;
+                --fs-small: 18px;
+                --fs-caption: 16px;
+            }
+
+            body {
+                overflow-y: auto;
+                overflow-x: hidden;
+                height: auto;
+                background: var(--white);
+            }
+
+            #deck-container {
+                width: 100%;
+                height: auto;
+                transform: none !important;
+                box-shadow: none;
+            }
+
+            .slide {
+                position: relative;
+                min-height: 100vh;
+                height: auto;
+                opacity: 1;
+                pointer-events: auto;
+                padding: var(--margin-y) var(--margin-x);
+                overflow: visible;
+            }
+
+            .slide.active {
+                z-index: auto;
+            }
+
+            h1 {
+                margin-bottom: 24px;
+            }
+
+            h3 {
+                font-size: 28px;
+            }
+
+            h4 {
+                font-size: 24px;
+            }
+
+            .two-column,
+            .three-column,
+            .opportunity-grid {
+                grid-template-columns: 1fr;
+                gap: 32px;
+            }
+
+            .card-minimal .number {
+                font-size: 48px;
+            }
+
+            .card-minimal h3 {
+                font-size: 22px;
+            }
+
+            .card-minimal p {
+                font-size: 16px;
+            }
+
+            .feature-list li {
+                font-size: 18px;
+                padding: 16px 0;
+            }
+
+            .problem-list li {
+                font-size: 18px;
+                padding: 12px 0;
+            }
+
+            .opportunity-item {
+                padding: 24px;
+            }
+
+            .opportunity-item .icon {
+                font-size: 36px;
+            }
+
+            .opportunity-item h4 {
+                font-size: 22px;
+            }
+
+            .opportunity-item p {
+                font-size: 16px;
+            }
+
+            .case-flow {
+                flex-direction: column;
+                gap: 16px;
+            }
+
+            .flow-arrow {
+                transform: rotate(90deg);
+                font-size: 24px;
+            }
+
+            .case-step .step-number {
+                width: 44px;
+                height: 44px;
+                font-size: 20px;
+            }
+
+            .case-step h4 {
+                font-size: 18px;
+            }
+
+            .case-step p {
+                font-size: 14px;
+            }
+
+            .timeline-item {
+                grid-template-columns: 1fr;
+                gap: 8px;
+            }
+
+            .timeline-item .phase {
+                font-size: 20px;
+            }
+
+            .timeline-item .content h4 {
+                font-size: 20px;
+            }
+
+            .timeline-item .content p {
+                font-size: 16px;
+            }
+
+            .objective-card {
+                padding: 24px;
+            }
+
+            .objective-card h3 {
+                font-size: 24px;
+                margin-bottom: 16px;
+            }
+
+            .objective-icon {
+                font-size: 36px;
+                margin-bottom: 12px;
+            }
+
+            .objective-list li {
+                font-size: 16px;
+            }
+
+            .slide.dark div[style*="font-size: 64px"] {
+                font-size: 40px !important;
+            }
+
+            .slide.dark h4[style*="font-size: 28px"] {
+                font-size: 20px !important;
+            }
+
+            .slide.dark p[style*="font-size: 20px"] {
+                font-size: 16px !important;
+            }
+
+            .nav-controls {
+                position: fixed;
+                bottom: 16px;
+                right: 16px;
+                opacity: 1;
+            }
+
+            .nav-btn {
+                width: 44px;
+                height: 44px;
+                font-size: 18px;
+                background: rgba(0, 0, 0, 0.1);
+            }
+
+            .link-btn {
+                font-size: 18px;
+                padding: 14px 24px;
+            }
+
+            .tag {
+                font-size: 14px;
+                padding: 6px 16px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            :root {
+                --margin-x: 24px;
+                --margin-y: 32px;
+                --fs-hero: 36px;
+                --fs-h1: 32px;
+                --fs-h2: 28px;
+                --fs-body: 16px;
+                --fs-small: 15px;
+                --fs-caption: 13px;
+            }
+
+            h1 {
+                letter-spacing: -1px;
+            }
+
+            h3 {
+                font-size: 22px;
+            }
+
+            .feature-list li {
+                font-size: 15px;
+            }
+
+            .feature-list .desc {
+                display: block;
+                margin-left: 0;
+                margin-top: 4px;
+            }
+
+            .problem-list li {
+                font-size: 15px;
+            }
+
+            .card-minimal {
+                padding: 20px;
+            }
+
+            .card-minimal .number {
+                font-size: 40px;
+            }
+
+            .card-minimal h3 {
+                font-size: 18px;
+            }
+
+            .objective-card h3 {
+                font-size: 20px;
+            }
+
+            .objective-list li {
+                font-size: 14px;
+            }
+
+            .screenshot-container {
+                border-radius: 12px;
+            }
+
+            .link-btn {
+                font-size: 16px;
+                padding: 12px 20px;
+                width: 100%;
+                justify-content: center;
+            }
+        }
     </style>
 </head>
 
@@ -830,24 +1090,44 @@
         const slides = document.querySelectorAll('.slide');
         const container = document.getElementById('deck-container');
 
+        function isMobile() {
+            return window.innerWidth <= 1024;
+        }
+
         function resize() {
-            const scaleX = window.innerWidth / 1920;
-            const scaleY = window.innerHeight / 1080;
-            const scale = Math.min(scaleX, scaleY);
-            container.style.transform = `scale(${scale})`;
+            if (isMobile()) {
+                container.style.transform = 'none';
+                // Show all slides on mobile
+                slides.forEach(s => {
+                    s.classList.add('active');
+                });
+            } else {
+                const scaleX = window.innerWidth / 1920;
+                const scaleY = window.innerHeight / 1080;
+                const scale = Math.min(scaleX, scaleY);
+                container.style.transform = `scale(${scale})`;
+                // Reset to single slide view
+                slides.forEach(s => s.classList.remove('active'));
+                slides[currentSlide].classList.add('active');
+            }
         }
 
         function showSlide(index) {
-            slides.forEach(s => s.classList.remove('active'));
-            slides[index].classList.add('active');
+            if (isMobile()) {
+                // On mobile, scroll to slide
+                slides[index].scrollIntoView({ behavior: 'smooth' });
+            } else {
+                slides.forEach(s => s.classList.remove('active'));
+                slides[index].classList.add('active');
 
-            const current = slides[index];
-            const animatedElements = current.querySelectorAll('.animate');
-            animatedElements.forEach(el => {
-                el.style.animation = 'none';
-                el.offsetHeight;
-                el.style.animation = null;
-            });
+                const current = slides[index];
+                const animatedElements = current.querySelectorAll('.animate');
+                animatedElements.forEach(el => {
+                    el.style.animation = 'none';
+                    el.offsetHeight;
+                    el.style.animation = null;
+                });
+            }
         }
 
         function nextSlide() {
@@ -868,6 +1148,32 @@
             if (e.key === 'ArrowRight' || e.key === ' ') nextSlide();
             if (e.key === 'ArrowLeft') prevSlide();
         });
+
+        // Touch/swipe support for mobile
+        let touchStartX = 0;
+        let touchEndX = 0;
+
+        document.addEventListener('touchstart', (e) => {
+            touchStartX = e.changedTouches[0].screenX;
+        });
+
+        document.addEventListener('touchend', (e) => {
+            touchEndX = e.changedTouches[0].screenX;
+            handleSwipe();
+        });
+
+        function handleSwipe() {
+            const swipeThreshold = 50;
+            const diff = touchStartX - touchEndX;
+
+            if (Math.abs(diff) > swipeThreshold) {
+                if (diff > 0) {
+                    nextSlide();
+                } else {
+                    prevSlide();
+                }
+            }
+        }
 
         window.addEventListener('resize', resize);
         resize();
