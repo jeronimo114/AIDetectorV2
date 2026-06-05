@@ -93,7 +93,7 @@ export default function SiteHeader() {
         : "Free";
   const planStyles =
     normalizedPlan === "pro"
-      ? "bg-orange-50 text-orange-600 border-orange-200"
+      ? "bg-[#e2f5f3] text-[#367f7b] border-[#b6d9d5]"
       : normalizedPlan === "starter"
         ? "bg-blue-50 text-blue-600 border-blue-200"
         : "bg-gray-100 text-gray-600 border-gray-200";
@@ -103,21 +103,12 @@ export default function SiteHeader() {
   }
 
   return (
-    <header className="sticky top-0 z-50 border-b border-gray-100 bg-white/95 backdrop-blur-sm">
+    <header className="sticky top-0 z-50 border-b border-[#d8ebe8] bg-[#f8fcfb]/92 backdrop-blur-sm">
       <div className="mx-auto w-full max-w-[1200px] px-6 py-4">
         <div className="grid w-full grid-cols-3 items-center md:hidden">
           <Link href="/" className="flex items-center gap-2.5 justify-self-start">
-            <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-orange-500">
-              <svg viewBox="0 0 24 24" fill="none" className="h-5 w-5 text-white">
-                <path
-                  d="M9 12l2 2 4-4"
-                  stroke="currentColor"
-                  strokeWidth="2.5"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                />
-                <circle cx="12" cy="12" r="9" stroke="currentColor" strokeWidth="2" />
-              </svg>
+            <div className="flex h-9 w-9 items-center justify-center rounded-full bg-[#9fd8d3] text-sm font-semibold text-[#173331]">
+              V
             </div>
             <span className="text-lg font-bold text-gray-900">Veridict</span>
           </Link>
@@ -132,9 +123,9 @@ export default function SiteHeader() {
             ) : (
               <LoadingLink
                 href="/signup"
-                className="inline-flex items-center rounded-full bg-orange-500 px-4 py-2 text-[10px] font-semibold uppercase tracking-[0.25em] text-white shadow-sm transition hover:bg-orange-600"
+                className="inline-flex items-center rounded-full bg-[#4ea7a2] px-4 py-2 text-[10px] font-semibold uppercase tracking-[0.25em] text-white shadow-sm transition hover:bg-[#367f7b]"
               >
-                Get Started
+                Start
               </LoadingLink>
             )}
           </div>
@@ -172,17 +163,8 @@ export default function SiteHeader() {
 
         <div className="hidden w-full items-center justify-between md:flex">
           <Link href="/" className="flex items-center gap-2.5">
-            <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-orange-500">
-              <svg viewBox="0 0 24 24" fill="none" className="h-5 w-5 text-white">
-                <path
-                  d="M9 12l2 2 4-4"
-                  stroke="currentColor"
-                  strokeWidth="2.5"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                />
-                <circle cx="12" cy="12" r="9" stroke="currentColor" strokeWidth="2" />
-              </svg>
+            <div className="flex h-9 w-9 items-center justify-center rounded-full bg-[#9fd8d3] text-sm font-semibold text-[#173331]">
+              V
             </div>
             <span className="text-xl font-bold text-gray-900">Veridict</span>
           </Link>
@@ -196,7 +178,7 @@ export default function SiteHeader() {
                   : "text-gray-600 hover:bg-gray-50 hover:text-gray-900"
               }`}
             >
-              Detector
+              Studio
             </Link>
             <Link
               href="/tools"
@@ -206,7 +188,7 @@ export default function SiteHeader() {
                   : "text-gray-600 hover:bg-gray-50 hover:text-gray-900"
               }`}
             >
-              Tools
+              Rituals
             </Link>
             <Link
               href="/pricing"
@@ -216,7 +198,7 @@ export default function SiteHeader() {
                   : "text-gray-600 hover:bg-gray-50 hover:text-gray-900"
               }`}
             >
-              Pricing
+              Services
             </Link>
             <Link
               href="/blog"
@@ -226,7 +208,7 @@ export default function SiteHeader() {
                   : "text-gray-600 hover:bg-gray-50 hover:text-gray-900"
               }`}
             >
-              Blog
+              Journal
             </Link>
             {isReady && user && (
               <Link
@@ -278,9 +260,9 @@ export default function SiteHeader() {
                 </Link>
                 <LoadingLink
                   href="/signup"
-                  className="inline-flex items-center gap-2 rounded-full bg-orange-500 px-5 py-2.5 text-sm font-semibold text-white shadow-sm transition-all hover:bg-orange-600 hover:shadow-md"
+                  className="inline-flex items-center gap-2 rounded-full bg-[#4ea7a2] px-5 py-2.5 text-sm font-semibold text-white shadow-sm transition-all hover:bg-[#367f7b] hover:shadow-md"
                 >
-                  Get Started
+                  Start
                   <svg viewBox="0 0 16 16" fill="none" className="h-4 w-4">
                     <path
                       d="M6 12l4-4-4-4"
@@ -306,28 +288,28 @@ export default function SiteHeader() {
                 className="rounded-lg px-3 py-2 text-sm font-medium text-gray-700 transition hover:bg-gray-50 hover:text-gray-900"
                 onClick={() => setMobileMenuOpen(false)}
               >
-                Detector
+                Studio
               </Link>
               <Link
                 href="/tools"
                 className="rounded-lg px-3 py-2 text-sm font-medium text-gray-700 transition hover:bg-gray-50 hover:text-gray-900"
                 onClick={() => setMobileMenuOpen(false)}
               >
-                Tools
+                Rituals
               </Link>
               <Link
                 href="/pricing"
                 className="rounded-lg px-3 py-2 text-sm font-medium text-gray-700 transition hover:bg-gray-50 hover:text-gray-900"
                 onClick={() => setMobileMenuOpen(false)}
               >
-                Pricing
+                Services
               </Link>
               <Link
                 href="/blog"
                 className="rounded-lg px-3 py-2 text-sm font-medium text-gray-700 transition hover:bg-gray-50 hover:text-gray-900"
                 onClick={() => setMobileMenuOpen(false)}
               >
-                Blog
+                Journal
               </Link>
               {isReady && user && (
                 <Link
@@ -364,10 +346,10 @@ export default function SiteHeader() {
                   </Link>
                   <LoadingLink
                     href="/signup"
-                    className="rounded-full bg-orange-500 px-4 py-2 text-xs font-semibold uppercase tracking-[0.2em] text-white transition hover:bg-orange-600"
+                    className="rounded-full bg-[#4ea7a2] px-4 py-2 text-xs font-semibold uppercase tracking-[0.2em] text-white transition hover:bg-[#367f7b]"
                     onClick={() => setMobileMenuOpen(false)}
                   >
-                    Get Started
+                    Start
                   </LoadingLink>
                 </>
               )}

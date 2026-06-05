@@ -16,19 +16,18 @@ const siteUrl = "https://veridict.xyz";
 
 export const metadata: Metadata = {
   title: {
-    default: "Veridict | AI Writing Detector for Students",
+    default: "Veridict | Korean Skincare Brand Showcase",
     template: "%s | Veridict"
   },
   description:
-    "Check if your essay looks AI-generated before submitting. Get actionable signals to reduce false positives on Turnitin and other detectors.",
+    "A clean Korean skincare-inspired showcase for Veridict, built around soft aqua-green color, premium product presentation, and calm brand storytelling.",
   keywords: [
-    "AI writing detector",
-    "AI detector for students",
-    "AI-generated text checker",
-    "Turnitin AI detection",
-    "GPTZero alternative",
-    "AI plagiarism checker",
-    "essay AI check"
+    "Veridict",
+    "Korean skincare brand",
+    "skincare showcase",
+    "K-beauty branding",
+    "aqua green skincare",
+    "brand presentation"
   ],
   authors: [{ name: "Veridict" }],
   creator: "Veridict",
@@ -38,15 +37,15 @@ export const metadata: Metadata = {
     locale: "en_US",
     url: siteUrl,
     siteName: "Veridict",
-    title: "Veridict | AI Writing Detector for Students",
+    title: "Veridict | Korean Skincare Brand Showcase",
     description:
-      "Check if your essay looks AI-generated before submitting. Get actionable signals to reduce false positives."
+      "A clean Korean skincare-inspired showcase with soft aqua-green color and premium product presentation."
   },
   twitter: {
     card: "summary_large_image",
-    title: "Veridict | AI Writing Detector for Students",
+    title: "Veridict | Korean Skincare Brand Showcase",
     description:
-      "Check if your essay looks AI-generated before submitting. Get actionable signals to reduce false positives."
+      "A clean Korean skincare-inspired showcase with soft aqua-green color and premium product presentation."
   },
   icons: {
     icon: [
